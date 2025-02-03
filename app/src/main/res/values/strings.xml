@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">SpendLess</string>
+    <string name="welcome_to_spendless">Welcome to SpendLess! How can we address you?</string>
+    <string name="username_placeholder">username</string>
+    <string name="create_unique_username">Create unique username</string>
+    <string name="already_have_an_account">Already have an account?</string>
 </resources>
