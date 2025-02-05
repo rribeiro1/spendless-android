@@ -1,4 +1,4 @@
-package io.rafaelribeiro.spendless.ui.theme
+package io.rafaelribeiro.spendless.presentation.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

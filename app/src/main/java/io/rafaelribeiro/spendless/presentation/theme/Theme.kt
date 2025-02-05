@@ -1,4 +1,4 @@
-package io.rafaelribeiro.spendless.ui.theme
+package io.rafaelribeiro.spendless.presentation.theme
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.lightColorScheme
@@ -10,6 +10,7 @@ private val SpendLessColorScheme =
 		primary = RoyalPurple,
 		onPrimary = White,
 		onSurface = CharcoalBlack,
+		error = DarkRed,
 	/* Other default colors to override
 	background = Color(0xFFFFFBFE),
 	surface = Color(0xFFFFFBFE),

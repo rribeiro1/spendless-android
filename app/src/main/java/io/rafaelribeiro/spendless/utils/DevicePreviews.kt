@@ -1,4 +1,4 @@
-package io.rafaelribeiro.spendless.ui
+package io.rafaelribeiro.spendless.utils
 
 import androidx.compose.ui.tooling.preview.Preview
 

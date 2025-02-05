@@ -1,4 +1,4 @@
-package io.rafaelribeiro.spendless.ui.features.registration
+package io.rafaelribeiro.spendless.presentation.screens.registration
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -16,6 +16,8 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -24,20 +26,50 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import io.rafaelribeiro.spendless.R
-import io.rafaelribeiro.spendless.ui.DevicePreviews
-import io.rafaelribeiro.spendless.ui.theme.SpendLessTheme
+import io.rafaelribeiro.spendless.utils.DevicePreviews
+import io.rafaelribeiro.spendless.presentation.theme.SpendLessTheme
+import io.rafaelribeiro.spendless.utils.KeyboardAware
+import io.rafaelribeiro.spendless.utils.UiText
+import kotlinx.coroutines.delay
+
 
 @Composable
 fun RegistrationScreen(
 	modifier: Modifier,
-	onNextClick: (String) -> Unit,
-	onHaveAccountClick: () -> Unit,
+	onRegistrationClick: (String) -> Unit,
+	onLoginClick: () -> Unit,
+) {
+	val viewModel: RegistrationViewModel = hiltViewModel()
+	val uiState by viewModel.uiState.collectAsState()
+	Box(
+		contentAlignment = Alignment.BottomEnd,
+	) {
+		RegistrationBody(
+			modifier = modifier,
+			onRegistrationClick = onRegistrationClick,
+			onLoginClick = onLoginClick,
+		)
+		if (uiState.errorMessage.isNotEmpty()) {
+			ErrorDialog(errorMessage = uiState.errorMessage) {
+				viewModel.userMessageShown()
+			}
+		}
+	}
+}
+
+@Composable
+fun RegistrationBody(
+	modifier: Modifier,
+	onRegistrationClick: (String) -> Unit,
+	onLoginClick: () -> Unit,
 ) {
 	var username by remember { mutableStateOf("") }
-
+	val alphanumericRegex = Regex("^[a-zA-Z0-9]*$")
 	Column(
 		horizontalAlignment = Alignment.CenterHorizontally,
 		modifier = modifier
@@ -66,8 +98,13 @@ fun RegistrationScreen(
 		)
 		BasicTextField(
 			value = username,
-			onValueChange = { username = it },
+			onValueChange = { newValue ->
+				if (newValue.matches(alphanumericRegex) && newValue.length <= 14) {
+					username = newValue
+				}
+			},
 			textStyle = MaterialTheme.typography.bodyLarge.copy(textAlign = TextAlign.Center),
+			singleLine = true,
 			modifier = Modifier
 				.fillMaxWidth()
 				.height(64.dp)
@@ -93,7 +130,7 @@ fun RegistrationScreen(
 			},
 		)
 		Button(
-			onClick = { onNextClick(username) },
+			onClick = { onRegistrationClick(username) },
 			modifier = Modifier
 				.padding(top = 16.dp)
 				.height(48.dp)
@@ -105,10 +142,10 @@ fun RegistrationScreen(
 				disabledContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
 			),
 			shape = RoundedCornerShape(16.dp),
-			enabled = username.isNotBlank(),
+			enabled = username.length >= 3,
 		) {
 			Text(
-				text = "Next" ,
+				text = stringResource(R.string.next),
 				style = MaterialTheme.typography.labelSmall,
 			)
 		}
@@ -119,8 +156,36 @@ fun RegistrationScreen(
 			textAlign = TextAlign.Center,
 			modifier = Modifier
 				.padding(top = 28.dp)
-				.clickable(onClick = onHaveAccountClick),
+				.clickable(onClick = onLoginClick),
 		)
+	}
+}
+
+@Composable
+fun ErrorDialog(
+	errorMessage: UiText,
+	onCompleted: () -> Unit = {},
+) {
+	LaunchedEffect(Unit) {
+		delay(2000)
+		onCompleted()
+	}
+	KeyboardAware {
+		Box(
+			contentAlignment = Alignment.BottomEnd,
+			modifier = Modifier
+				.height(48.dp)
+				.fillMaxWidth()
+				.background(MaterialTheme.colorScheme.error)
+				.padding(vertical = 12.dp, horizontal = 16.dp),
+		) {
+			Text(
+				text = errorMessage.asString(),
+				color = MaterialTheme.colorScheme.onPrimary,
+				style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Medium),
+				modifier = Modifier.align(Alignment.Center)
+			)
+		}
 	}
 }
 
@@ -128,10 +193,10 @@ fun RegistrationScreen(
 @Composable
 fun RegistrationScreenPreview() {
 	SpendLessTheme {
-		RegistrationScreen(
+		RegistrationBody(
 			modifier = Modifier.fillMaxSize(),
-			onNextClick = {},
-			onHaveAccountClick = {},
+			onRegistrationClick = {},
+			onLoginClick = {},
 		)
 	}
 }
