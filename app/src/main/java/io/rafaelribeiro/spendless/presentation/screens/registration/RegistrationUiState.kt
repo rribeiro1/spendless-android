@@ -1,10 +1,18 @@
 package io.rafaelribeiro.spendless.presentation.screens.registration
 
-import io.rafaelribeiro.spendless.presentation.core.UiState
-import io.rafaelribeiro.spendless.utils.UiText
-import io.rafaelribeiro.spendless.utils.UiText.Companion.Empty
+import io.rafaelribeiro.spendless.core.presentation.UiText
+import io.rafaelribeiro.spendless.core.presentation.UiText.Companion.Empty
 
 data class RegistrationUiState(
-	val isLoading: Boolean = false,
+	val username: String = "",
 	val errorMessage: UiText = Empty,
-) : UiState
+	val nextButtonEnabled: Boolean = false,
+	val registrationStage: RegistrationStage = RegistrationStage.INITIAL,
+)
+
+enum class RegistrationStage {
+	INITIAL,
+	PIN_CREATION,
+	PIN_CONFIRMATION,
+	PREFERENCES,
+}

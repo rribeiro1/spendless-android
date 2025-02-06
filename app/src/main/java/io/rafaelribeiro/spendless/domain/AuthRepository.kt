@@ -1,7 +1,7 @@
 package io.rafaelribeiro.spendless.domain
 
 interface AuthRepository {
-	fun exists(username: String): Result<Unit, RegistrationError>
+	fun checkUserName(username: String): Result<Unit, RegistrationError>
 
 	fun register(
 		username: String,

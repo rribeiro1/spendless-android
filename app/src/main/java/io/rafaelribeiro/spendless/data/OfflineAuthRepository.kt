@@ -9,8 +9,10 @@ import javax.inject.Inject
 class OfflineAuthRepository
 	@Inject
 	constructor() : AuthRepository {
-		override fun exists(username: String): Result<Unit, RegistrationError> =
-			if (username == "rafael") {
+		override fun checkUserName(username: String): Result<Unit, RegistrationError> =
+			if (!username.all { it.isLetterOrDigit() }) {
+				Result.Failure(RegistrationError.USERNAME_MUST_BE_ALPHANUMERIC)
+			} else if (username == "rafael") {
 				Result.Failure(RegistrationError.USERNAME_ALREADY_EXISTS)
 			} else {
 				Result.Success(Unit)

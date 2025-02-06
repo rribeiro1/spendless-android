@@ -9,10 +9,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.hilt.navigation.compose.hiltViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationScreen
-import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationViewModel
 import io.rafaelribeiro.spendless.presentation.theme.SpendLessTheme
 
 // TODO: Add a view model to handle app initialization state.
@@ -31,12 +29,7 @@ class MainActivity : ComponentActivity() {
 		setContent {
 			SpendLessTheme {
 				Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-					val viewModel: RegistrationViewModel = hiltViewModel()
-					RegistrationScreen(
-						modifier = Modifier.padding(innerPadding),
-						onRegistrationClick = viewModel::exists,
-						onLoginClick = {},
-					)
+					RegistrationScreen(modifier = Modifier.padding(innerPadding))
 				}
 			}
 		}

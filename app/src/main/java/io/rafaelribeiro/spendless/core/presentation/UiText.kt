@@ -1,4 +1,4 @@
-package io.rafaelribeiro.spendless.utils
+package io.rafaelribeiro.spendless.core.presentation
 
 import android.content.Context
 import androidx.annotation.StringRes
@@ -41,6 +41,7 @@ sealed class UiText {
 fun RegistrationError.asUiText(): UiText =
 	when (this) {
 		RegistrationError.USERNAME_ALREADY_EXISTS -> UiText.StringResource(R.string.username_has_already_been_taken)
+		RegistrationError.USERNAME_MUST_BE_ALPHANUMERIC -> UiText.StringResource(R.string.username_must_be_alphanumeric)
 	}
 
 fun Result.Failure<*, RegistrationError>.asErrorUiText(): UiText = error.asUiText()

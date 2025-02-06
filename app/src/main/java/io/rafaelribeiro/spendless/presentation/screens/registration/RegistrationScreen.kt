@@ -16,60 +16,56 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import io.rafaelribeiro.spendless.R
-import io.rafaelribeiro.spendless.utils.DevicePreviews
+import io.rafaelribeiro.spendless.core.presentation.ErrorDialog
 import io.rafaelribeiro.spendless.presentation.theme.SpendLessTheme
-import io.rafaelribeiro.spendless.utils.KeyboardAware
-import io.rafaelribeiro.spendless.utils.UiText
-import kotlinx.coroutines.delay
 
 
 @Composable
 fun RegistrationScreen(
-	modifier: Modifier,
-	onRegistrationClick: (String) -> Unit,
-	onLoginClick: () -> Unit,
+	modifier: Modifier = Modifier,
 ) {
 	val viewModel: RegistrationViewModel = hiltViewModel()
 	val uiState by viewModel.uiState.collectAsState()
 	Box(
 		contentAlignment = Alignment.BottomEnd,
 	) {
-		RegistrationBody(
-			modifier = modifier,
-			onRegistrationClick = onRegistrationClick,
-			onLoginClick = onLoginClick,
-		)
-		if (uiState.errorMessage.isNotEmpty()) {
-			ErrorDialog(errorMessage = uiState.errorMessage) {
-				viewModel.userMessageShown()
-			}
+		when (uiState.registrationStage) {
+			RegistrationStage.INITIAL -> UsernameStageScreen(
+				modifier = modifier,
+				username = uiState.username,
+				onNextClick = viewModel::checkUserName,
+				onUsernameChange = viewModel::usernameChanged,
+				onLoginLinkClick = {},
+				nextButtonEnabled = uiState.nextButtonEnabled,
+			)
+			RegistrationStage.PIN_CREATION -> PinCreationStageScreen()
+			RegistrationStage.PIN_CONFIRMATION -> PinConfirmationStageScreen()
+			RegistrationStage.PREFERENCES -> PreferencesStageScreen()
 		}
+		ErrorDialog(errorMessage = uiState.errorMessage)
 	}
 }
 
 @Composable
-fun RegistrationBody(
+fun UsernameStageScreen(
 	modifier: Modifier,
-	onRegistrationClick: (String) -> Unit,
-	onLoginClick: () -> Unit,
+	nextButtonEnabled: Boolean,
+	onNextClick: (String) -> Unit,
+	username: String,
+	onUsernameChange: (String) -> Unit = {},
+	onLoginLinkClick: () -> Unit,
 ) {
-	var username by remember { mutableStateOf("") }
-	val alphanumericRegex = Regex("^[a-zA-Z0-9]*$")
 	Column(
 		horizontalAlignment = Alignment.CenterHorizontally,
 		modifier = modifier
@@ -98,10 +94,8 @@ fun RegistrationBody(
 		)
 		BasicTextField(
 			value = username,
-			onValueChange = { newValue ->
-				if (newValue.matches(alphanumericRegex) && newValue.length <= 14) {
-					username = newValue
-				}
+			onValueChange = {
+				onUsernameChange(it)
 			},
 			textStyle = MaterialTheme.typography.bodyLarge.copy(textAlign = TextAlign.Center),
 			singleLine = true,
@@ -130,7 +124,7 @@ fun RegistrationBody(
 			},
 		)
 		Button(
-			onClick = { onRegistrationClick(username) },
+			onClick = { onNextClick(username) },
 			modifier = Modifier
 				.padding(top = 16.dp)
 				.height(48.dp)
@@ -142,7 +136,7 @@ fun RegistrationBody(
 				disabledContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
 			),
 			shape = RoundedCornerShape(16.dp),
-			enabled = username.length >= 3,
+			enabled = nextButtonEnabled,
 		) {
 			Text(
 				text = stringResource(R.string.next),
@@ -156,47 +150,42 @@ fun RegistrationBody(
 			textAlign = TextAlign.Center,
 			modifier = Modifier
 				.padding(top = 28.dp)
-				.clickable(onClick = onLoginClick),
+				.clickable(onClick = onLoginLinkClick),
 		)
 	}
 }
 
 @Composable
-fun ErrorDialog(
-	errorMessage: UiText,
-	onCompleted: () -> Unit = {},
-) {
-	LaunchedEffect(Unit) {
-		delay(2000)
-		onCompleted()
-	}
-	KeyboardAware {
-		Box(
-			contentAlignment = Alignment.BottomEnd,
-			modifier = Modifier
-				.height(48.dp)
-				.fillMaxWidth()
-				.background(MaterialTheme.colorScheme.error)
-				.padding(vertical = 12.dp, horizontal = 16.dp),
-		) {
-			Text(
-				text = errorMessage.asString(),
-				color = MaterialTheme.colorScheme.onPrimary,
-				style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Medium),
-				modifier = Modifier.align(Alignment.Center)
-			)
-		}
+fun PinCreationStageScreen() {
+	Column {
+		Text(text = "Pin Creation")
 	}
 }
 
-@DevicePreviews
+@Composable
+fun PinConfirmationStageScreen() {
+	Column {
+		Text(text = "Pin Confirmation")
+	}
+}
+
+@Composable
+fun PreferencesStageScreen() {
+	Column {
+		Text(text = "Preferences")
+	}
+}
+
+@Preview
 @Composable
 fun RegistrationScreenPreview() {
 	SpendLessTheme {
-		RegistrationBody(
+		UsernameStageScreen(
 			modifier = Modifier.fillMaxSize(),
-			onRegistrationClick = {},
-			onLoginClick = {},
+			onNextClick = {},
+			onLoginLinkClick = {},
+			nextButtonEnabled = true,
+			username = "",
 		)
 	}
 }

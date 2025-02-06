@@ -1,4 +1,4 @@
-package io.rafaelribeiro.spendless.utils
+package io.rafaelribeiro.spendless.core.presentation
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.imePadding
