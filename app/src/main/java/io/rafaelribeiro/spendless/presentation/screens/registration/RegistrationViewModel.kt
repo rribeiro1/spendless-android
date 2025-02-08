@@ -25,8 +25,8 @@ class RegistrationViewModel @Inject constructor(
 	private val _uiState: MutableStateFlow<RegistrationUiState> = MutableStateFlow(RegistrationUiState())
 	val uiState: StateFlow<RegistrationUiState> = _uiState.asStateFlow()
 
-	private val _actionEvent = Channel<RegistrationActionEvent>()
-	val actionEvent = _actionEvent.receiveAsFlow()
+	private val _actionEvents = Channel<RegistrationActionEvent>()
+	val actionEvents = _actionEvents.receiveAsFlow()
 
 	companion object {
 		const val ERROR_MESSAGE_DURATION = 2000L
@@ -35,13 +35,24 @@ class RegistrationViewModel @Inject constructor(
 		const val PIN_MAX_SIZE = 5
 	}
 
-	fun checkUserName(username: String) {
+	fun onEvent(event: RegistrationUiEvent) {
+		when (event) {
+			is RegistrationUiEvent.UsernameChanged -> usernameChanged(event.username)
+			is RegistrationUiEvent.ActionButtonNextClicked -> checkUserName()
+			is RegistrationUiEvent.LoginLinkClicked -> {}
+			is RegistrationUiEvent.PinDigitTapped -> pinChanged(event.digit)
+			is RegistrationUiEvent.PinBackspaceTapped -> backspacePinTapped()
+			is RegistrationUiEvent.PinConfirmationDigitTapped -> pinConfirmationChanged(event.digit)
+			is RegistrationUiEvent.PinConfirmationBackspaceTapped -> backspaceConfirmationPinTapped()
+		}
+	}
+
+	private fun checkUserName() {
 		viewModelScope.launch {
 			setNextButtonEnabled(false)
-			when (val result = authRepository.checkUserName(username)) {
+			when (val result = authRepository.checkUserName(_uiState.value.username)) {
 				is Result.Success -> {
 					sendActionEvent(RegistrationActionEvent.UsernameCheckSuccess)
-					updateStage(RegistrationStage.PIN_CREATION)
 				}
 				is Result.Failure -> {
 					showErrorMessage(result.error.asUiText())
@@ -50,40 +61,43 @@ class RegistrationViewModel @Inject constructor(
 		}
 	}
 
-	fun usernameChanged(username: String) {
+	private fun usernameChanged(username: String) {
 		val trimmedUsername = username.take(USERNAME_MAX_SIZE)
 		updateUsername(trimmedUsername)
 		setNextButtonEnabled(trimmedUsername.length >= USERNAME_MIN_SIZE)
 	}
 
-	fun pinChanged(digit: String) {
-		if ((_uiState.value.pin + digit).length == PIN_MAX_SIZE) {
-			updateStage(RegistrationStage.PIN_CONFIRMATION)
-			sendActionEvent(RegistrationActionEvent.PinCreated)
-		} else {
-			_uiState.update { it.copy(pin = _uiState.value.pin + digit) }
-		}
-	}
-
-	fun pinConfirmationChanged(digit: String) {
-		if ((_uiState.value.pinConfirmation + digit).length == PIN_MAX_SIZE) {
-			if (_uiState.value.pin == _uiState.value.pinConfirmation) {
-				sendActionEvent(RegistrationActionEvent.PinConfirmed)
-			} else {
-				_uiState.update { it.copy(pin = "", pinConfirmation = "") }
-				sendActionEvent(RegistrationActionEvent.PinMismatch)
-				showErrorMessage(UiText.StringResource(R.string.pin_mismatch))
+	private fun pinChanged(digit: String) {
+		val currentPin = _uiState.value.pin + digit
+		if (currentPin.length <= PIN_MAX_SIZE) {
+			_uiState.update { it.copy(pin = currentPin) }
+			if (currentPin.length == PIN_MAX_SIZE) {
+				sendActionEvent(RegistrationActionEvent.PinCreated)
 			}
-		} else {
-			_uiState.update { it.copy(pinConfirmation = _uiState.value.pinConfirmation + digit) }
 		}
 	}
 
-	fun backspacePinTapped() {
+	private fun pinConfirmationChanged(digit: String) {
+		val currentPin = _uiState.value.pinConfirmation + digit
+		if (currentPin.length <= PIN_MAX_SIZE) {
+			_uiState.update { it.copy(pinConfirmation = currentPin) }
+			if (currentPin.length == PIN_MAX_SIZE) {
+				if (_uiState.value.pin == currentPin) {
+					sendActionEvent(RegistrationActionEvent.PinConfirmed)
+				} else {
+					_uiState.update { it.copy(pin = "", pinConfirmation = "") }
+					sendActionEvent(RegistrationActionEvent.PinMismatch)
+					showErrorMessage(UiText.StringResource(R.string.pin_mismatch))
+				}
+			}
+		}
+	}
+
+	private fun backspacePinTapped() {
 		_uiState.update { it.copy(pin = _uiState.value.pin.dropLast(n = 1)) }
 	}
 
-	fun backspaceConfirmationPinTapped() {
+	private fun backspaceConfirmationPinTapped() {
 		_uiState.update { it.copy(pinConfirmation = _uiState.value.pinConfirmation.dropLast(n = 1)) }
 	}
 
@@ -103,12 +117,8 @@ class RegistrationViewModel @Inject constructor(
 		_uiState.update { it.copy(username = username) }
 	}
 
-	private fun updateStage(stage: RegistrationStage) {
-		_uiState.update { it.copy(registrationStage = stage) }
-	}
-
 	private fun sendActionEvent(actionEvent: RegistrationActionEvent) {
-		viewModelScope.launch { _actionEvent.send(actionEvent) }
+		viewModelScope.launch { _actionEvents.send(actionEvent) }
 	}
 }
 
@@ -117,4 +127,15 @@ sealed interface RegistrationActionEvent {
 	data object PinCreated : RegistrationActionEvent
 	data object PinConfirmed : RegistrationActionEvent
 	data object PinMismatch : RegistrationActionEvent
+}
+
+sealed interface RegistrationUiEvent {
+	data class UsernameChanged(val username: String) : RegistrationUiEvent
+	data object ActionButtonNextClicked : RegistrationUiEvent
+	data object LoginLinkClicked : RegistrationUiEvent
+
+	data class PinDigitTapped(val digit: String) : RegistrationUiEvent
+	data object PinBackspaceTapped : RegistrationUiEvent
+	data class PinConfirmationDigitTapped(val digit: String) : RegistrationUiEvent
+	data object PinConfirmationBackspaceTapped : RegistrationUiEvent
 }

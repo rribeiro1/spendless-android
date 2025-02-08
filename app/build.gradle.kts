@@ -93,17 +93,6 @@ spotless {
     kotlin {
         target("**/*.kt")
         ktlint("1.5.0")
-        listOf(
-            "standard:no-wildcard-imports",
-            "standard:function-naming",
-            "standard:argument-list-wrapping",
-            "standard:annotation"
-        ).forEach { rule ->
-            suppressLintsFor {
-                step = "ktlint"
-                shortCode = rule
-            }
-        }
         trimTrailingWhitespace()
         leadingSpacesToTabs()
         endWithNewline()

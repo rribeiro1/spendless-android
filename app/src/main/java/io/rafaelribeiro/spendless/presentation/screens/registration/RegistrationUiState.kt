@@ -9,12 +9,4 @@ data class RegistrationUiState(
 	val pin: String = "",
 	val pinConfirmation: String = "",
 	val nextButtonEnabled: Boolean = false,
-	val registrationStage: RegistrationStage = RegistrationStage.INITIAL,
 )
-
-enum class RegistrationStage {
-	INITIAL,
-	PIN_CREATION,
-	PIN_CONFIRMATION,
-	PREFERENCES,
-}

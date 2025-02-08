@@ -10,7 +10,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import dagger.hilt.android.AndroidEntryPoint
-import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationScreen
+import io.rafaelribeiro.spendless.navigation.RootAppNavigation
+import io.rafaelribeiro.spendless.navigation.rememberNavigationState
 import io.rafaelribeiro.spendless.presentation.theme.SpendLessTheme
 
 // TODO: Add a view model to handle app initialization state.
@@ -28,8 +29,13 @@ class MainActivity : ComponentActivity() {
 		enableEdgeToEdge()
 		setContent {
 			SpendLessTheme {
+				val navigationState = rememberNavigationState()
 				Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-					RegistrationScreen(modifier = Modifier.padding(innerPadding))
+					RootAppNavigation(
+						navigationState = navigationState,
+						modifier = Modifier
+							.padding(innerPadding),
+					)
 				}
 			}
 		}

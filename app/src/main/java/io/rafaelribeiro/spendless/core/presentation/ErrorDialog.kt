@@ -24,9 +24,9 @@ fun ErrorDialog(
 ) {
 	AnimatedVisibility(
 		visible = errorMessage.isNotEmpty(),
-		enter = fadeIn(animationSpec = tween(durationMillis = 300)) ,
+		enter = fadeIn(animationSpec = tween(durationMillis = 300)),
 		exit = fadeOut(animationSpec = tween(durationMillis = 300)),
-		modifier = modifier
+		modifier = modifier,
 	) {
 		KeyboardAware {
 			Box(
@@ -35,13 +35,13 @@ fun ErrorDialog(
 					.height(48.dp)
 					.background(MaterialTheme.colorScheme.error)
 					.padding(vertical = 12.dp, horizontal = 16.dp),
-				contentAlignment = Alignment.Center
+				contentAlignment = Alignment.Center,
 			) {
 				Text(
 					text = errorMessage.asString(),
 					color = MaterialTheme.colorScheme.onPrimary,
 					style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Medium),
-					modifier = Modifier.align(Alignment.Center)
+					modifier = Modifier.align(Alignment.Center),
 				)
 			}
 		}
