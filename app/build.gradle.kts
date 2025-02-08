@@ -7,6 +7,8 @@ plugins {
     // -- Hilt
     id("kotlin-kapt")
     id("com.google.dagger.hilt.android")
+    // -- JUnit
+    id("de.mannodermaus.android-junit5") version "1.11.3.0"
 }
 
 android {
@@ -55,10 +57,12 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.ui.text.google.fonts)
+    implementation(libs.androidx.material.icons.extended)
     // -- Hilt
     kapt(libs.hilt.android.compiler)
     implementation(libs.hilt.android)
     implementation(libs.androidx.hilt.navigation.compose)
+    // -- Tests
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -66,6 +70,10 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    testImplementation(libs.junit.jupiter.api)
+    testRuntimeOnly(libs.junit.jupiter.engine)
+    testImplementation(libs.junit.jupiter.params)
+    testImplementation(libs.assertk)
 }
 
 // Allow references to generated code
@@ -88,6 +96,8 @@ spotless {
         listOf(
             "standard:no-wildcard-imports",
             "standard:function-naming",
+            "standard:argument-list-wrapping",
+            "standard:annotation"
         ).forEach { rule ->
             suppressLintsFor {
                 step = "ktlint"

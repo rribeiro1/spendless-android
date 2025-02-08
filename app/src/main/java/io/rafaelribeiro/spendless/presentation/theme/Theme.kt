@@ -8,6 +8,8 @@ private val SpendLessColorScheme =
 	lightColorScheme(
 		background = SoftLavender,
 		primary = RoyalPurple,
+		secondary = Lavender,
+		tertiary = DeepPurple,
 		onPrimary = White,
 		onSurface = CharcoalBlack,
 		error = DarkRed,

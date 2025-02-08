@@ -26,34 +26,37 @@ val fontFamily =
 		FallBackFont(R.font.figtree_light, weight = FontWeight.Light),
 	)
 
-val SpendLessTypography =
+val SpendLessTypography by lazy {
 	Typography(
-		titleSmall =
-			TextStyle(
-				fontFamily = fontFamily,
-				fontWeight = FontWeight.Normal,
-				fontSize = 16.sp,
-				lineHeight = 24.sp,
-			),
-		titleMedium =
-			TextStyle(
-				fontFamily = fontFamily,
-				fontWeight = FontWeight.SemiBold,
-				fontSize = 28.sp,
-				lineHeight = 34.sp,
-			),
-		bodyLarge =
-			TextStyle(
-				fontFamily = fontFamily,
-				fontWeight = FontWeight.Bold,
-				fontSize = 36.sp,
-				lineHeight = 44.sp,
-			),
-		labelSmall =
-			TextStyle(
-				fontFamily = fontFamily,
-				fontWeight = FontWeight.SemiBold,
-				fontSize = 16.sp,
-				lineHeight = 24.sp,
-			),
+		titleSmall = TextStyle(
+			fontFamily = fontFamily,
+			fontWeight = FontWeight.Normal,
+			fontSize = 16.sp,
+			lineHeight = 24.sp,
+		),
+		titleMedium = TextStyle(
+			fontFamily = fontFamily,
+			fontWeight = FontWeight.SemiBold,
+			fontSize = 28.sp,
+			lineHeight = 34.sp,
+		),
+		bodyLarge = TextStyle(
+			fontFamily = fontFamily,
+			fontWeight = FontWeight.Bold,
+			fontSize = 36.sp,
+			lineHeight = 44.sp,
+		),
+		labelSmall = TextStyle(
+			fontFamily = fontFamily,
+			fontWeight = FontWeight.SemiBold,
+			fontSize = 16.sp,
+			lineHeight = 24.sp,
+		),
+		labelMedium = TextStyle(
+			fontFamily = fontFamily,
+			fontWeight = FontWeight.Bold,
+			fontSize = 32.sp,
+			lineHeight = 40.sp,
+		),
 	)
+}
