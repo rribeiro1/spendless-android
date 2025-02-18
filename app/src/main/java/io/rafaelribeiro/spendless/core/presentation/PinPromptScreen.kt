@@ -50,7 +50,7 @@ fun PinPromptScreen(
 		horizontalAlignment = Alignment.CenterHorizontally,
 		modifier = modifier
 			.background(MaterialTheme.colorScheme.background)
-			.padding(26.dp)
+            .padding(horizontal = 26.dp)
 			.fillMaxSize(),
 	) {
 		Image(
@@ -61,14 +61,14 @@ fun PinPromptScreen(
 		Text(
 			text = title,
 			color = MaterialTheme.colorScheme.onSurface,
-			style = MaterialTheme.typography.titleMedium,
+			style = MaterialTheme.typography.headlineMedium,
 			textAlign = TextAlign.Center,
 			modifier = Modifier.padding(bottom = 8.dp),
 		)
 		Text(
 			text = description,
 			color = MaterialTheme.colorScheme.onSurface,
-			style = MaterialTheme.typography.titleSmall,
+			style = MaterialTheme.typography.bodyMedium,
 			textAlign = TextAlign.Center,
 			modifier = Modifier.padding(bottom = 55.dp),
 		)
@@ -184,7 +184,7 @@ fun PinPadButton(
 		} else {
 			Text(
 				text = text,
-				style = MaterialTheme.typography.labelMedium,
+				style = MaterialTheme.typography.headlineLarge,
 				color = MaterialTheme.colorScheme.tertiary,
 			)
 		}

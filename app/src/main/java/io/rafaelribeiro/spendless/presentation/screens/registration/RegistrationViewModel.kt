@@ -87,7 +87,7 @@ class RegistrationViewModel @Inject constructor(
 				} else {
 					_uiState.update { it.copy(pin = "", pinConfirmation = "") }
 					sendActionEvent(RegistrationActionEvent.PinMismatch)
-					showErrorMessage(UiText.StringResource(R.string.pin_mismatch))
+					showErrorMessage(UiText.StringResource(R.string.registration_pin_mismatch))
 				}
 			}
 		}

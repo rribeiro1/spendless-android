@@ -21,13 +21,28 @@ val fontName = GoogleFont(name = "Figtree")
 val fontFamily =
 	FontFamily(
 		Font(googleFont = fontName, fontProvider = provider),
+        FallBackFont(R.font.figtree_light, weight = FontWeight.Light),
+        FallBackFont(R.font.figtree_regular, weight = FontWeight.Normal),
 		FallBackFont(R.font.figtree_medium, weight = FontWeight.Medium),
-		FallBackFont(R.font.figtree_regular, weight = FontWeight.Normal),
-		FallBackFont(R.font.figtree_light, weight = FontWeight.Light),
+        FallBackFont(R.font.figtree_semibold, weight = FontWeight.SemiBold),
+        FallBackFont(R.font.figtree_bold, weight = FontWeight.Bold),
 	)
 
 val SpendLessTypography by lazy {
 	Typography(
+        headlineMedium = TextStyle(
+            fontFamily = fontFamily,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 28.sp,
+            lineHeight = 34.sp,
+        ),
+        headlineLarge = TextStyle(
+            fontFamily = fontFamily,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 32.sp,
+            lineHeight = 40.sp,
+            letterSpacing = 0.1.sp
+        ),
 		titleSmall = TextStyle(
 			fontFamily = fontFamily,
 			fontWeight = FontWeight.Normal,
@@ -37,8 +52,8 @@ val SpendLessTypography by lazy {
 		titleMedium = TextStyle(
 			fontFamily = fontFamily,
 			fontWeight = FontWeight.SemiBold,
-			fontSize = 28.sp,
-			lineHeight = 34.sp,
+			fontSize = 16.sp,
+			lineHeight = 24.sp,
 		),
 		bodyLarge = TextStyle(
 			fontFamily = fontFamily,
@@ -46,17 +61,35 @@ val SpendLessTypography by lazy {
 			fontSize = 36.sp,
 			lineHeight = 44.sp,
 		),
+        bodyMedium = TextStyle(
+            fontFamily = fontFamily,
+            fontWeight = FontWeight.Normal,
+            fontSize = 16.sp,
+            lineHeight = 24.sp,
+        ),
+        bodySmall = TextStyle(
+            fontFamily = fontFamily,
+            fontWeight = FontWeight.Normal,
+            fontSize = 14.sp,
+            lineHeight = 20.sp,
+        ),
 		labelSmall = TextStyle(
 			fontFamily = fontFamily,
-			fontWeight = FontWeight.SemiBold,
-			fontSize = 16.sp,
-			lineHeight = 24.sp,
+			fontWeight = FontWeight.Medium,
+			fontSize = 14.sp,
+			lineHeight = 20.sp,
 		),
-		labelMedium = TextStyle(
-			fontFamily = fontFamily,
-			fontWeight = FontWeight.Bold,
-			fontSize = 32.sp,
-			lineHeight = 40.sp,
-		),
+        labelMedium = TextStyle(
+            fontFamily = fontFamily,
+            fontWeight = FontWeight.Medium,
+            fontSize = 16.sp,
+            lineHeight = 24.sp,
+        ),
+        displayMedium = TextStyle(
+            fontFamily = fontFamily,
+            fontWeight = FontWeight.Bold,
+            fontSize = 36.sp,
+            lineHeight = 44.sp,
+        ),
 	)
 }

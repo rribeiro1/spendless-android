@@ -3,42 +3,67 @@ package io.rafaelribeiro.spendless.presentation.screens.registration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.rafaelribeiro.spendless.R
 import io.rafaelribeiro.spendless.presentation.theme.SpendLessTheme
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegistrationUsernameRootScreen(
 	uiState: RegistrationUiState,
 	onEvent: (RegistrationUiEvent) -> Unit,
 	modifier: Modifier,
 ) {
-	RegistrationUsernameScreen(
-		modifier = modifier,
-		uiState = uiState,
-		onNextClick = { onEvent(RegistrationUiEvent.ActionButtonNextClicked) },
-		onUsernameChange = { onEvent(RegistrationUiEvent.UsernameChanged(it)) },
-		onLoginLinkClick = { onEvent(RegistrationUiEvent.LoginLinkClicked) },
-	)
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        topBar = {
+            TopAppBar(
+                title = {},
+                colors = TopAppBarDefaults.topAppBarColors().copy(
+                    containerColor = MaterialTheme.colorScheme.background,
+                )
+            )
+        }
+    ) { innerPadding ->
+        RegistrationUsernameScreen(
+            modifier = modifier.padding(innerPadding),
+            uiState = uiState,
+            onNextClick = { onEvent(RegistrationUiEvent.ActionButtonNextClicked) },
+            onUsernameChange = { onEvent(RegistrationUiEvent.UsernameChanged(it)) },
+            onLoginLinkClick = { onEvent(RegistrationUiEvent.LoginLinkClicked) },
+        )
+    }
 }
 
 @Composable
@@ -53,7 +78,7 @@ fun RegistrationUsernameScreen(
 		horizontalAlignment = Alignment.CenterHorizontally,
 		modifier = modifier
 			.background(MaterialTheme.colorScheme.background)
-			.padding(26.dp)
+            .padding(horizontal = 26.dp)
 			.fillMaxSize(),
 	) {
 		Image(
@@ -64,14 +89,14 @@ fun RegistrationUsernameScreen(
 		Text(
 			text = stringResource(R.string.welcome_to_spendless),
 			color = MaterialTheme.colorScheme.onSurface,
-			style = MaterialTheme.typography.titleMedium,
+			style = MaterialTheme.typography.headlineMedium,
 			textAlign = TextAlign.Center,
 			modifier = Modifier.padding(bottom = 8.dp),
 		)
 		Text(
 			text = stringResource(R.string.create_unique_username),
 			color = MaterialTheme.colorScheme.onSurface,
-			style = MaterialTheme.typography.titleSmall,
+			style = MaterialTheme.typography.bodyMedium,
 			textAlign = TextAlign.Center,
 			modifier = Modifier.padding(bottom = 36.dp),
 		)
@@ -80,7 +105,10 @@ fun RegistrationUsernameScreen(
 			onValueChange = {
 				onUsernameChange(it)
 			},
-			textStyle = MaterialTheme.typography.bodyLarge.copy(textAlign = TextAlign.Center),
+			textStyle = MaterialTheme.typography.displayMedium.copy(
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight.SemiBold,
+            ),
 			singleLine = true,
 			modifier = Modifier
 				.fillMaxWidth()
@@ -98,7 +126,8 @@ fun RegistrationUsernameScreen(
 					if (uiState.username.isEmpty()) {
 						Text(
 							text = stringResource(R.string.username_placeholder),
-							style = MaterialTheme.typography.bodyLarge,
+							style = MaterialTheme.typography.displayMedium,
+                            fontWeight = FontWeight.SemiBold,
 							color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
 						)
 					}
@@ -121,15 +150,28 @@ fun RegistrationUsernameScreen(
 			shape = RoundedCornerShape(16.dp),
 			enabled = uiState.nextButtonEnabled,
 		) {
-			Text(
-				text = stringResource(R.string.next),
-				style = MaterialTheme.typography.labelSmall,
-			)
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = stringResource(R.string.next),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                )
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                    contentDescription = "Next",
+                    modifier = Modifier
+                        .size(18.dp)
+
+                )
+            }
 		}
 		Text(
 			text = stringResource(R.string.already_have_an_account),
 			color = MaterialTheme.colorScheme.primary,
-			style = MaterialTheme.typography.labelSmall,
+			style = MaterialTheme.typography.titleMedium,
 			textAlign = TextAlign.Center,
 			modifier = Modifier
 				.padding(top = 28.dp)

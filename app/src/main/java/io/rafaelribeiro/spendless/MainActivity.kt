@@ -30,13 +30,10 @@ class MainActivity : ComponentActivity() {
 		setContent {
 			SpendLessTheme {
 				val navigationState = rememberNavigationState()
-				Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-					RootAppNavigation(
-						navigationState = navigationState,
-						modifier = Modifier
-							.padding(innerPadding),
-					)
-				}
+                RootAppNavigation(
+                    navigationState = navigationState,
+                    modifier = Modifier.fillMaxSize()
+                )
 			}
 		}
 	}

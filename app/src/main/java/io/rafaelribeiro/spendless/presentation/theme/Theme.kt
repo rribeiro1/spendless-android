@@ -9,10 +9,12 @@ private val SpendLessColorScheme =
 		background = SoftLavender,
 		primary = RoyalPurple,
 		secondary = Lavender,
-		tertiary = DeepPurple,
 		onPrimary = White,
 		onSurface = CharcoalBlack,
+        primaryContainer = VividPurple,
+        surfaceContainer = White,
 		error = DarkRed,
+        tertiary = DeepPurple,
 	/* Other default colors to override
 	background = Color(0xFFFFFBFE),
 	surface = Color(0xFFFFFBFE),

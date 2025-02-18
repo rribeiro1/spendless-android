@@ -58,6 +58,7 @@ dependencies {
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.ui.text.google.fonts)
     implementation(libs.androidx.material.icons.extended)
+    implementation(libs.androidx.foundation.layout.android)
     // -- Hilt
     kapt(libs.hilt.android.compiler)
     implementation(libs.hilt.android)
@@ -74,6 +75,7 @@ dependencies {
     testRuntimeOnly(libs.junit.jupiter.engine)
     testImplementation(libs.junit.jupiter.params)
     testImplementation(libs.assertk)
+    testImplementation(libs.kotlinx.coroutines.test)
 }
 
 // Allow references to generated code

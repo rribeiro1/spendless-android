@@ -39,7 +39,7 @@ fun ErrorDialog(
 			) {
 				Text(
 					text = errorMessage.asString(),
-					color = MaterialTheme.colorScheme.onPrimary,
+					color = MaterialTheme.colorScheme.onSurface,
 					style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Medium),
 					modifier = Modifier.align(Alignment.Center),
 				)

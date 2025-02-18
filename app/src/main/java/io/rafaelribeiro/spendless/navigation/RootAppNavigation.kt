@@ -23,6 +23,7 @@ import io.rafaelribeiro.spendless.core.presentation.ErrorDialog
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationActionEvent
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationPinConfirmationScreen
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationPinPromptScreen
+import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationPreferencesRootScreen
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationUsernameRootScreen
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationViewModel
 import kotlinx.coroutines.flow.Flow
@@ -37,7 +38,7 @@ fun RootAppNavigation(
 		startDestination = Screen.RegistrationFlow.route,
 	) {
 		navigation(
-			startDestination = Screen.RegistrationUsername.route,
+			startDestination = Screen.RegistrationSetPreferences.route,
 			route = Screen.RegistrationFlow.route,
 		) {
 			composable(route = Screen.RegistrationUsername.route) { entry ->
@@ -66,6 +67,7 @@ fun RootAppNavigation(
 				RegistrationPinPromptScreen(
 					uiState = uiState,
 					onEvent = viewModel::onEvent,
+                    navigationState = navigationState,
 					modifier = modifier,
 				)
 				ErrorDialog(errorMessage = uiState.errorMessage)
@@ -87,6 +89,7 @@ fun RootAppNavigation(
 				RegistrationPinConfirmationScreen(
 					uiState = uiState,
 					onEvent = viewModel::onEvent,
+                    navigationState = navigationState,
 					modifier = modifier,
 				)
 				ErrorDialog(errorMessage = uiState.errorMessage)
@@ -94,14 +97,10 @@ fun RootAppNavigation(
 			composable(route = Screen.RegistrationSetPreferences.route) { entry ->
 				val viewModel = entry.sharedViewModel<RegistrationViewModel>(navigationState.navHostController)
 				val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-				Column(
-					modifier = modifier.fillMaxSize(),
-				) {
-					Text(text = "Set Preferences")
-					Text(text = uiState.username)
-					Text(text = uiState.pin)
-					Text(text = uiState.pinConfirmation)
-				}
+                RegistrationPreferencesRootScreen(
+                    navigationState = navigationState,
+                    modifier = modifier,
+                )
 			}
 		}
 	}
