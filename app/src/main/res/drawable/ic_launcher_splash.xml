@@ -1,13 +1,13 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="108dp"
-    android:height="108dp"
-    android:viewportWidth="108"
-    android:viewportHeight="108">
+    android:width="100dp"
+    android:height="100dp"
+    android:viewportWidth="75"
+    android:viewportHeight="75">
     <group
-        android:pivotX="-62"
-        android:pivotY="-62"
-        android:scaleX="1.5"
-        android:scaleY="1.5"
+        android:pivotX="240"
+        android:pivotY="240"
+        android:scaleX="0.9"
+        android:scaleY="0.9"
         >
         <path
             android:pathData="M26.486,12.505C26.408,12.5 26.323,12.5 26.235,12.5L26.213,12.5H22.769C19.929,12.5 17.5,14.67 17.5,17.5C17.5,20.33 19.929,22.5 22.769,22.5H26.213L26.235,22.5C26.323,22.5 26.408,22.5 26.486,22.495C27.639,22.425 28.659,21.548 28.744,20.324C28.75,20.244 28.75,20.157 28.75,20.077L28.75,20.056V14.944L28.75,14.923C28.75,14.842 28.75,14.756 28.744,14.676C28.659,13.452 27.639,12.575 26.486,12.505ZM22.463,18.833C23.194,18.833 23.787,18.236 23.787,17.5C23.787,16.764 23.194,16.167 22.463,16.167C21.732,16.167 21.14,16.764 21.14,17.5C21.14,18.236 21.732,18.833 22.463,18.833Z"

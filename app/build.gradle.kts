@@ -2,7 +2,13 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    // -- Spotless
     id("com.diffplug.spotless") version "7.0.2"
+    // -- Hilt
+    id("kotlin-kapt")
+    id("com.google.dagger.hilt.android")
+    // -- JUnit
+    id("de.mannodermaus.android-junit5") version "1.11.3.0"
 }
 
 android {
@@ -24,7 +30,7 @@ android {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
         }
     }
@@ -41,7 +47,6 @@ android {
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -50,6 +55,15 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.core.splashscreen)
+    implementation(libs.androidx.ui.text.google.fonts)
+    implementation(libs.androidx.material.icons.extended)
+    implementation(libs.androidx.foundation.layout.android)
+    // -- Hilt
+    kapt(libs.hilt.android.compiler)
+    implementation(libs.hilt.android)
+    implementation(libs.androidx.hilt.navigation.compose)
+    // -- Tests
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -57,6 +71,16 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    testImplementation(libs.junit.jupiter.api)
+    testRuntimeOnly(libs.junit.jupiter.engine)
+    testImplementation(libs.junit.jupiter.params)
+    testImplementation(libs.assertk)
+    testImplementation(libs.kotlinx.coroutines.test)
+}
+
+// Allow references to generated code
+kapt {
+    correctErrorTypes = true
 }
 
 spotless {
@@ -71,15 +95,6 @@ spotless {
     kotlin {
         target("**/*.kt")
         ktlint("1.5.0")
-        listOf(
-            "standard:no-wildcard-imports",
-            "standard:function-naming"
-        ).forEach { rule ->
-            suppressLintsFor {
-                step = "ktlint"
-                shortCode = rule
-            }
-        }
         trimTrailingWhitespace()
         leadingSpacesToTabs()
         endWithNewline()
