@@ -104,6 +104,7 @@ fun RootAppNavigation(
                 RegistrationPreferencesRootScreen(
                     navigationState = navigationState,
                     modifier = modifier,
+					onEvent = viewModel::onEvent
                 )
 			}
 		}

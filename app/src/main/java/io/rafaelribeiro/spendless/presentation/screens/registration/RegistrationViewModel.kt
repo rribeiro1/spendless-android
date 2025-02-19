@@ -44,6 +44,7 @@ class RegistrationViewModel @Inject constructor(
 			is RegistrationUiEvent.PinBackspaceTapped -> backspacePinTapped()
 			is RegistrationUiEvent.PinConfirmationDigitTapped -> pinConfirmationChanged(event.digit)
 			is RegistrationUiEvent.PinConfirmationBackspaceTapped -> backspaceConfirmationPinTapped()
+			is RegistrationUiEvent.ResetPinValues -> resetPinValues()
 		}
 	}
 
@@ -53,9 +54,11 @@ class RegistrationViewModel @Inject constructor(
 			when (val result = authRepository.checkUserName(_uiState.value.username)) {
 				is Result.Success -> {
 					sendActionEvent(RegistrationActionEvent.UsernameCheckSuccess)
+					setNextButtonEnabled(true)
 				}
 				is Result.Failure -> {
 					showErrorMessage(result.error.asUiText())
+					setNextButtonEnabled(true)
 				}
 			}
 		}
@@ -85,7 +88,7 @@ class RegistrationViewModel @Inject constructor(
 				if (_uiState.value.pin == currentPin) {
 					sendActionEvent(RegistrationActionEvent.PinConfirmed)
 				} else {
-					_uiState.update { it.copy(pin = "", pinConfirmation = "") }
+					resetPinValues()
 					sendActionEvent(RegistrationActionEvent.PinMismatch)
 					showErrorMessage(UiText.StringResource(R.string.registration_pin_mismatch))
 				}
@@ -99,6 +102,10 @@ class RegistrationViewModel @Inject constructor(
 
 	private fun backspaceConfirmationPinTapped() {
 		_uiState.update { it.copy(pinConfirmation = _uiState.value.pinConfirmation.dropLast(n = 1)) }
+	}
+
+	private fun resetPinValues() {
+		_uiState.update { it.copy(pinConfirmation = "", pin = "") }
 	}
 
 	private fun showErrorMessage(text: UiText) {
@@ -138,4 +145,5 @@ sealed interface RegistrationUiEvent {
 	data object PinBackspaceTapped : RegistrationUiEvent
 	data class PinConfirmationDigitTapped(val digit: String) : RegistrationUiEvent
 	data object PinConfirmationBackspaceTapped : RegistrationUiEvent
+	data object ResetPinValues : RegistrationUiEvent
 }
