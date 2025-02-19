@@ -19,6 +19,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
+import androidx.navigation.navOptions
 import io.rafaelribeiro.spendless.core.presentation.ErrorDialog
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationActionEvent
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationPinConfirmationScreen
@@ -38,7 +39,7 @@ fun RootAppNavigation(
 		startDestination = Screen.RegistrationFlow.route,
 	) {
 		navigation(
-			startDestination = Screen.RegistrationSetPreferences.route,
+			startDestination = Screen.RegistrationUsername.route,
 			route = Screen.RegistrationFlow.route,
 		) {
 			composable(route = Screen.RegistrationUsername.route) { entry ->
@@ -78,7 +79,13 @@ fun RootAppNavigation(
 				ObserveAsEvents(flow = viewModel.actionEvents) { event ->
 					when (event) {
 						is RegistrationActionEvent.PinConfirmed -> {
-							navigationState.navigateTo(Screen.RegistrationSetPreferences.route)
+							navigationState.navigateTo(
+								route = Screen.RegistrationSetPreferences.route,
+								navOptions = navOptions {
+									popUpTo(Screen.RegistrationPinCreation.route) { inclusive = false }
+									restoreState = true
+								}
+							)
 						}
 						is RegistrationActionEvent.PinMismatch -> {
 							navigationState.popBackStack()
