@@ -1,22 +1,23 @@
 [versions]
-agp = "8.8.0"
+agp = "8.8.1"
 assertk = "0.26.1"
 coreSplashscreen = "1.0.1"
 junitJupiter = "5.11.4"
-kotlin = "2.0.0"
+kotlin = "2.1.10"
 coreKtx = "1.15.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
 lifecycleRuntimeKtx = "2.8.7"
 activityCompose = "1.10.0"
-composeBom = "2024.04.01"
-materialIconsExtended = "1.7.7"
-uiTextGoogleFonts = "1.7.7"
+composeBom = "2025.02.00"
+materialIconsExtended = "1.7.8"
+uiTextGoogleFonts = "1.7.8"
 hiltAndroid = "2.51.1"
 hiltNavigationCompose = "1.2.0"
-foundationLayoutAndroid = "1.6.6"
+foundationLayoutAndroid = "1.7.8"
 kotlinx_coroutines = "1.9.0"
+androidx-navigation = "2.8.7"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -40,6 +41,7 @@ androidx-material3 = { group = "androidx.compose.material3", name = "material3" 
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroid" }
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
+androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "androidx-navigation" }
 junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junitJupiter" }
 junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junitJupiter" }
 junit-jupiter-params = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junitJupiter" }
