@@ -54,13 +54,12 @@ class RegistrationViewModel @Inject constructor(
 			when (val result = authRepository.checkUserName(_uiState.value.username)) {
 				is Result.Success -> {
 					sendActionEvent(RegistrationActionEvent.UsernameCheckSuccess)
-					setNextButtonEnabled(true)
 				}
 				is Result.Failure -> {
 					showErrorMessage(result.error.asUiText())
-					setNextButtonEnabled(true)
 				}
 			}
+			setNextButtonEnabled(true)
 		}
 	}
 
