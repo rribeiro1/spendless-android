@@ -1,5 +1,7 @@
 package io.rafaelribeiro.spendless.navigation
 
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -34,6 +36,18 @@ fun RootAppNavigation(
 	NavHost(
 		navController = navigationState.navHostController,
 		startDestination = Screen.RegistrationFlow.route,
+		enterTransition = {
+			enterTransition(AnimatedContentTransitionScope.SlideDirection.Start)
+		},
+		exitTransition = {
+			exitTransition(AnimatedContentTransitionScope.SlideDirection.Start)
+		},
+		popEnterTransition = {
+			enterTransition(AnimatedContentTransitionScope.SlideDirection.End)
+		},
+		popExitTransition = {
+			exitTransition(AnimatedContentTransitionScope.SlideDirection.End)
+		}
 	) {
 		navigation(
 			startDestination = Screen.RegistrationUsername.route,
@@ -131,3 +145,17 @@ private fun <T> ObserveAsEvents(flow: Flow<T>, onEvent: (T) -> Unit) {
 		}
 	}
 }
+
+fun AnimatedContentTransitionScope<NavBackStackEntry>.exitTransition(
+	slideDirection: AnimatedContentTransitionScope.SlideDirection
+) = slideOutOfContainer(
+	slideDirection,
+	animationSpec = tween(500)
+)
+
+fun AnimatedContentTransitionScope<NavBackStackEntry>.enterTransition(
+	slideDirection: AnimatedContentTransitionScope.SlideDirection
+) = slideIntoContainer(
+	slideDirection,
+	animationSpec = tween(500)
+)
