@@ -1,5 +1,6 @@
 package io.rafaelribeiro.spendless.presentation.screens.registration
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -26,13 +27,18 @@ fun RegistrationPinConfirmationScreen(
     onEvent: (RegistrationUiEvent) -> Unit,
     modifier: Modifier,
 ) {
+    fun onBackPress() {
+        onEvent(RegistrationUiEvent.ResetPinValues)
+        navigationState.popBackStack()
+    }
+    BackHandler(onBack = ::onBackPress)
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
                 title = {},
                 navigationIcon = {
-                    IconButton(onClick = { navigationState.popBackStack() }) {
+                    IconButton(onClick = ::onBackPress) {
                         Icon(
                             imageVector = Icons. AutoMirrored. Filled. ArrowBack,
                             contentDescription = "Go back"

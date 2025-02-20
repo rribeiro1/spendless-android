@@ -1,8 +1,7 @@
 package io.rafaelribeiro.spendless.navigation
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Text
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -19,6 +18,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
+import androidx.navigation.navOptions
 import io.rafaelribeiro.spendless.core.presentation.ErrorDialog
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationActionEvent
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationPinConfirmationScreen
@@ -36,9 +36,21 @@ fun RootAppNavigation(
 	NavHost(
 		navController = navigationState.navHostController,
 		startDestination = Screen.RegistrationFlow.route,
+		enterTransition = {
+			enterTransition(AnimatedContentTransitionScope.SlideDirection.Start)
+		},
+		exitTransition = {
+			exitTransition(AnimatedContentTransitionScope.SlideDirection.Start)
+		},
+		popEnterTransition = {
+			enterTransition(AnimatedContentTransitionScope.SlideDirection.End)
+		},
+		popExitTransition = {
+			exitTransition(AnimatedContentTransitionScope.SlideDirection.End)
+		}
 	) {
 		navigation(
-			startDestination = Screen.RegistrationSetPreferences.route,
+			startDestination = Screen.RegistrationUsername.route,
 			route = Screen.RegistrationFlow.route,
 		) {
 			composable(route = Screen.RegistrationUsername.route) { entry ->
@@ -78,7 +90,13 @@ fun RootAppNavigation(
 				ObserveAsEvents(flow = viewModel.actionEvents) { event ->
 					when (event) {
 						is RegistrationActionEvent.PinConfirmed -> {
-							navigationState.navigateTo(Screen.RegistrationSetPreferences.route)
+							navigationState.navigateTo(
+								route = Screen.RegistrationSetPreferences.route,
+								navOptions = navOptions {
+									popUpTo(Screen.RegistrationPinCreation.route) { inclusive = false }
+									restoreState = true
+								}
+							)
 						}
 						is RegistrationActionEvent.PinMismatch -> {
 							navigationState.popBackStack()
@@ -100,6 +118,7 @@ fun RootAppNavigation(
                 RegistrationPreferencesRootScreen(
                     navigationState = navigationState,
                     modifier = modifier,
+					onEvent = viewModel::onEvent
                 )
 			}
 		}
@@ -126,3 +145,17 @@ private fun <T> ObserveAsEvents(flow: Flow<T>, onEvent: (T) -> Unit) {
 		}
 	}
 }
+
+fun AnimatedContentTransitionScope<NavBackStackEntry>.exitTransition(
+	slideDirection: AnimatedContentTransitionScope.SlideDirection
+) = slideOutOfContainer(
+	slideDirection,
+	animationSpec = tween(500)
+)
+
+fun AnimatedContentTransitionScope<NavBackStackEntry>.enterTransition(
+	slideDirection: AnimatedContentTransitionScope.SlideDirection
+) = slideIntoContainer(
+	slideDirection,
+	animationSpec = tween(500)
+)
