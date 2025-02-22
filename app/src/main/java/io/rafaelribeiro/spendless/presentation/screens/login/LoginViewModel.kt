@@ -24,6 +24,7 @@ class LoginViewModel @Inject constructor(
         when (event) {
             is LoginUiEvent.UsernameChanged -> usernameChanged(event.username)
             is LoginUiEvent.PinChanged -> pinChanged(event.pin)
+            is LoginUiEvent.ActionButtonLoginClicked -> loginClicked()
         }
     }
 
@@ -47,10 +48,17 @@ class LoginViewModel @Inject constructor(
         }
     }
 
+    private fun loginClicked() {
+        val username = _uiState.value.username
+        val pin = _uiState.value.pin
+        // TODO: Login
+    }
+
 }
 
 
 sealed interface LoginUiEvent {
     data class UsernameChanged(val username: String) : LoginUiEvent
     data class PinChanged(val pin: String) : LoginUiEvent
+    data object ActionButtonLoginClicked: LoginUiEvent
 }

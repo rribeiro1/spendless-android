@@ -73,7 +73,7 @@ fun LoginRootScreen(
         LoginScreen(
             modifier = modifier.padding(innerPadding),
             uiState = uiState,
-            onNextClick = { },
+            onLoginClick = { viewModel.onEvent(LoginUiEvent.ActionButtonLoginClicked) },
             onUsernameChange = { viewModel.onEvent(LoginUiEvent.UsernameChanged(it)) },
             onPinChange = { viewModel.onEvent(LoginUiEvent.PinChanged(it)) },
             onNewAccountClick = {
@@ -93,7 +93,7 @@ fun LoginRootScreen(
 fun LoginScreen(
     modifier: Modifier,
     uiState: LoginUiState,
-    onNextClick: () -> Unit = {},
+    onLoginClick: () -> Unit = {},
     onUsernameChange: (String) -> Unit = {},
     onPinChange: (String) -> Unit = {},
     onNewAccountClick: () -> Unit = {},
@@ -196,7 +196,7 @@ fun LoginScreen(
             }
         )
         Button(
-            onClick = onNextClick,
+            onClick = onLoginClick,
             modifier = Modifier
                 .padding(16.dp)
                 .height(48.dp)
