@@ -1,14 +1,9 @@
 package io.rafaelribeiro.spendless.navigation
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
@@ -23,6 +18,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.navOptions
 import io.rafaelribeiro.spendless.core.presentation.ErrorDialog
+import io.rafaelribeiro.spendless.presentation.screens.login.LoginRootScreen
+import io.rafaelribeiro.spendless.presentation.screens.login.LoginViewModel
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationActionEvent
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationPinConfirmationScreen
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationPinPromptScreen
@@ -133,22 +130,15 @@ fun RootAppNavigation(
 		) {
 			composable(
 				route = Screen.LoginScreen.route,
-			) {
-				Box(Modifier.fillMaxSize()) {
-					Button(
-						modifier = Modifier.align(alignment = Alignment.Center),
-						onClick = {
-							navigationState.navigateTo(
-								route = Screen.RegistrationUsername.route,
-								navOptions = navOptions {
-									popUpTo(Screen.LoginScreen.route) { inclusive = true }
-								}
-							)
-						}
-					) {
-						Text(text = "Register")
-					}
-				}
+			) { entry ->
+				val viewModel = entry.sharedViewModel<LoginViewModel>(navigationState.navHostController)
+				val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+				LoginRootScreen(
+					viewModel = viewModel,
+					uiState = uiState,
+					navigationState = navigationState,
+					modifier = modifier,
+				)
 			}
 		}
 	}

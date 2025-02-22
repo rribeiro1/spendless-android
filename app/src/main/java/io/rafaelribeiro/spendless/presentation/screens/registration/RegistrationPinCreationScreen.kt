@@ -15,9 +15,11 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import io.rafaelribeiro.spendless.R
 import io.rafaelribeiro.spendless.core.presentation.PinPromptScreen
 import io.rafaelribeiro.spendless.navigation.NavigationState
+import io.rafaelribeiro.spendless.navigation.rememberNavigationState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -60,4 +62,15 @@ fun RegistrationPinPromptScreen(
             onBackspaceClick = { onEvent(RegistrationUiEvent.PinBackspaceTapped) },
         )
     }
+}
+
+@Preview
+@Composable
+fun RegistrationPinPromptScreenPreview() {
+    RegistrationPinPromptScreen(
+        navigationState = rememberNavigationState(),
+        uiState = RegistrationUiState(),
+        onEvent = {},
+        modifier = Modifier,
+    )
 }
