@@ -1,11 +1,14 @@
 package io.rafaelribeiro.spendless.navigation
 
-import androidx.compose.animation.AnimatedContentTransitionScope
-import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
@@ -36,18 +39,10 @@ fun RootAppNavigation(
 	NavHost(
 		navController = navigationState.navHostController,
 		startDestination = Screen.RegistrationFlow.route,
-		enterTransition = {
-			enterTransition(AnimatedContentTransitionScope.SlideDirection.Start)
-		},
-		exitTransition = {
-			exitTransition(AnimatedContentTransitionScope.SlideDirection.Start)
-		},
-		popEnterTransition = {
-			enterTransition(AnimatedContentTransitionScope.SlideDirection.End)
-		},
-		popExitTransition = {
-			exitTransition(AnimatedContentTransitionScope.SlideDirection.End)
-		}
+		enterTransition = enterTransition(),
+		exitTransition = exitTransition(),
+		popEnterTransition = popEnterTransition(),
+		popExitTransition = popExitTransition()
 	) {
 		navigation(
 			startDestination = Screen.RegistrationUsername.route,
@@ -57,8 +52,18 @@ fun RootAppNavigation(
 				val viewModel = entry.sharedViewModel<RegistrationViewModel>(navigationState.navHostController)
 				val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 				ObserveAsEvents(flow = viewModel.actionEvents) { event ->
-					if (event is RegistrationActionEvent.UsernameCheckSuccess) {
-						navigationState.navigateTo(Screen.RegistrationPinCreation.route)
+					when {
+						event is RegistrationActionEvent.AlreadyHaveAccount -> {
+							navigationState.navigateTo(
+								route = Screen.LoginScreen.route,
+								navOptions = navOptions {
+									popUpTo(Screen.RegistrationUsername.route) { inclusive = true }
+								}
+							)
+						}
+						event is RegistrationActionEvent.UsernameCheckSuccess -> {
+							navigationState.navigateTo(Screen.RegistrationPinCreation.route)
+						}
 					}
 				}
 				RegistrationUsernameRootScreen(
@@ -122,6 +127,30 @@ fun RootAppNavigation(
                 )
 			}
 		}
+		navigation(
+			startDestination = Screen.LoginScreen.route,
+			route = Screen.LoginFlow.route,
+		) {
+			composable(
+				route = Screen.LoginScreen.route,
+			) {
+				Box(Modifier.fillMaxSize()) {
+					Button(
+						modifier = Modifier.align(alignment = Alignment.Center),
+						onClick = {
+							navigationState.navigateTo(
+								route = Screen.RegistrationUsername.route,
+								navOptions = navOptions {
+									popUpTo(Screen.LoginScreen.route) { inclusive = true }
+								}
+							)
+						}
+					) {
+						Text(text = "Register")
+					}
+				}
+			}
+		}
 	}
 }
 
@@ -146,16 +175,3 @@ private fun <T> ObserveAsEvents(flow: Flow<T>, onEvent: (T) -> Unit) {
 	}
 }
 
-fun AnimatedContentTransitionScope<NavBackStackEntry>.exitTransition(
-	slideDirection: AnimatedContentTransitionScope.SlideDirection
-) = slideOutOfContainer(
-	slideDirection,
-	animationSpec = tween(500)
-)
-
-fun AnimatedContentTransitionScope<NavBackStackEntry>.enterTransition(
-	slideDirection: AnimatedContentTransitionScope.SlideDirection
-) = slideIntoContainer(
-	slideDirection,
-	animationSpec = tween(500)
-)
