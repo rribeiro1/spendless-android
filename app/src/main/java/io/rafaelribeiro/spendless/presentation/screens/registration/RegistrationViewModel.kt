@@ -74,7 +74,10 @@ class RegistrationViewModel @Inject constructor(
 		if (currentPin.length <= PIN_MAX_SIZE) {
 			_uiState.update { it.copy(pin = currentPin) }
 			if (currentPin.length == PIN_MAX_SIZE) {
-				sendActionEvent(RegistrationActionEvent.PinCreated)
+				viewModelScope.launch {
+					delay(111) // in order to able to see last pin digit
+					sendActionEvent(RegistrationActionEvent.PinCreated)
+				}
 			}
 		}
 	}
@@ -85,7 +88,10 @@ class RegistrationViewModel @Inject constructor(
 			_uiState.update { it.copy(pinConfirmation = currentPin) }
 			if (currentPin.length == PIN_MAX_SIZE) {
 				if (_uiState.value.pin == currentPin) {
-					sendActionEvent(RegistrationActionEvent.PinConfirmed)
+					viewModelScope.launch {
+						delay(111) // in order to able to see last pin digit
+						sendActionEvent(RegistrationActionEvent.PinConfirmed)
+					}
 				} else {
 					resetPinValues()
 					sendActionEvent(RegistrationActionEvent.PinMismatch)
