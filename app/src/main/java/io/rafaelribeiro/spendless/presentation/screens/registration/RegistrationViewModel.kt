@@ -16,6 +16,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.text.DecimalFormat
+import java.text.DecimalFormatSymbols
 import javax.inject.Inject
 
 @HiltViewModel
@@ -45,7 +47,99 @@ class RegistrationViewModel @Inject constructor(
 			is RegistrationUiEvent.PinConfirmationDigitTapped -> pinConfirmationChanged(event.digit)
 			is RegistrationUiEvent.PinConfirmationBackspaceTapped -> backspaceConfirmationPinTapped()
 			is RegistrationUiEvent.ResetPinValues -> resetPinValues()
+			is RegistrationUiEvent.ExpensesFormatSelected -> {
+				updateState {
+					it.copy(
+						preferences = it.preferences.copy(
+							expensesFormat = event.expensesFormat,
+							entryFormat = formatExpense(
+								expensesFormat = event.expensesFormat,
+								decimalSeparator = it.preferences.decimalSeparator,
+								thousandSeparator = it.preferences.thousandSeparator,
+								currencySymbol = it.preferences.currencySymbol
+							)
+						)
+					)
+				}
+			}
+			is RegistrationUiEvent.DecimalSeparatorSelected -> {
+				updateState {
+					it.copy(
+						preferences = it.preferences.copy(
+							decimalSeparator = event.decimalSeparator,
+							entryFormat = formatExpense(
+								decimalSeparator = event.decimalSeparator,
+								expensesFormat = it.preferences.expensesFormat,
+								thousandSeparator = it.preferences.thousandSeparator,
+								currencySymbol = it.preferences.currencySymbol
+							)
+						)
+					)
+				}
+			}
+			is RegistrationUiEvent.ThousandSeparatorSelected -> {
+				updateState {
+					it.copy(
+						preferences = it.preferences.copy(
+							thousandSeparator = event.thousandSeparator,
+							entryFormat = formatExpense(
+								thousandSeparator = event.thousandSeparator,
+								expensesFormat = it.preferences.expensesFormat,
+								decimalSeparator = it.preferences.decimalSeparator,
+								currencySymbol = it.preferences.currencySymbol
+							)
+						)
+					)
+				}
+			}
 		}
+	}
+
+	private fun formatExpense(
+		amount: Double = -1234.50,
+		expensesFormat: ExpensesFormat,
+		decimalSeparator: DecimalSeparator,
+		thousandSeparator: ThousandSeparator,
+		currencySymbol: CurrencySymbol,
+	): String {
+		if ((decimalSeparator == DecimalSeparator.DOT && thousandSeparator == ThousandSeparator.DOT) ||
+				(decimalSeparator == DecimalSeparator.COMMA && thousandSeparator == ThousandSeparator.COMMA)) {
+			updateState {
+				it.copy(
+					preferences = it.preferences.copy(
+						startTrackingButtonEnabled = false
+					)
+				)
+			}
+		} else {
+			updateState {
+				it.copy(
+					preferences = it.preferences.copy(
+						startTrackingButtonEnabled = true
+					)
+				)
+			}
+		}
+
+		val symbols = DecimalFormatSymbols().apply {
+			this.decimalSeparator = decimalSeparator.symbol.first()
+			this.groupingSeparator = thousandSeparator.symbol.first()
+		}
+
+		val pattern = "#,##0.00"
+		val formatter = DecimalFormat(pattern, symbols)
+
+		val formattedValue = formatter.format(kotlin.math.abs(amount))
+
+		return when {
+			amount < 0 && expensesFormat == ExpensesFormat.PARENTHESES -> "(${currencySymbol.value}$formattedValue)"
+			amount < 0 -> "-${currencySymbol.value}$formattedValue"
+			else -> "${currencySymbol.value}$formattedValue"
+		}
+	}
+
+	private fun updateState(state: (RegistrationUiState) -> RegistrationUiState) {
+		_uiState.update { state(it) }
 	}
 
 	private fun checkUserName() {
@@ -145,4 +239,8 @@ sealed interface RegistrationUiEvent {
 	data class PinConfirmationDigitTapped(val digit: String) : RegistrationUiEvent
 	data object PinConfirmationBackspaceTapped : RegistrationUiEvent
 	data object ResetPinValues : RegistrationUiEvent
+
+	data class ExpensesFormatSelected(val expensesFormat: ExpensesFormat) : RegistrationUiEvent
+	data class DecimalSeparatorSelected(val decimalSeparator: DecimalSeparator) : RegistrationUiEvent
+	data class ThousandSeparatorSelected(val thousandSeparator: ThousandSeparator) : RegistrationUiEvent
 }

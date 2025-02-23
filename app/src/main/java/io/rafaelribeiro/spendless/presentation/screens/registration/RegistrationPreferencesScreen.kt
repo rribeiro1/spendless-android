@@ -1,5 +1,6 @@
 package io.rafaelribeiro.spendless.presentation.screens.registration
 
+import android.icu.text.DecimalFormat
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -47,6 +48,7 @@ import io.rafaelribeiro.spendless.presentation.theme.SpendLessTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegistrationPreferencesRootScreen(
+    uiState: RegistrationUiState,
     navigationState: NavigationState,
     modifier: Modifier,
     onEvent: (RegistrationUiEvent) -> Unit,
@@ -77,7 +79,8 @@ fun RegistrationPreferencesRootScreen(
     ) { innerPadding ->
         RegistrationPreferencesScreen(
             modifier = modifier.padding(innerPadding),
-            expenseFormat = "-$10,382.45"
+            uiState = uiState.preferences,
+            onEvent = onEvent,
         )
     }
 }
@@ -85,13 +88,9 @@ fun RegistrationPreferencesRootScreen(
 @Composable
 fun RegistrationPreferencesScreen(
     modifier: Modifier,
-    expenseFormat: String,
+    uiState: RegistrationPreferencesUiState,
+    onEvent: (RegistrationUiEvent) -> Unit,
 ) {
-    var selectedPreferenceFormat by remember { mutableIntStateOf(0) }
-    var selectedCurrency by remember { mutableIntStateOf(0) }
-    var selectedDecimalSeparator by remember { mutableIntStateOf(0) }
-    var selectedThousandSeparator by remember { mutableIntStateOf(0) }
-
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
@@ -137,7 +136,7 @@ fun RegistrationPreferencesScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = expenseFormat,
+                    text = uiState.entryFormat,
                     style = MaterialTheme.typography.headlineLarge,
                     textAlign = TextAlign.Center,
                     modifier = Modifier
@@ -145,7 +144,7 @@ fun RegistrationPreferencesScreen(
                         .padding(top = 24.dp, bottom = 8.dp),
                 )
                 Text(
-                    text = "spend this month",
+                    text = stringResource(R.string.spend_this_month),
                     style = MaterialTheme.typography.bodySmall,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(bottom = 24.dp)
@@ -154,27 +153,33 @@ fun RegistrationPreferencesScreen(
         }
 
         SpendLessSegmentedButton(
-            title = "Expenses format",
-            options = listOf("-$10", "($10)"),
-            selectedIndex = selectedPreferenceFormat,
-            onOptionSelected = { selectedPreferenceFormat = it }
+            title = stringResource(R.string.expenses_format),
+            options = ExpensesFormat.entries.map { it.value },
+            selectedIndex = ExpensesFormat.entries.indexOf(uiState.expensesFormat),
+            onOptionSelected = {
+                onEvent(RegistrationUiEvent.ExpensesFormatSelected(ExpensesFormat.entries[it]))
+            }
         )
         SpendLessDropDown(
-            title = "Currency",
+            title = stringResource(R.string.currency),
             values = ExpenseCategories.categories,
             itemBackgroundColor = MaterialTheme.colorScheme.secondary,
         )
         SpendLessSegmentedButton(
-            title = "Decimal separator",
-            options = listOf("1.00", "1,00"),
-            selectedIndex = selectedDecimalSeparator,
-            onOptionSelected = { selectedDecimalSeparator = it }
+            title = stringResource(R.string.decimal_separator),
+            options = DecimalSeparator.entries.map { it.value },
+            selectedIndex = DecimalSeparator.entries.indexOf(uiState.decimalSeparator),
+            onOptionSelected = {
+                onEvent(RegistrationUiEvent.DecimalSeparatorSelected(DecimalSeparator.entries[it]))
+            }
         )
         SpendLessSegmentedButton(
-            title = "Thousands separator",
-            options = listOf("1.000", "1,000", "1 000"),
-            selectedIndex = selectedThousandSeparator,
-            onOptionSelected = { selectedThousandSeparator = it }
+            title = stringResource(R.string.thousands_separator),
+            options = ThousandSeparator.entries.map { it.value },
+            selectedIndex = ThousandSeparator.entries.indexOf(uiState.thousandSeparator),
+            onOptionSelected = {
+                onEvent(RegistrationUiEvent.ThousandSeparatorSelected(ThousandSeparator.entries[it]))
+            }
         )
         Button(
             onClick = {},
@@ -189,14 +194,14 @@ fun RegistrationPreferencesScreen(
                 disabledContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
             ),
             shape = RoundedCornerShape(16.dp),
-            enabled = true
+            enabled = uiState.startTrackingButtonEnabled
         ) {
             Row(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = "Start Tracking!",
+                    text = stringResource(R.string.start_tracking),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
                 )
@@ -211,7 +216,14 @@ fun RegistrationPreferencesRootScreenPreview() {
     SpendLessTheme {
         RegistrationPreferencesScreen(
             modifier = Modifier,
-            expenseFormat = "-$10,382.45"
+            uiState = RegistrationPreferencesUiState(
+                entryFormat = "-$10",
+                expensesFormat = ExpensesFormat.PARENTHESES,
+                decimalSeparator = DecimalSeparator.DOT,
+                thousandSeparator = ThousandSeparator.SPACE,
+                currencySymbol = CurrencySymbol.DOLLAR,
+            ),
+            onEvent = {},
         )
     }
 }

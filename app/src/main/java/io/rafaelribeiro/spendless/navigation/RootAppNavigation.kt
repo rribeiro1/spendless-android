@@ -50,7 +50,7 @@ fun RootAppNavigation(
 		}
 	) {
 		navigation(
-			startDestination = Screen.RegistrationUsername.route,
+			startDestination = Screen.RegistrationSetPreferences.route,
 			route = Screen.RegistrationFlow.route,
 		) {
 			composable(route = Screen.RegistrationUsername.route) { entry ->
@@ -116,6 +116,7 @@ fun RootAppNavigation(
 				val viewModel = entry.sharedViewModel<RegistrationViewModel>(navigationState.navHostController)
 				val uiState by viewModel.uiState.collectAsStateWithLifecycle()
                 RegistrationPreferencesRootScreen(
+					uiState = uiState,
                     navigationState = navigationState,
                     modifier = modifier,
 					onEvent = viewModel::onEvent

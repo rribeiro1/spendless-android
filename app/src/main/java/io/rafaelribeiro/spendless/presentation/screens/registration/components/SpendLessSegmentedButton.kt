@@ -97,7 +97,7 @@ fun SpendLessSegmentedButton(
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxSize()
-                        .pointerInput(Unit) { detectTapGestures { onOptionSelected(selectedIndex) } },
+                        .pointerInput(Unit) { detectTapGestures { onOptionSelected(index) } },
                     contentAlignment = Alignment.Center
                 ) {
                     Text(

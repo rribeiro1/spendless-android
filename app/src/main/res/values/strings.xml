@@ -14,4 +14,10 @@
     <string name="registration_pin_confirmation_description">Enter your PIN again</string>
     <string name="registration_preferences_title">Set SpendLess\nto your preferences</string>
     <string name="registration_preferences_description">You can change it at any time in Settings</string>
+    <string name="spend_this_month">spend this month</string>
+    <string name="expenses_format">Expenses format</string>
+    <string name="currency">Currency</string>
+    <string name="decimal_separator">Decimal separator</string>
+    <string name="thousands_separator">Thousands separator</string>
+    <string name="start_tracking">Start Tracking!</string>
 </resources>
