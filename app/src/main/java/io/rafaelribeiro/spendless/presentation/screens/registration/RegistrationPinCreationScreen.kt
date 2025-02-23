@@ -1,6 +1,7 @@
 package io.rafaelribeiro.spendless.presentation.screens.registration
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -13,10 +14,12 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import io.rafaelribeiro.spendless.R
+import io.rafaelribeiro.spendless.core.presentation.ErrorDialog
 import io.rafaelribeiro.spendless.core.presentation.PinPromptScreen
 import io.rafaelribeiro.spendless.navigation.NavigationState
 import io.rafaelribeiro.spendless.navigation.rememberNavigationState
@@ -34,32 +37,39 @@ fun RegistrationPinPromptScreen(
         navigationState.popBackStack()
     }
     BackHandler(onBack = ::onBackPress)
-    Scaffold(
-        modifier = modifier.fillMaxSize(),
-        topBar = {
-            TopAppBar(
-                title = {},
-                navigationIcon = {
-                    IconButton(onClick = ::onBackPress) {
-                        Icon(
-                            imageVector = Icons. AutoMirrored. Filled. ArrowBack,
-                            contentDescription = "Go back"
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors().copy(
-                    containerColor = MaterialTheme.colorScheme.background,
+
+    Box {
+        Scaffold(
+            modifier = modifier.fillMaxSize(),
+            topBar = {
+                TopAppBar(
+                    title = {},
+                    navigationIcon = {
+                        IconButton(onClick = ::onBackPress) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = "Go back"
+                            )
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors().copy(
+                        containerColor = MaterialTheme.colorScheme.background,
+                    )
                 )
+            }
+        ) { innerPadding ->
+            PinPromptScreen(
+                modifier = modifier.padding(innerPadding),
+                title = stringResource(id = R.string.registration_pin_creation_title),
+                description = stringResource(id = R.string.registration_pin_creation_description),
+                currentPinSize = uiState.pin.length,
+                onNumberClick = { onEvent(RegistrationUiEvent.PinDigitTapped(it)) },
+                onBackspaceClick = { onEvent(RegistrationUiEvent.PinBackspaceTapped) },
             )
         }
-    ) { innerPadding ->
-        PinPromptScreen(
-            modifier = modifier.padding(innerPadding),
-            title = stringResource(id = R.string.registration_pin_creation_title),
-            description = stringResource(id = R.string.registration_pin_creation_description),
-            currentPinSize = uiState.pin.length,
-            onNumberClick = { onEvent(RegistrationUiEvent.PinDigitTapped(it)) },
-            onBackspaceClick = { onEvent(RegistrationUiEvent.PinBackspaceTapped) },
+        ErrorDialog(
+            modifier = modifier.align(Alignment.BottomCenter),
+            errorMessage = uiState.errorMessage,
         )
     }
 }

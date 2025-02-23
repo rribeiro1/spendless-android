@@ -17,7 +17,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.navOptions
-import io.rafaelribeiro.spendless.core.presentation.ErrorDialog
 import io.rafaelribeiro.spendless.presentation.screens.login.LoginRootScreen
 import io.rafaelribeiro.spendless.presentation.screens.login.LoginViewModel
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationActionEvent
@@ -31,7 +30,7 @@ import kotlinx.coroutines.flow.Flow
 @Composable
 fun RootAppNavigation(
 	navigationState: NavigationState,
-	modifier: Modifier,
+	modifier: Modifier = Modifier,
 ) {
 	NavHost(
 		navController = navigationState.navHostController,
@@ -39,7 +38,7 @@ fun RootAppNavigation(
 		enterTransition = enterTransition(),
 		exitTransition = exitTransition(),
 		popEnterTransition = popEnterTransition(),
-		popExitTransition = popExitTransition()
+		popExitTransition = popExitTransition(),
 	) {
 		navigation(
 			startDestination = Screen.RegistrationUsername.route,
@@ -68,7 +67,6 @@ fun RootAppNavigation(
 					onEvent = viewModel::onEvent,
 					modifier = modifier,
 				)
-				ErrorDialog(errorMessage = uiState.errorMessage)
 			}
 			composable(route = Screen.RegistrationPinCreation.route) { entry ->
 				val viewModel = entry.sharedViewModel<RegistrationViewModel>(navigationState.navHostController)
@@ -84,7 +82,6 @@ fun RootAppNavigation(
                     navigationState = navigationState,
 					modifier = modifier,
 				)
-				ErrorDialog(errorMessage = uiState.errorMessage)
 			}
 			composable(route = Screen.RegistrationPinConfirmation.route) { entry ->
 				val viewModel = entry.sharedViewModel<RegistrationViewModel>(navigationState.navHostController)
@@ -112,7 +109,6 @@ fun RootAppNavigation(
                     navigationState = navigationState,
 					modifier = modifier,
 				)
-				ErrorDialog(errorMessage = uiState.errorMessage)
 			}
 			composable(route = Screen.RegistrationSetPreferences.route) { entry ->
 				val viewModel = entry.sharedViewModel<RegistrationViewModel>(navigationState.navHostController)

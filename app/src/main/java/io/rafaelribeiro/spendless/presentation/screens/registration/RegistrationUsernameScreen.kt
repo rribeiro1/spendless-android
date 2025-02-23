@@ -16,7 +16,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
-import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -36,6 +35,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.rafaelribeiro.spendless.R
+import io.rafaelribeiro.spendless.core.presentation.ErrorDialog
 import io.rafaelribeiro.spendless.presentation.theme.SpendLessTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -45,25 +45,31 @@ fun RegistrationUsernameRootScreen(
 	onEvent: (RegistrationUiEvent) -> Unit,
 	modifier: Modifier,
 ) {
-    Scaffold(
-        modifier = modifier.fillMaxSize(),
-        topBar = {
-            TopAppBar(
-                title = {},
-                colors = TopAppBarDefaults.topAppBarColors().copy(
-                    containerColor = MaterialTheme.colorScheme.background,
-                )
-            )
-        }
-    ) { innerPadding ->
-        RegistrationUsernameScreen(
-            modifier = modifier.padding(innerPadding),
-            uiState = uiState,
-            onNextClick = { onEvent(RegistrationUiEvent.ActionButtonNextClicked) },
-            onUsernameChange = { onEvent(RegistrationUiEvent.UsernameChanged(it)) },
-            onLoginLinkClick = { onEvent(RegistrationUiEvent.LoginLinkClicked) },
-        )
-    }
+	Box {
+		Scaffold(
+			modifier = modifier.fillMaxSize(),
+			topBar = {
+				TopAppBar(
+					title = {},
+					colors = TopAppBarDefaults.topAppBarColors().copy(
+						containerColor = MaterialTheme.colorScheme.background,
+					)
+				)
+			}
+		) { innerPadding ->
+			RegistrationUsernameScreen(
+				modifier = modifier.padding(innerPadding),
+				uiState = uiState,
+				onNextClick = { onEvent(RegistrationUiEvent.ActionButtonNextClicked) },
+				onUsernameChange = { onEvent(RegistrationUiEvent.UsernameChanged(it)) },
+				onLoginLinkClick = { onEvent(RegistrationUiEvent.LoginLinkClicked) },
+			)
+		}
+		ErrorDialog(
+			modifier = modifier.align(Alignment.BottomCenter),
+			errorMessage = uiState.errorMessage,
+		)
+	}
 }
 
 @Composable
@@ -78,7 +84,7 @@ fun RegistrationUsernameScreen(
 		horizontalAlignment = Alignment.CenterHorizontally,
 		modifier = modifier
 			.background(MaterialTheme.colorScheme.background)
-            .padding(horizontal = 26.dp)
+			.padding(horizontal = 26.dp)
 			.fillMaxSize(),
 	) {
 		Image(
