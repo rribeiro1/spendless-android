@@ -19,4 +19,6 @@
     <string name="new_to_spendless">New to Spendless?</string>
     <string name="login">Log in</string>
     <string name="pin">pin</string>
+    <string name="hide_password">Hide password</string>
+    <string name="show_password">Show password</string>
 </resources>

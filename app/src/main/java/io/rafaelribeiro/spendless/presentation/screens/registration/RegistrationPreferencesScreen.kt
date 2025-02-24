@@ -38,6 +38,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.rafaelribeiro.spendless.R
+import io.rafaelribeiro.spendless.core.presentation.SpendLessButton
 import io.rafaelribeiro.spendless.navigation.NavigationState
 import io.rafaelribeiro.spendless.presentation.screens.registration.components.ExpenseCategories
 import io.rafaelribeiro.spendless.presentation.screens.registration.components.SpendLessDropDown
@@ -176,32 +177,13 @@ fun RegistrationPreferencesScreen(
             selectedIndex = selectedThousandSeparator,
             onOptionSelected = { selectedThousandSeparator = it }
         )
-        Button(
-            onClick = {},
-            modifier = Modifier
-                .padding(top = 34.dp)
-                .height(48.dp)
-                .fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(
-                contentColor = MaterialTheme.colorScheme.onPrimary,
-                containerColor = MaterialTheme.colorScheme.primary,
-                disabledContentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
-                disabledContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
-            ),
-            shape = RoundedCornerShape(16.dp),
-            enabled = true
-        ) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(
-                    text = "Start Tracking!",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                )
-            }
-        }
+        SpendLessButton(
+            text = "Start Tracking!!!",
+            modifier = Modifier.padding(top = 34.dp),
+            onClick = {
+                // TODO:
+            },
+        )
     }
 }
 

@@ -3,21 +3,16 @@ package io.rafaelribeiro.spendless.presentation.screens.login
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -47,6 +42,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.navOptions
 import io.rafaelribeiro.spendless.R
+import io.rafaelribeiro.spendless.core.presentation.SpendLessButton
 import io.rafaelribeiro.spendless.navigation.NavigationState
 import io.rafaelribeiro.spendless.navigation.Screen
 import io.rafaelribeiro.spendless.presentation.theme.SpendLessTheme
@@ -57,7 +53,7 @@ fun LoginRootScreen(
     navigationState: NavigationState,
     modifier: Modifier,
     uiState: LoginUiState,
-    viewModel: LoginViewModel,
+    onEvent: (LoginUiEvent) -> Unit = {},
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -73,9 +69,7 @@ fun LoginRootScreen(
         LoginScreen(
             modifier = modifier.padding(innerPadding),
             uiState = uiState,
-            onLoginClick = { viewModel.onEvent(LoginUiEvent.ActionButtonLoginClicked) },
-            onUsernameChange = { viewModel.onEvent(LoginUiEvent.UsernameChanged(it)) },
-            onPinChange = { viewModel.onEvent(LoginUiEvent.PinChanged(it)) },
+            onEvent = onEvent,
             onNewAccountClick = {
                 navigationState.navigateTo(
                     route = Screen.RegistrationUsername.route,
@@ -93,9 +87,7 @@ fun LoginRootScreen(
 fun LoginScreen(
     modifier: Modifier,
     uiState: LoginUiState,
-    onLoginClick: () -> Unit = {},
-    onUsernameChange: (String) -> Unit = {},
-    onPinChange: (String) -> Unit = {},
+    onEvent: (LoginUiEvent) -> Unit,
     onNewAccountClick: () -> Unit = {},
 ) {
     var passwordVisible by remember { mutableStateOf(false) }
@@ -132,14 +124,14 @@ fun LoginScreen(
                 .padding(horizontal = 16.dp, vertical = 8.dp), // Add padding here,
             value = uiState.username,
             onValueChange = {
-                onUsernameChange(it)
+                onEvent(LoginUiEvent.UsernameChanged(it))
             },
             textStyle = MaterialTheme.typography.bodyMedium.copy(
                 textAlign = TextAlign.Start,
                 fontWeight = FontWeight.Normal,
             ),
             singleLine = true,
-            shape = RoundedCornerShape(24.dp),
+            shape = RoundedCornerShape(16.dp),
             placeholder = {
                 Box(
                     modifier = Modifier,
@@ -160,14 +152,14 @@ fun LoginScreen(
                 .padding(horizontal = 16.dp, vertical = 8.dp), // Add padding here,
             value = uiState.pin,
             onValueChange = {
-                onPinChange(it)
+                onEvent(LoginUiEvent.PinChanged(it))
             },
             textStyle = MaterialTheme.typography.bodyMedium.copy(
                 textAlign = TextAlign.Start,
                 fontWeight = FontWeight.Normal,
             ),
             singleLine = true,
-            shape = RoundedCornerShape(24.dp),
+            shape = RoundedCornerShape(16.dp),
             placeholder = {
                 Box(
                     modifier = Modifier,
@@ -188,39 +180,20 @@ fun LoginScreen(
                     Icons.Filled.Visibility
                 else Icons.Filled.VisibilityOff
 
-                val description = if (passwordVisible) "Hide password" else "Show password"
+                val description = if (passwordVisible) R.string.hide_password else R.string.show_password
 
                 IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                    Icon(imageVector = image, description)
+                    Icon(imageVector = image, contentDescription =  stringResource(description))
                 }
             }
         )
-        Button(
-            onClick = onLoginClick,
-            modifier = Modifier
-                .padding(16.dp)
-                .height(48.dp)
-                .fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(
-                contentColor = MaterialTheme.colorScheme.onPrimary,
-                containerColor = MaterialTheme.colorScheme.primary,
-                disabledContentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
-                disabledContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
-            ),
-            shape = RoundedCornerShape(16.dp),
-            enabled = uiState.loginButtonEnabled,
-        ) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(
-                    text = stringResource(R.string.login),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                )
+        SpendLessButton(
+            text = stringResource(R.string.login),
+            modifier = Modifier.padding(16.dp),
+            onClick = {
+                onEvent(LoginUiEvent.ActionButtonLoginClicked)
             }
-        }
+        )
         Text(
             text = stringResource(R.string.new_to_spendless),
             color = MaterialTheme.colorScheme.primary,
@@ -240,6 +213,7 @@ fun LoginScreenPreview() {
         LoginScreen(
             modifier = Modifier.fillMaxSize(),
             uiState = LoginUiState(),
+            onEvent = {},
         )
     }
 }

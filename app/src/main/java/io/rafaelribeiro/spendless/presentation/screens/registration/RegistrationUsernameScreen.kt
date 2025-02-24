@@ -36,6 +36,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.rafaelribeiro.spendless.R
 import io.rafaelribeiro.spendless.core.presentation.ErrorDialog
+import io.rafaelribeiro.spendless.core.presentation.SpendLessButton
 import io.rafaelribeiro.spendless.presentation.theme.SpendLessTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -141,39 +142,15 @@ fun RegistrationUsernameScreen(
 				}
 			},
 		)
-		Button(
-			onClick = onNextClick,
-			modifier = Modifier
-				.padding(top = 16.dp)
-				.height(48.dp)
-				.fillMaxWidth(),
-			colors = ButtonDefaults.buttonColors(
-				contentColor = MaterialTheme.colorScheme.onPrimary,
-				containerColor = MaterialTheme.colorScheme.primary,
-				disabledContentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
-				disabledContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
-			),
-			shape = RoundedCornerShape(16.dp),
-			enabled = uiState.nextButtonEnabled,
-		) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(
-                    text = stringResource(R.string.next),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                )
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                    contentDescription = "Next",
-                    modifier = Modifier
-                        .size(18.dp)
-
-                )
-            }
-		}
+        SpendLessButton(
+            text = stringResource(R.string.next),
+            modifier = Modifier
+                .padding(top = 16.dp)
+                .fillMaxWidth(),
+            onClick = onNextClick,
+            enabled = uiState.nextButtonEnabled,
+            trailingIcon = Icons.AutoMirrored.Filled.ArrowForward,
+        )
 		Text(
 			text = stringResource(R.string.already_have_an_account),
 			color = MaterialTheme.colorScheme.primary,
