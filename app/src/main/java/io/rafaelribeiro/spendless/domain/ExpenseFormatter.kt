@@ -9,12 +9,6 @@ class ExpenseFormatter(
     private val currencySymbol: CurrencySymbol,
     private val expensesFormat: ExpenseFormat
 ) {
-    init {
-        if (decimalSeparator.symbol == thousandSeparator.symbol) {
-            throw IllegalArgumentException("Decimal and thousand separators must be different.")
-        }
-    }
-
     fun format(amount: Double): String {
         val formatter = createFormatter()
         val formattedValue = formatter.format(kotlin.math.abs(amount))
@@ -30,7 +24,7 @@ class ExpenseFormatter(
     }
 
     private fun formatOutput(amount: Double, formattedValue: String): String {
-        val prefix = currencySymbol.value
+        val prefix = currencySymbol.symbol
         return when {
             amount < 0 && expensesFormat == ExpenseFormat.PARENTHESES -> "($prefix$formattedValue)"
             amount < 0 -> "-$prefix$formattedValue"

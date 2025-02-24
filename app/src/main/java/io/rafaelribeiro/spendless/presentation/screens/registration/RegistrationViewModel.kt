@@ -7,6 +7,7 @@ import io.rafaelribeiro.spendless.R
 import io.rafaelribeiro.spendless.core.presentation.UiText
 import io.rafaelribeiro.spendless.core.presentation.asUiText
 import io.rafaelribeiro.spendless.domain.AuthRepository
+import io.rafaelribeiro.spendless.domain.CurrencySymbol
 import io.rafaelribeiro.spendless.domain.DecimalSeparator
 import io.rafaelribeiro.spendless.domain.ExpenseFormat
 import io.rafaelribeiro.spendless.domain.ExpenseFormatter
@@ -61,24 +62,29 @@ class RegistrationViewModel @Inject constructor(
 				updateState { it.copy(preferences = it.preferences.copy(thousandSeparator = event.thousandSeparator)) }
                 formatExpense(-10382.45)
 			}
-		}
+            is RegistrationUiEvent.CurrencySelected -> {
+                updateState { it.copy(preferences = it.preferences.copy(currencySymbol = event.currency)) }
+                formatExpense(-10382.45)
+            }
+        }
 	}
 
     private fun formatExpense(amount: Double) {
-        try {
-            val formatter = ExpenseFormatter(
-                decimalSeparator = _uiState.value.preferences.decimalSeparator,
-                thousandSeparator = _uiState.value.preferences.thousandSeparator,
-                currencySymbol = _uiState.value.preferences.currencySymbol,
-                expensesFormat = _uiState.value.preferences.expensesFormat
-            )
-            val formattedAmount = formatter.format(amount)
-            updateState { it.copy(preferences = it.preferences.copy(exampleExpenseFormat = formattedAmount)) }
-            enableStartTrackingButton(true)
-        } catch (e: IllegalArgumentException) {
-            enableStartTrackingButton(false)
+        val formatter = ExpenseFormatter(
+            decimalSeparator = _uiState.value.preferences.decimalSeparator,
+            thousandSeparator = _uiState.value.preferences.thousandSeparator,
+            currencySymbol = _uiState.value.preferences.currencySymbol,
+            expensesFormat = _uiState.value.preferences.expensesFormat
+        )
+        updateState { it.copy(preferences = it.preferences.copy(exampleExpenseFormat = formatter.format(amount))) }
+        if (isSameSeparator()) {
+            enableStartTrackingButton(enabled = false)
+        } else {
+            enableStartTrackingButton(enabled = true)
         }
     }
+
+    private fun isSameSeparator() = _uiState.value.preferences.thousandSeparator.name == _uiState.value.preferences.decimalSeparator.name
 
     private fun enableStartTrackingButton(enabled: Boolean) {
         updateState { it.copy(preferences = it.preferences.copy(startTrackingButtonEnabled = enabled)) }
@@ -93,13 +99,14 @@ class RegistrationViewModel @Inject constructor(
 			setNextButtonEnabled(false)
 			when (val result = authRepository.checkUserName(_uiState.value.username)) {
 				is Result.Success -> {
+                    setNextButtonEnabled(true)
 					sendActionEvent(RegistrationActionEvent.UsernameCheckSuccess)
 				}
 				is Result.Failure -> {
+                    setNextButtonEnabled(false)
 					showErrorMessage(result.error.asUiText())
 				}
 			}
-			setNextButtonEnabled(true)
 		}
 	}
 
@@ -189,4 +196,5 @@ sealed interface RegistrationUiEvent {
 	data class ExpensesFormatSelected(val expensesFormat: ExpenseFormat) : RegistrationUiEvent
 	data class DecimalSeparatorSelected(val decimalSeparator: DecimalSeparator) : RegistrationUiEvent
 	data class ThousandSeparatorSelected(val thousandSeparator: ThousandSeparator) : RegistrationUiEvent
+    data class CurrencySelected(val currency: CurrencySymbol) : RegistrationUiEvent
 }

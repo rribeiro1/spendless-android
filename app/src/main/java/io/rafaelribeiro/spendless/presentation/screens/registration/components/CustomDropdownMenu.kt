@@ -35,7 +35,7 @@ fun CustomDropdownMenu(
             Surface(
                 modifier = modifier,
                 shape = RoundedCornerShape(16.dp),
-                color = MaterialTheme.colorScheme.surface,
+                color = MaterialTheme.colorScheme.onPrimary,
                 shadowElevation = 4.dp
             ) {
                 Column(

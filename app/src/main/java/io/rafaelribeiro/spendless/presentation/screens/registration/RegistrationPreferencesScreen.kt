@@ -27,6 +27,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.DefaultShadowColor
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -161,8 +162,11 @@ fun RegistrationPreferencesScreen(
         )
         SpendLessDropDown(
             title = stringResource(R.string.currency),
-            values = ExpenseCategories.categories,
-            itemBackgroundColor = MaterialTheme.colorScheme.secondary,
+            values = CurrencySymbol.entries,
+            itemBackgroundColor = MaterialTheme.colorScheme.onPrimary,
+            getText = { it.title },
+            getLeadingIcon = { it.symbol },
+            onItemSelected = { onEvent(RegistrationUiEvent.CurrencySelected(it)) },
         )
         SpendLessSegmentedButton(
             title = stringResource(R.string.decimal_separator),

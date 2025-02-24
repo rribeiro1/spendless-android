@@ -12,7 +12,7 @@ data class RegistrationUiState(
 	val errorMessage: UiText = Empty,
 	val pin: String = "",
 	val pinConfirmation: String = "",
-	val nextButtonEnabled: Boolean = true,
+	val nextButtonEnabled: Boolean = false,
     val preferences: RegistrationPreferencesUiState = RegistrationPreferencesUiState(
         exampleExpenseFormat = "-$10,382.45",
         expensesFormat = ExpenseFormat.NEGATIVE,
