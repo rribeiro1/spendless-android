@@ -135,7 +135,7 @@ fun LoginScreen(
                 fontWeight = FontWeight.Normal,
             ),
             singleLine = true,
-            shape = RoundedCornerShape(24.dp),
+            shape = RoundedCornerShape(16.dp),
             placeholder = {
                 Box(
                     modifier = Modifier,
