@@ -1,7 +1,5 @@
 package io.rafaelribeiro.spendless.navigation
 
-import androidx.compose.animation.AnimatedContentTransitionScope
-import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -19,7 +17,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.navOptions
-import io.rafaelribeiro.spendless.core.presentation.ErrorDialog
+import io.rafaelribeiro.spendless.presentation.screens.login.LoginRootScreen
+import io.rafaelribeiro.spendless.presentation.screens.login.LoginViewModel
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationActionEvent
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationPinConfirmationScreen
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationPinPromptScreen
@@ -31,23 +30,15 @@ import kotlinx.coroutines.flow.Flow
 @Composable
 fun RootAppNavigation(
 	navigationState: NavigationState,
-	modifier: Modifier,
+	modifier: Modifier = Modifier,
 ) {
 	NavHost(
 		navController = navigationState.navHostController,
 		startDestination = Screen.RegistrationFlow.route,
-		enterTransition = {
-			enterTransition(AnimatedContentTransitionScope.SlideDirection.Start)
-		},
-		exitTransition = {
-			exitTransition(AnimatedContentTransitionScope.SlideDirection.Start)
-		},
-		popEnterTransition = {
-			enterTransition(AnimatedContentTransitionScope.SlideDirection.End)
-		},
-		popExitTransition = {
-			exitTransition(AnimatedContentTransitionScope.SlideDirection.End)
-		}
+		enterTransition = enterTransition(),
+		exitTransition = exitTransition(),
+		popEnterTransition = popEnterTransition(),
+		popExitTransition = popExitTransition(),
 	) {
 		navigation(
 			startDestination = Screen.RegistrationUsername.route,
@@ -57,8 +48,18 @@ fun RootAppNavigation(
 				val viewModel = entry.sharedViewModel<RegistrationViewModel>(navigationState.navHostController)
 				val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 				ObserveAsEvents(flow = viewModel.actionEvents) { event ->
-					if (event is RegistrationActionEvent.UsernameCheckSuccess) {
-						navigationState.navigateTo(Screen.RegistrationPinCreation.route)
+					when {
+						event is RegistrationActionEvent.AlreadyHaveAccount -> {
+							navigationState.navigateTo(
+								route = Screen.LoginScreen.route,
+								navOptions = navOptions {
+									popUpTo(Screen.RegistrationUsername.route) { inclusive = true }
+								}
+							)
+						}
+						event is RegistrationActionEvent.UsernameCheckSuccess -> {
+							navigationState.navigateTo(Screen.RegistrationPinCreation.route)
+						}
 					}
 				}
 				RegistrationUsernameRootScreen(
@@ -66,7 +67,6 @@ fun RootAppNavigation(
 					onEvent = viewModel::onEvent,
 					modifier = modifier,
 				)
-				ErrorDialog(errorMessage = uiState.errorMessage)
 			}
 			composable(route = Screen.RegistrationPinCreation.route) { entry ->
 				val viewModel = entry.sharedViewModel<RegistrationViewModel>(navigationState.navHostController)
@@ -82,7 +82,6 @@ fun RootAppNavigation(
                     navigationState = navigationState,
 					modifier = modifier,
 				)
-				ErrorDialog(errorMessage = uiState.errorMessage)
 			}
 			composable(route = Screen.RegistrationPinConfirmation.route) { entry ->
 				val viewModel = entry.sharedViewModel<RegistrationViewModel>(navigationState.navHostController)
@@ -110,7 +109,6 @@ fun RootAppNavigation(
                     navigationState = navigationState,
 					modifier = modifier,
 				)
-				ErrorDialog(errorMessage = uiState.errorMessage)
 			}
 			composable(route = Screen.RegistrationSetPreferences.route) { entry ->
 				val viewModel = entry.sharedViewModel<RegistrationViewModel>(navigationState.navHostController)
@@ -121,6 +119,18 @@ fun RootAppNavigation(
 					onEvent = viewModel::onEvent
                 )
 			}
+		}
+		composable(
+			route = Screen.LoginScreen.route,
+		) {
+			val viewModel = hiltViewModel<LoginViewModel>()
+			val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+			LoginRootScreen(
+				modifier = modifier,
+				uiState = uiState,
+				navigationState = navigationState,
+				onEvent = viewModel::onEvent,
+			)
 		}
 	}
 }
@@ -146,16 +156,3 @@ private fun <T> ObserveAsEvents(flow: Flow<T>, onEvent: (T) -> Unit) {
 	}
 }
 
-fun AnimatedContentTransitionScope<NavBackStackEntry>.exitTransition(
-	slideDirection: AnimatedContentTransitionScope.SlideDirection
-) = slideOutOfContainer(
-	slideDirection,
-	animationSpec = tween(500)
-)
-
-fun AnimatedContentTransitionScope<NavBackStackEntry>.enterTransition(
-	slideDirection: AnimatedContentTransitionScope.SlideDirection
-) = slideIntoContainer(
-	slideDirection,
-	animationSpec = tween(500)
-)
