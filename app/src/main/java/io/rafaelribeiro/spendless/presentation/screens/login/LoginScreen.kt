@@ -57,7 +57,7 @@ fun LoginRootScreen(
     navigationState: NavigationState,
     modifier: Modifier,
     uiState: LoginUiState,
-    viewModel: LoginViewModel,
+    onEvent: (LoginUiEvent) -> Unit = {},
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -73,9 +73,7 @@ fun LoginRootScreen(
         LoginScreen(
             modifier = modifier.padding(innerPadding),
             uiState = uiState,
-            onLoginClick = { viewModel.onEvent(LoginUiEvent.ActionButtonLoginClicked) },
-            onUsernameChange = { viewModel.onEvent(LoginUiEvent.UsernameChanged(it)) },
-            onPinChange = { viewModel.onEvent(LoginUiEvent.PinChanged(it)) },
+            onEvent = onEvent,
             onNewAccountClick = {
                 navigationState.navigateTo(
                     route = Screen.RegistrationUsername.route,
@@ -93,9 +91,7 @@ fun LoginRootScreen(
 fun LoginScreen(
     modifier: Modifier,
     uiState: LoginUiState,
-    onLoginClick: () -> Unit = {},
-    onUsernameChange: (String) -> Unit = {},
-    onPinChange: (String) -> Unit = {},
+    onEvent: (LoginUiEvent) -> Unit,
     onNewAccountClick: () -> Unit = {},
 ) {
     var passwordVisible by remember { mutableStateOf(false) }
@@ -132,7 +128,7 @@ fun LoginScreen(
                 .padding(horizontal = 16.dp, vertical = 8.dp), // Add padding here,
             value = uiState.username,
             onValueChange = {
-                onUsernameChange(it)
+                onEvent(LoginUiEvent.UsernameChanged(it))
             },
             textStyle = MaterialTheme.typography.bodyMedium.copy(
                 textAlign = TextAlign.Start,
@@ -160,7 +156,7 @@ fun LoginScreen(
                 .padding(horizontal = 16.dp, vertical = 8.dp), // Add padding here,
             value = uiState.pin,
             onValueChange = {
-                onPinChange(it)
+                onEvent(LoginUiEvent.PinChanged(it))
             },
             textStyle = MaterialTheme.typography.bodyMedium.copy(
                 textAlign = TextAlign.Start,
@@ -188,15 +184,15 @@ fun LoginScreen(
                     Icons.Filled.Visibility
                 else Icons.Filled.VisibilityOff
 
-                val description = if (passwordVisible) "Hide password" else "Show password"
+                val description = if (passwordVisible) R.string.hide_password else R.string.show_password
 
                 IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                    Icon(imageVector = image, description)
+                    Icon(imageVector = image, contentDescription =  stringResource(description))
                 }
             }
         )
         Button(
-            onClick = onLoginClick,
+            onClick = { onEvent(LoginUiEvent.ActionButtonLoginClicked) },
             modifier = Modifier
                 .padding(16.dp)
                 .height(48.dp)
@@ -240,6 +236,7 @@ fun LoginScreenPreview() {
         LoginScreen(
             modifier = Modifier.fillMaxSize(),
             uiState = LoginUiState(),
+            onEvent = {},
         )
     }
 }

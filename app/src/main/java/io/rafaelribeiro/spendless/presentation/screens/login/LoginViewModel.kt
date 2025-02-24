@@ -52,6 +52,7 @@ class LoginViewModel @Inject constructor(
         val username = _uiState.value.username
         val pin = _uiState.value.pin
         // TODO: Login
+        println("Username: $username, Pin: $pin")
     }
 
 }

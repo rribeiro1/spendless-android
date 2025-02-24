@@ -120,22 +120,17 @@ fun RootAppNavigation(
                 )
 			}
 		}
-		navigation(
-			startDestination = Screen.LoginScreen.route,
-			route = Screen.LoginFlow.route,
+		composable(
+			route = Screen.LoginScreen.route,
 		) {
-			composable(
-				route = Screen.LoginScreen.route,
-			) { entry ->
-				val viewModel = entry.sharedViewModel<LoginViewModel>(navigationState.navHostController)
-				val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-				LoginRootScreen(
-					viewModel = viewModel,
-					uiState = uiState,
-					navigationState = navigationState,
-					modifier = modifier,
-				)
-			}
+			val viewModel = hiltViewModel<LoginViewModel>()
+			val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+			LoginRootScreen(
+				modifier = modifier,
+				uiState = uiState,
+				navigationState = navigationState,
+				onEvent = viewModel::onEvent,
+			)
 		}
 	}
 }
