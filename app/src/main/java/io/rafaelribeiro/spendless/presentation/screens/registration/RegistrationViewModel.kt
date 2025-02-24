@@ -7,7 +7,11 @@ import io.rafaelribeiro.spendless.R
 import io.rafaelribeiro.spendless.core.presentation.UiText
 import io.rafaelribeiro.spendless.core.presentation.asUiText
 import io.rafaelribeiro.spendless.domain.AuthRepository
+import io.rafaelribeiro.spendless.domain.DecimalSeparator
+import io.rafaelribeiro.spendless.domain.ExpenseFormat
+import io.rafaelribeiro.spendless.domain.ExpenseFormatter
 import io.rafaelribeiro.spendless.domain.Result
+import io.rafaelribeiro.spendless.domain.ThousandSeparator
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,8 +20,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.text.DecimalFormat
-import java.text.DecimalFormatSymbols
 import javax.inject.Inject
 
 @HiltViewModel
@@ -48,95 +50,39 @@ class RegistrationViewModel @Inject constructor(
 			is RegistrationUiEvent.PinConfirmationBackspaceTapped -> backspaceConfirmationPinTapped()
 			is RegistrationUiEvent.ResetPinValues -> resetPinValues()
 			is RegistrationUiEvent.ExpensesFormatSelected -> {
-				updateState {
-					it.copy(
-						preferences = it.preferences.copy(
-							expensesFormat = event.expensesFormat,
-							entryFormat = formatExpense(
-								expensesFormat = event.expensesFormat,
-								decimalSeparator = it.preferences.decimalSeparator,
-								thousandSeparator = it.preferences.thousandSeparator,
-								currencySymbol = it.preferences.currencySymbol
-							)
-						)
-					)
-				}
+				updateState { it.copy(preferences = it.preferences.copy(expensesFormat = event.expensesFormat)) }
+                formatExpense(-10382.45)
 			}
 			is RegistrationUiEvent.DecimalSeparatorSelected -> {
-				updateState {
-					it.copy(
-						preferences = it.preferences.copy(
-							decimalSeparator = event.decimalSeparator,
-							entryFormat = formatExpense(
-								decimalSeparator = event.decimalSeparator,
-								expensesFormat = it.preferences.expensesFormat,
-								thousandSeparator = it.preferences.thousandSeparator,
-								currencySymbol = it.preferences.currencySymbol
-							)
-						)
-					)
-				}
+				updateState { it.copy(preferences = it.preferences.copy(decimalSeparator = event.decimalSeparator)) }
+                formatExpense(-10382.45)
 			}
 			is RegistrationUiEvent.ThousandSeparatorSelected -> {
-				updateState {
-					it.copy(
-						preferences = it.preferences.copy(
-							thousandSeparator = event.thousandSeparator,
-							entryFormat = formatExpense(
-								thousandSeparator = event.thousandSeparator,
-								expensesFormat = it.preferences.expensesFormat,
-								decimalSeparator = it.preferences.decimalSeparator,
-								currencySymbol = it.preferences.currencySymbol
-							)
-						)
-					)
-				}
+				updateState { it.copy(preferences = it.preferences.copy(thousandSeparator = event.thousandSeparator)) }
+                formatExpense(-10382.45)
 			}
 		}
 	}
 
-	private fun formatExpense(
-		amount: Double = -1234.50,
-		expensesFormat: ExpensesFormat,
-		decimalSeparator: DecimalSeparator,
-		thousandSeparator: ThousandSeparator,
-		currencySymbol: CurrencySymbol,
-	): String {
-		if ((decimalSeparator == DecimalSeparator.DOT && thousandSeparator == ThousandSeparator.DOT) ||
-				(decimalSeparator == DecimalSeparator.COMMA && thousandSeparator == ThousandSeparator.COMMA)) {
-			updateState {
-				it.copy(
-					preferences = it.preferences.copy(
-						startTrackingButtonEnabled = false
-					)
-				)
-			}
-		} else {
-			updateState {
-				it.copy(
-					preferences = it.preferences.copy(
-						startTrackingButtonEnabled = true
-					)
-				)
-			}
-		}
+    private fun formatExpense(amount: Double) {
+        try {
+            val formatter = ExpenseFormatter(
+                decimalSeparator = _uiState.value.preferences.decimalSeparator,
+                thousandSeparator = _uiState.value.preferences.thousandSeparator,
+                currencySymbol = _uiState.value.preferences.currencySymbol,
+                expensesFormat = _uiState.value.preferences.expensesFormat
+            )
+            val formattedAmount = formatter.format(amount)
+            updateState { it.copy(preferences = it.preferences.copy(exampleExpenseFormat = formattedAmount)) }
+            enableStartTrackingButton(true)
+        } catch (e: IllegalArgumentException) {
+            enableStartTrackingButton(false)
+        }
+    }
 
-		val symbols = DecimalFormatSymbols().apply {
-			this.decimalSeparator = decimalSeparator.symbol.first()
-			this.groupingSeparator = thousandSeparator.symbol.first()
-		}
-
-		val pattern = "#,##0.00"
-		val formatter = DecimalFormat(pattern, symbols)
-
-		val formattedValue = formatter.format(kotlin.math.abs(amount))
-
-		return when {
-			amount < 0 && expensesFormat == ExpensesFormat.PARENTHESES -> "(${currencySymbol.value}$formattedValue)"
-			amount < 0 -> "-${currencySymbol.value}$formattedValue"
-			else -> "${currencySymbol.value}$formattedValue"
-		}
-	}
+    private fun enableStartTrackingButton(enabled: Boolean) {
+        updateState { it.copy(preferences = it.preferences.copy(startTrackingButtonEnabled = enabled)) }
+    }
 
 	private fun updateState(state: (RegistrationUiState) -> RegistrationUiState) {
 		_uiState.update { state(it) }
@@ -166,7 +112,7 @@ class RegistrationViewModel @Inject constructor(
 	private fun pinChanged(digit: String) {
 		val currentPin = _uiState.value.pin + digit
 		if (currentPin.length <= PIN_MAX_SIZE) {
-			_uiState.update { it.copy(pin = currentPin) }
+            updateState { it.copy(pin = currentPin) }
 			if (currentPin.length == PIN_MAX_SIZE) {
 				sendActionEvent(RegistrationActionEvent.PinCreated)
 			}
@@ -176,7 +122,7 @@ class RegistrationViewModel @Inject constructor(
 	private fun pinConfirmationChanged(digit: String) {
 		val currentPin = _uiState.value.pinConfirmation + digit
 		if (currentPin.length <= PIN_MAX_SIZE) {
-			_uiState.update { it.copy(pinConfirmation = currentPin) }
+            updateState { it.copy(pinConfirmation = currentPin) }
 			if (currentPin.length == PIN_MAX_SIZE) {
 				if (_uiState.value.pin == currentPin) {
 					sendActionEvent(RegistrationActionEvent.PinConfirmed)
@@ -190,31 +136,31 @@ class RegistrationViewModel @Inject constructor(
 	}
 
 	private fun backspacePinTapped() {
-		_uiState.update { it.copy(pin = _uiState.value.pin.dropLast(n = 1)) }
+        updateState { it.copy(pin = _uiState.value.pin.dropLast(n = 1)) }
 	}
 
 	private fun backspaceConfirmationPinTapped() {
-		_uiState.update { it.copy(pinConfirmation = _uiState.value.pinConfirmation.dropLast(n = 1)) }
+        updateState { it.copy(pinConfirmation = _uiState.value.pinConfirmation.dropLast(n = 1)) }
 	}
 
 	private fun resetPinValues() {
-		_uiState.update { it.copy(pinConfirmation = "", pin = "") }
+        updateState { it.copy(pinConfirmation = "", pin = "") }
 	}
 
 	private fun showErrorMessage(text: UiText) {
-		_uiState.update { it.copy(errorMessage = text) }
+        updateState { it.copy(errorMessage = text) }
 		viewModelScope.launch {
 			delay(ERROR_MESSAGE_DURATION)
-			_uiState.update { it.copy(errorMessage = UiText.Empty) }
+            updateState { it.copy(errorMessage = UiText.Empty) }
 		}
 	}
 
 	private fun setNextButtonEnabled(enabled: Boolean) {
-		_uiState.update { it.copy(nextButtonEnabled = enabled) }
+        updateState { it.copy(nextButtonEnabled = enabled) }
 	}
 
 	private fun updateUsername(username: String) {
-		_uiState.update { it.copy(username = username) }
+        updateState { it.copy(username = username) }
 	}
 
 	private fun sendActionEvent(actionEvent: RegistrationActionEvent) {
@@ -240,7 +186,7 @@ sealed interface RegistrationUiEvent {
 	data object PinConfirmationBackspaceTapped : RegistrationUiEvent
 	data object ResetPinValues : RegistrationUiEvent
 
-	data class ExpensesFormatSelected(val expensesFormat: ExpensesFormat) : RegistrationUiEvent
+	data class ExpensesFormatSelected(val expensesFormat: ExpenseFormat) : RegistrationUiEvent
 	data class DecimalSeparatorSelected(val decimalSeparator: DecimalSeparator) : RegistrationUiEvent
 	data class ThousandSeparatorSelected(val thousandSeparator: ThousandSeparator) : RegistrationUiEvent
 }

@@ -1,6 +1,5 @@
 package io.rafaelribeiro.spendless.presentation.screens.registration
 
-import android.icu.text.DecimalFormat
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -25,10 +24,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -39,6 +34,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.rafaelribeiro.spendless.R
+import io.rafaelribeiro.spendless.domain.CurrencySymbol
+import io.rafaelribeiro.spendless.domain.DecimalSeparator
+import io.rafaelribeiro.spendless.domain.ExpenseFormat
+import io.rafaelribeiro.spendless.domain.ThousandSeparator
 import io.rafaelribeiro.spendless.navigation.NavigationState
 import io.rafaelribeiro.spendless.presentation.screens.registration.components.ExpenseCategories
 import io.rafaelribeiro.spendless.presentation.screens.registration.components.SpendLessDropDown
@@ -136,7 +135,7 @@ fun RegistrationPreferencesScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = uiState.entryFormat,
+                    text = uiState.exampleExpenseFormat,
                     style = MaterialTheme.typography.headlineLarge,
                     textAlign = TextAlign.Center,
                     modifier = Modifier
@@ -154,10 +153,10 @@ fun RegistrationPreferencesScreen(
 
         SpendLessSegmentedButton(
             title = stringResource(R.string.expenses_format),
-            options = ExpensesFormat.entries.map { it.value },
-            selectedIndex = ExpensesFormat.entries.indexOf(uiState.expensesFormat),
+            options = ExpenseFormat.entries.map { it.value },
+            selectedIndex = ExpenseFormat.entries.indexOf(uiState.expensesFormat),
             onOptionSelected = {
-                onEvent(RegistrationUiEvent.ExpensesFormatSelected(ExpensesFormat.entries[it]))
+                onEvent(RegistrationUiEvent.ExpensesFormatSelected(ExpenseFormat.entries[it]))
             }
         )
         SpendLessDropDown(
@@ -217,10 +216,10 @@ fun RegistrationPreferencesRootScreenPreview() {
         RegistrationPreferencesScreen(
             modifier = Modifier,
             uiState = RegistrationPreferencesUiState(
-                entryFormat = "-$10",
-                expensesFormat = ExpensesFormat.PARENTHESES,
-                decimalSeparator = DecimalSeparator.DOT,
-                thousandSeparator = ThousandSeparator.SPACE,
+                exampleExpenseFormat = "-$1.234,50",
+                expensesFormat = ExpenseFormat.PARENTHESES,
+                decimalSeparator = DecimalSeparator.COMMA,
+                thousandSeparator = ThousandSeparator.DOT,
                 currencySymbol = CurrencySymbol.DOLLAR,
             ),
             onEvent = {},
