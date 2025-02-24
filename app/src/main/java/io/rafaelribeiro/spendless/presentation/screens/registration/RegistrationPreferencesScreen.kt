@@ -5,16 +5,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -27,10 +23,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.DefaultShadowColor
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -39,8 +33,8 @@ import io.rafaelribeiro.spendless.domain.CurrencySymbol
 import io.rafaelribeiro.spendless.domain.DecimalSeparator
 import io.rafaelribeiro.spendless.domain.ExpenseFormat
 import io.rafaelribeiro.spendless.domain.ThousandSeparator
+import io.rafaelribeiro.spendless.core.presentation.SpendLessButton
 import io.rafaelribeiro.spendless.navigation.NavigationState
-import io.rafaelribeiro.spendless.presentation.screens.registration.components.ExpenseCategories
 import io.rafaelribeiro.spendless.presentation.screens.registration.components.SpendLessDropDown
 import io.rafaelribeiro.spendless.presentation.screens.registration.components.SpendLessSegmentedButton
 import io.rafaelribeiro.spendless.presentation.theme.SpendLessTheme
@@ -184,32 +178,12 @@ fun RegistrationPreferencesScreen(
                 onEvent(RegistrationUiEvent.ThousandSeparatorSelected(ThousandSeparator.entries[it]))
             }
         )
-        Button(
+        SpendLessButton(
+            text = stringResource(R.string.start_tracking),
+            modifier = Modifier.padding(top = 34.dp),
+            enabled = uiState.startTrackingButtonEnabled,
             onClick = {},
-            modifier = Modifier
-                .padding(top = 34.dp)
-                .height(48.dp)
-                .fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(
-                contentColor = MaterialTheme.colorScheme.onPrimary,
-                containerColor = MaterialTheme.colorScheme.primary,
-                disabledContentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
-                disabledContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
-            ),
-            shape = RoundedCornerShape(16.dp),
-            enabled = uiState.startTrackingButtonEnabled
-        ) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(
-                    text = stringResource(R.string.start_tracking),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                )
-            }
-        }
+        )
     }
 }
 

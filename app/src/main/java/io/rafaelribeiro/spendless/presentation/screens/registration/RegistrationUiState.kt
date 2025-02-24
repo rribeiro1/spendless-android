@@ -28,5 +28,5 @@ data class RegistrationPreferencesUiState(
     val decimalSeparator: DecimalSeparator,
     val thousandSeparator: ThousandSeparator,
     val currencySymbol: CurrencySymbol,
-    val startTrackingButtonEnabled: Boolean = false,
+    val startTrackingButtonEnabled: Boolean = true,
 )

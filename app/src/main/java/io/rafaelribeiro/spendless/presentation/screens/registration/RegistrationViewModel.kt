@@ -44,7 +44,7 @@ class RegistrationViewModel @Inject constructor(
 		when (event) {
 			is RegistrationUiEvent.UsernameChanged -> usernameChanged(event.username)
 			is RegistrationUiEvent.ActionButtonNextClicked -> checkUserName()
-			is RegistrationUiEvent.LoginLinkClicked -> {}
+			is RegistrationUiEvent.LoginLinkClicked -> sendActionEvent(RegistrationActionEvent.AlreadyHaveAccount)
 			is RegistrationUiEvent.PinDigitTapped -> pinChanged(event.digit)
 			is RegistrationUiEvent.PinBackspaceTapped -> backspacePinTapped()
 			is RegistrationUiEvent.PinConfirmationDigitTapped -> pinConfirmationChanged(event.digit)
@@ -180,6 +180,7 @@ sealed interface RegistrationActionEvent {
 	data object PinCreated : RegistrationActionEvent
 	data object PinConfirmed : RegistrationActionEvent
 	data object PinMismatch : RegistrationActionEvent
+	data object AlreadyHaveAccount : RegistrationActionEvent
 }
 
 sealed interface RegistrationUiEvent {
