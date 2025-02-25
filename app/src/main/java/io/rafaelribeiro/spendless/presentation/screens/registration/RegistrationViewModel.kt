@@ -51,19 +51,19 @@ class RegistrationViewModel @Inject constructor(
 			is RegistrationUiEvent.PinConfirmationBackspaceTapped -> backspaceConfirmationPinTapped()
 			is RegistrationUiEvent.ResetPinValues -> resetPinValues()
 			is RegistrationUiEvent.ExpensesFormatSelected -> {
-				updateState { it.copy(preferences = it.preferences.copy(expensesFormat = event.expensesFormat)) }
+				updatePreferencesState { it.copy(expensesFormat = event.expensesFormat) }
                 formatExampleExpense()
 			}
 			is RegistrationUiEvent.DecimalSeparatorSelected -> {
-				updateState { it.copy(preferences = it.preferences.copy(decimalSeparator = event.decimalSeparator)) }
+				updatePreferencesState { it.copy(decimalSeparator = event.decimalSeparator) }
                 formatExampleExpense()
 			}
 			is RegistrationUiEvent.ThousandSeparatorSelected -> {
-				updateState { it.copy(preferences = it.preferences.copy(thousandSeparator = event.thousandSeparator)) }
+				updatePreferencesState { it.copy(thousandSeparator = event.thousandSeparator) }
                 formatExampleExpense()
 			}
             is RegistrationUiEvent.CurrencySelected -> {
-                updateState { it.copy(preferences = it.preferences.copy(currencySymbol = event.currency)) }
+                updatePreferencesState { it.copy(currencySymbol = event.currency) }
                 formatExampleExpense()
             }
             is RegistrationUiEvent.StartTrackingButtonTapped -> {
@@ -84,7 +84,7 @@ class RegistrationViewModel @Inject constructor(
             currencySymbol = _uiState.value.preferences.currencySymbol,
             expensesFormat = _uiState.value.preferences.expensesFormat
         )
-        updateState { it.copy(preferences = it.preferences.copy(exampleExpenseFormat = formatter.format(amount))) }
+        updatePreferencesState { it.copy(exampleExpenseFormat = formatter.format(amount)) }
         if (isSameSeparator()) {
             enableStartTrackingButton(enabled = false)
         } else {
@@ -95,12 +95,16 @@ class RegistrationViewModel @Inject constructor(
     private fun isSameSeparator() = _uiState.value.preferences.thousandSeparator.name == _uiState.value.preferences.decimalSeparator.name
 
     private fun enableStartTrackingButton(enabled: Boolean) {
-        updateState { it.copy(preferences = it.preferences.copy(startTrackingButtonEnabled = enabled)) }
+        updatePreferencesState { it.copy(startTrackingButtonEnabled = enabled) }
     }
 
 	private fun updateState(state: (RegistrationUiState) -> RegistrationUiState) {
 		_uiState.update { state(it) }
 	}
+
+    private fun updatePreferencesState(state: (RegistrationPreferencesUiState) -> RegistrationPreferencesUiState) {
+        updateState { it.copy(preferences = state(it.preferences)) }
+    }
 
 	private fun checkUserName() {
 		viewModelScope.launch {
