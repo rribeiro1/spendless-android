@@ -8,7 +8,11 @@ import assertk.assertions.isNotNull
 import assertk.assertions.isTrue
 import io.rafaelribeiro.spendless.core.presentation.UiText
 import io.rafaelribeiro.spendless.core.presentation.asUiText
+import io.rafaelribeiro.spendless.domain.CurrencySymbol
+import io.rafaelribeiro.spendless.domain.DecimalSeparator
+import io.rafaelribeiro.spendless.domain.ExpenseFormat
 import io.rafaelribeiro.spendless.domain.RegistrationError
+import io.rafaelribeiro.spendless.domain.ThousandSeparator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestDispatcher
@@ -93,6 +97,41 @@ class RegistrationViewModelTest {
             registrationViewModel.actionEvents.collect {
                 assertThat(it).isInstanceOf(RegistrationActionEvent.UsernameCheckSuccess::class.java)
             }
+        }
+    }
+
+    @Nested
+    inner class OnPreferenceSettingsChangedEvent {
+        @Test
+        fun `updates the example currency text to match the current preferences selected`() {
+            assertThat(state.preferences.exampleExpenseFormat).isEqualTo("-$10,382.45")
+
+            registrationViewModel.onEvent(RegistrationUiEvent.ExpensesFormatSelected(ExpenseFormat.PARENTHESES))
+            assertThat(state.preferences.exampleExpenseFormat).isEqualTo("($10,382.45)")
+
+            registrationViewModel.onEvent(RegistrationUiEvent.DecimalSeparatorSelected(DecimalSeparator.COMMA))
+            assertThat(state.preferences.exampleExpenseFormat).isEqualTo("($10,382,45)")
+
+            registrationViewModel.onEvent(RegistrationUiEvent.ThousandSeparatorSelected(ThousandSeparator.SPACE))
+            assertThat(state.preferences.exampleExpenseFormat).isEqualTo("($10 382,45)")
+
+            registrationViewModel.onEvent(RegistrationUiEvent.CurrencySelected(CurrencySymbol.EURO))
+            assertThat(state.preferences.exampleExpenseFormat).isEqualTo("(€10 382,45)")
+        }
+
+        @Test
+        fun `disables button when user has the same separator selected for both the thousands and decimal separator`() {
+            assertThat(state.preferences.startTrackingButtonEnabled).isTrue()
+
+            registrationViewModel.onEvent(RegistrationUiEvent.DecimalSeparatorSelected(DecimalSeparator.COMMA))
+            registrationViewModel.onEvent(RegistrationUiEvent.ThousandSeparatorSelected(ThousandSeparator.COMMA))
+            assertThat(state.preferences.startTrackingButtonEnabled).isFalse()
+
+            registrationViewModel.onEvent(RegistrationUiEvent.ThousandSeparatorSelected(ThousandSeparator.DOT))
+            assertThat(state.preferences.startTrackingButtonEnabled).isTrue()
+
+            registrationViewModel.onEvent(RegistrationUiEvent.DecimalSeparatorSelected(DecimalSeparator.DOT))
+            assertThat(state.preferences.startTrackingButtonEnabled).isFalse()
         }
     }
 }

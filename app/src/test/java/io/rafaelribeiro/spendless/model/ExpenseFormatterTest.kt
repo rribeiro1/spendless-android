@@ -65,15 +65,15 @@ class ExpenseFormatterTest {
     }
 
     @Test
-    fun `should throw exception when decimal and thousand separators are the same`() {
-        val exception = assertThrows<IllegalArgumentException> {
-            ExpenseFormatter(
-                expensesFormat = ExpenseFormat.NEGATIVE,
-                decimalSeparator = DecimalSeparator.COMMA,
-                thousandSeparator = ThousandSeparator.COMMA,
-                currencySymbol = CurrencySymbol.DOLLAR
-            )
-        }
-        assertThat(exception.message).isEqualTo("Decimal and thousand separators must be different.")
+    fun `should format numbers with same decimal and thousand separator`() {
+        val expense = 10382.45
+        val formatter = ExpenseFormatter(
+            expensesFormat = ExpenseFormat.NEGATIVE,
+            decimalSeparator = DecimalSeparator.COMMA,
+            thousandSeparator = ThousandSeparator.COMMA,
+            currencySymbol = CurrencySymbol.DOLLAR
+        )
+        val result = formatter.format(expense)
+        assertThat(result).isEqualTo("$10,382,45")
     }
 }

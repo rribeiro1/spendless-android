@@ -41,7 +41,7 @@ fun RootAppNavigation(
 		popExitTransition = popExitTransition(),
 	) {
 		navigation(
-			startDestination = Screen.RegistrationSetPreferences.route,
+			startDestination = Screen.RegistrationUsername.route,
 			route = Screen.RegistrationFlow.route,
 		) {
 			composable(route = Screen.RegistrationUsername.route) { entry ->

@@ -182,7 +182,9 @@ fun RegistrationPreferencesScreen(
             text = stringResource(R.string.start_tracking),
             modifier = Modifier.padding(top = 34.dp),
             enabled = uiState.startTrackingButtonEnabled,
-            onClick = {},
+            onClick = {
+                onEvent(RegistrationUiEvent.StartTrackingButtonTapped)
+            },
         )
     }
 }
@@ -196,7 +198,7 @@ fun RegistrationPreferencesRootScreenPreview() {
             uiState = RegistrationPreferencesUiState(
                 exampleExpenseFormat = "-$1.234,50",
                 expensesFormat = ExpenseFormat.PARENTHESES,
-                decimalSeparator = DecimalSeparator.COMMA,
+                decimalSeparator = DecimalSeparator.DOT,
                 thousandSeparator = ThousandSeparator.DOT,
                 currencySymbol = CurrencySymbol.DOLLAR,
             ),
@@ -204,4 +206,3 @@ fun RegistrationPreferencesRootScreenPreview() {
         )
     }
 }
-

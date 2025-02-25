@@ -52,24 +52,32 @@ class RegistrationViewModel @Inject constructor(
 			is RegistrationUiEvent.ResetPinValues -> resetPinValues()
 			is RegistrationUiEvent.ExpensesFormatSelected -> {
 				updateState { it.copy(preferences = it.preferences.copy(expensesFormat = event.expensesFormat)) }
-                formatExpense(-10382.45)
+                formatExampleExpense()
 			}
 			is RegistrationUiEvent.DecimalSeparatorSelected -> {
 				updateState { it.copy(preferences = it.preferences.copy(decimalSeparator = event.decimalSeparator)) }
-                formatExpense(-10382.45)
+                formatExampleExpense()
 			}
 			is RegistrationUiEvent.ThousandSeparatorSelected -> {
 				updateState { it.copy(preferences = it.preferences.copy(thousandSeparator = event.thousandSeparator)) }
-                formatExpense(-10382.45)
+                formatExampleExpense()
 			}
             is RegistrationUiEvent.CurrencySelected -> {
                 updateState { it.copy(preferences = it.preferences.copy(currencySymbol = event.currency)) }
-                formatExpense(-10382.45)
+                formatExampleExpense()
+            }
+            is RegistrationUiEvent.StartTrackingButtonTapped -> {
+                // TODO: Save user data.
             }
         }
 	}
 
-    private fun formatExpense(amount: Double) {
+    /**
+     * Formats the example expense with the current preferences and updates the UI.
+     * The amount does not really matter, as the goal is to show the user how the expense will be formatted.
+     */
+    private fun formatExampleExpense() {
+        val amount = -10382.45
         val formatter = ExpenseFormatter(
             decimalSeparator = _uiState.value.preferences.decimalSeparator,
             thousandSeparator = _uiState.value.preferences.thousandSeparator,
@@ -198,4 +206,5 @@ sealed interface RegistrationUiEvent {
 	data class DecimalSeparatorSelected(val decimalSeparator: DecimalSeparator) : RegistrationUiEvent
 	data class ThousandSeparatorSelected(val thousandSeparator: ThousandSeparator) : RegistrationUiEvent
     data class CurrencySelected(val currency: CurrencySymbol) : RegistrationUiEvent
+    data object StartTrackingButtonTapped : RegistrationUiEvent
 }
