@@ -19,6 +19,7 @@ import androidx.navigation.compose.navigation
 import androidx.navigation.navOptions
 import io.rafaelribeiro.spendless.presentation.screens.login.LoginRootScreen
 import io.rafaelribeiro.spendless.presentation.screens.login.LoginViewModel
+import io.rafaelribeiro.spendless.presentation.screens.login.PinPromptRootScreen
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationActionEvent
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationPinConfirmationScreen
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationPinPromptScreen
@@ -130,6 +131,16 @@ fun RootAppNavigation(
 				uiState = uiState,
 				navigationState = navigationState,
 				onEvent = viewModel::onEvent,
+			)
+		}
+
+		composable(route = Screen.PinPromptScreen.route) { entry ->
+			val viewModel = entry.sharedViewModel<LoginViewModel>(navigationState.navHostController)
+			val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+			PinPromptRootScreen(
+				navigationState = navigationState,
+				uiState = uiState,
+				modifier = modifier,
 			)
 		}
 	}
