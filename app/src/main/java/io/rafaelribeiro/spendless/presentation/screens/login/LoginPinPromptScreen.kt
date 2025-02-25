@@ -27,15 +27,17 @@ import io.rafaelribeiro.spendless.core.presentation.PinPromptScreen
 import io.rafaelribeiro.spendless.navigation.NavigationState
 import io.rafaelribeiro.spendless.navigation.Screen
 import io.rafaelribeiro.spendless.navigation.rememberNavigationState
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PinPromptRootScreen(
+fun LoginPinPromptRootScreen(
     navigationState: NavigationState,
     uiState: LoginUiState,
     onEvent: (LoginUiEvent) -> Unit = {},
     modifier: Modifier,
 ) {
+    val isPinLocked = uiState.pinLockRemainingSeconds > 0
     Box {
         Scaffold(
             modifier = modifier.fillMaxSize(),
@@ -44,6 +46,7 @@ fun PinPromptRootScreen(
                     title = {},
                     actions = {
                         FilledTonalIconButton(
+                            modifier = modifier.padding(horizontal = 12.dp, vertical = 8.dp),
                             colors = IconButtonColors(
                                 containerColor = MaterialTheme.colorScheme.error.copy(alpha = 0.08f),
                                 contentColor = MaterialTheme.colorScheme.error,
@@ -70,11 +73,18 @@ fun PinPromptRootScreen(
                 )
             }
         ) { innerPadding ->
+            val title = if (isPinLocked) stringResource(R.string.too_many_failed_attempts) else stringResource(R.string.hello_user, uiState.username)
+            val description = if (isPinLocked) {
+                stringResource(id = R.string.try_pin_again_in, uiState.pinLockRemainingSeconds.formatSecondsToMMSS())
+            }
+            else stringResource(id = R.string.login_enter_pin)
+
             PinPromptScreen(
                 modifier = modifier.padding(innerPadding),
-                title = "Hello, ${uiState.username}",
-                description = stringResource(id = R.string.registration_pin_confirmation_description),
+                title = title,
+                description = description,
                 currentPinSize = uiState.pin.length,
+                pinPadEnabled = uiState.pinPadEnabled,
                 onNumberClick = { onEvent(LoginUiEvent.PinDigitTapped(it)) },
                 onBackspaceClick = { onEvent(LoginUiEvent.PinBackspaceTapped) },
             )
@@ -89,9 +99,16 @@ fun PinPromptRootScreen(
 @Preview
 @Composable
 fun PinPromptScreenPreview() {
-    PinPromptRootScreen(
+    LoginPinPromptRootScreen(
         navigationState = rememberNavigationState(),
         uiState = LoginUiState(),
         modifier = Modifier,
     )
+}
+
+
+fun Int.formatSecondsToMMSS(): String {
+    val minutes = this / 60
+    val remainingSeconds = this % 60
+    return String.format(Locale.getDefault(),"%02d:%02d", minutes, remainingSeconds)
 }

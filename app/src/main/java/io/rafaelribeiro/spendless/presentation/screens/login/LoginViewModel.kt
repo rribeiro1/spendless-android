@@ -3,10 +3,14 @@ package io.rafaelribeiro.spendless.presentation.screens.login
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.rafaelribeiro.spendless.R
+import io.rafaelribeiro.spendless.core.presentation.UiText
 import io.rafaelribeiro.spendless.domain.AuthRepository
+import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationViewModel.Companion.ERROR_MESSAGE_DURATION
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationViewModel.Companion.PIN_MAX_SIZE
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationViewModel.Companion.USERNAME_MAX_SIZE
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationViewModel.Companion.USERNAME_MIN_SIZE
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,6 +23,13 @@ import javax.inject.Inject
 class LoginViewModel @Inject constructor(
     private val authRepository: AuthRepository,
 ) : ViewModel() {
+
+    companion object {
+        const val PIN_MAX_WRONG_COUNT = 2
+        const val PIN_LOCK_DURATION_SECONDS = 30
+    }
+
+    private var pinLockTimerJob: Job? = null
 
     private val _uiState: MutableStateFlow<LoginUiState> = MutableStateFlow(LoginUiState())
     val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
@@ -54,21 +65,50 @@ class LoginViewModel @Inject constructor(
         if (currentPin.length <= PIN_MAX_SIZE) {
             updateUiState { it.copy(pin = currentPin) }
             if (currentPin.length == PIN_MAX_SIZE) {
-                viewModelScope.launch {
-                    delay(111) // in order to able to see last pin digit
-                    // TODO: Login Checking from DataStore if PIN prompt is correct!
+                // TODO: Login Checking from DataStore if PIN prompt is correct!
 
-                    //TOdo: Then pop back stack and navigate where it came from
-                    // popBackStack?
+                //TOdo: Then pop back stack and navigate where it came from
+                // popBackStack?
 
-                    //TODO: Once PIN was inserted incorrectly 3 (editable in settings) times, the screen
-                    // should enter a locked state:
-                    // - The digit buttons are disabled
-                    // - Greeting text changes to: “Too many failed attempts”
-                    // - Show text that the user can try again and show the current countdown
-                    // of when they can retry (duration is editable in settings)
+                val isWrongPinEntered = true // TODO: Check if PIN is correct
+                if (isWrongPinEntered) {
+                    resetPinValues(true)
+                    showErrorMessage(UiText.StringResource(R.string.wrong_pin))
+                    if (_uiState.value.wrongPinCount < PIN_MAX_WRONG_COUNT) {
+                        updateUiState { it.copy(wrongPinCount = it.wrongPinCount + 1) }
+                    } else {
+                        updateUiState { it.copy(pinPadEnabled = false) } // Disable PinPad
+                        startPinLockTimer() // try your PIN again in 00:30
+                    }
                 }
             }
+        }
+    }
+
+    private fun startPinLockTimer() {
+        pinLockTimerJob?.cancel()
+        pinLockTimerJob = viewModelScope.launch {
+            for (seconds in PIN_LOCK_DURATION_SECONDS downTo 0) {
+                updateUiState { it.copy(pinLockRemainingSeconds = seconds) } // Ticking
+                if (seconds == 0) break
+                delay(1000) // Wait for 1 second
+            }
+            updateUiState { it.copy(pinPadEnabled = true, wrongPinCount = 0) } // Re-enable PinPad
+        }
+    }
+
+    private fun resetPinValues(withDelay: Boolean = false) {
+        viewModelScope.launch {
+            delay(if (withDelay) 222 else 0)
+            updateUiState { it.copy(pin = "") }
+        }
+    }
+
+    private fun showErrorMessage(text: UiText) {
+        _uiState.update { it.copy(errorMessage = text) }
+        viewModelScope.launch {
+            delay(ERROR_MESSAGE_DURATION)
+            _uiState.update { it.copy(errorMessage = UiText.Empty) }
         }
     }
 
@@ -85,6 +125,11 @@ class LoginViewModel @Inject constructor(
         val pin = _uiState.value.pin
         // TODO: Login
         println("Username: $username, Pin: $pin")
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        pinLockTimerJob?.cancel()
     }
 
 }
