@@ -33,6 +33,7 @@ import io.rafaelribeiro.spendless.navigation.rememberNavigationState
 fun PinPromptRootScreen(
     navigationState: NavigationState,
     uiState: LoginUiState,
+    onEvent: (LoginUiEvent) -> Unit = {},
     modifier: Modifier,
 ) {
     Box {
@@ -74,8 +75,8 @@ fun PinPromptRootScreen(
                 title = "Hello, ${uiState.username}",
                 description = stringResource(id = R.string.registration_pin_confirmation_description),
                 currentPinSize = uiState.pin.length,
-//                onNumberClick = { onEvent(RegistrationUiEvent.PinDigitTapped(it)) }, //todo wip
-//                onBackspaceClick = { onEvent(RegistrationUiEvent.PinBackspaceTapped) },
+                onNumberClick = { onEvent(LoginUiEvent.PinDigitTapped(it)) },
+                onBackspaceClick = { onEvent(LoginUiEvent.PinBackspaceTapped) },
             )
         }
         ErrorDialog(

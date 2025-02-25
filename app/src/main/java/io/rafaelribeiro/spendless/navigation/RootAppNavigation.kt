@@ -140,6 +140,7 @@ fun RootAppNavigation(
 			PinPromptRootScreen(
 				navigationState = navigationState,
 				uiState = uiState,
+                onEvent = viewModel::onEvent,
 				modifier = modifier,
 			)
 		}

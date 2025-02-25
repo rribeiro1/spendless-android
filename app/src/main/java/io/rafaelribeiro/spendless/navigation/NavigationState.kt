@@ -16,6 +16,7 @@ class NavigationState(
 	fun popBackStack() = navHostController.popBackStack()
 
     /**
+     * This Screen should be triggered when user's session has expired. todo: idk how to detect it!
      * Trigger the pin prompt screen anywhere in the app. This will clear the back stack and navigate to the pin prompt screen.
      */
     fun triggerPinPromptScreen() {
