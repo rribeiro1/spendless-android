@@ -114,6 +114,7 @@ fun RootAppNavigation(
 				val viewModel = entry.sharedViewModel<RegistrationViewModel>(navigationState.navHostController)
 				val uiState by viewModel.uiState.collectAsStateWithLifecycle()
                 RegistrationPreferencesRootScreen(
+					uiState = uiState,
                     navigationState = navigationState,
                     modifier = modifier,
 					onEvent = viewModel::onEvent

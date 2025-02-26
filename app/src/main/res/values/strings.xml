@@ -21,4 +21,10 @@
     <string name="pin">pin</string>
     <string name="hide_password">Hide password</string>
     <string name="show_password">Show password</string>
+    <string name="spend_this_month">spend this month</string>
+    <string name="expenses_format">Expenses format</string>
+    <string name="currency">Currency</string>
+    <string name="decimal_separator">Decimal separator</string>
+    <string name="thousands_separator">Thousands separator</string>
+    <string name="start_tracking">Start Tracking!</string>
 </resources>

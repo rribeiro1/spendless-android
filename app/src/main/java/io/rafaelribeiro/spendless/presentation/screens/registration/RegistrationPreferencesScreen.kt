@@ -5,16 +5,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -24,23 +20,21 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.DefaultShadowColor
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.rafaelribeiro.spendless.R
+import io.rafaelribeiro.spendless.domain.CurrencySymbol
+import io.rafaelribeiro.spendless.domain.DecimalSeparator
+import io.rafaelribeiro.spendless.domain.ExpenseFormat
+import io.rafaelribeiro.spendless.domain.ThousandSeparator
 import io.rafaelribeiro.spendless.core.presentation.SpendLessButton
 import io.rafaelribeiro.spendless.navigation.NavigationState
-import io.rafaelribeiro.spendless.presentation.screens.registration.components.ExpenseCategories
 import io.rafaelribeiro.spendless.presentation.screens.registration.components.SpendLessDropDown
 import io.rafaelribeiro.spendless.presentation.screens.registration.components.SpendLessSegmentedButton
 import io.rafaelribeiro.spendless.presentation.theme.SpendLessTheme
@@ -48,6 +42,7 @@ import io.rafaelribeiro.spendless.presentation.theme.SpendLessTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegistrationPreferencesRootScreen(
+    uiState: RegistrationUiState,
     navigationState: NavigationState,
     modifier: Modifier,
     onEvent: (RegistrationUiEvent) -> Unit,
@@ -78,7 +73,8 @@ fun RegistrationPreferencesRootScreen(
     ) { innerPadding ->
         RegistrationPreferencesScreen(
             modifier = modifier.padding(innerPadding),
-            expenseFormat = "-$10,382.45"
+            uiState = uiState.preferences,
+            onEvent = onEvent,
         )
     }
 }
@@ -86,13 +82,9 @@ fun RegistrationPreferencesRootScreen(
 @Composable
 fun RegistrationPreferencesScreen(
     modifier: Modifier,
-    expenseFormat: String,
+    uiState: RegistrationPreferencesUiState,
+    onEvent: (RegistrationUiEvent) -> Unit,
 ) {
-    var selectedPreferenceFormat by remember { mutableIntStateOf(0) }
-    var selectedCurrency by remember { mutableIntStateOf(0) }
-    var selectedDecimalSeparator by remember { mutableIntStateOf(0) }
-    var selectedThousandSeparator by remember { mutableIntStateOf(0) }
-
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
@@ -138,7 +130,7 @@ fun RegistrationPreferencesScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = expenseFormat,
+                    text = uiState.exampleExpenseFormat,
                     style = MaterialTheme.typography.headlineLarge,
                     textAlign = TextAlign.Center,
                     modifier = Modifier
@@ -146,7 +138,7 @@ fun RegistrationPreferencesScreen(
                         .padding(top = 24.dp, bottom = 8.dp),
                 )
                 Text(
-                    text = "spend this month",
+                    text = stringResource(R.string.spend_this_month),
                     style = MaterialTheme.typography.bodySmall,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(bottom = 24.dp)
@@ -155,33 +147,43 @@ fun RegistrationPreferencesScreen(
         }
 
         SpendLessSegmentedButton(
-            title = "Expenses format",
-            options = listOf("-$10", "($10)"),
-            selectedIndex = selectedPreferenceFormat,
-            onOptionSelected = { selectedPreferenceFormat = it }
+            title = stringResource(R.string.expenses_format),
+            options = ExpenseFormat.entries.map { it.value },
+            selectedIndex = ExpenseFormat.entries.indexOf(uiState.expensesFormat),
+            onOptionSelected = {
+                onEvent(RegistrationUiEvent.ExpensesFormatSelected(ExpenseFormat.entries[it]))
+            }
         )
         SpendLessDropDown(
-            title = "Currency",
-            values = ExpenseCategories.categories,
-            itemBackgroundColor = MaterialTheme.colorScheme.secondary,
+            title = stringResource(R.string.currency),
+            values = CurrencySymbol.entries,
+            itemBackgroundColor = MaterialTheme.colorScheme.onPrimary,
+            getText = { it.title },
+            getLeadingIcon = { it.symbol },
+            onItemSelected = { onEvent(RegistrationUiEvent.CurrencySelected(it)) },
         )
         SpendLessSegmentedButton(
-            title = "Decimal separator",
-            options = listOf("1.00", "1,00"),
-            selectedIndex = selectedDecimalSeparator,
-            onOptionSelected = { selectedDecimalSeparator = it }
+            title = stringResource(R.string.decimal_separator),
+            options = DecimalSeparator.entries.map { it.value },
+            selectedIndex = DecimalSeparator.entries.indexOf(uiState.decimalSeparator),
+            onOptionSelected = {
+                onEvent(RegistrationUiEvent.DecimalSeparatorSelected(DecimalSeparator.entries[it]))
+            }
         )
         SpendLessSegmentedButton(
-            title = "Thousands separator",
-            options = listOf("1.000", "1,000", "1 000"),
-            selectedIndex = selectedThousandSeparator,
-            onOptionSelected = { selectedThousandSeparator = it }
+            title = stringResource(R.string.thousands_separator),
+            options = ThousandSeparator.entries.map { it.value },
+            selectedIndex = ThousandSeparator.entries.indexOf(uiState.thousandSeparator),
+            onOptionSelected = {
+                onEvent(RegistrationUiEvent.ThousandSeparatorSelected(ThousandSeparator.entries[it]))
+            }
         )
         SpendLessButton(
-            text = "Start Tracking!!!",
+            text = stringResource(R.string.start_tracking),
             modifier = Modifier.padding(top = 34.dp),
+            enabled = uiState.startTrackingButtonEnabled,
             onClick = {
-                // TODO:
+                onEvent(RegistrationUiEvent.StartTrackingButtonTapped)
             },
         )
     }
@@ -193,8 +195,14 @@ fun RegistrationPreferencesRootScreenPreview() {
     SpendLessTheme {
         RegistrationPreferencesScreen(
             modifier = Modifier,
-            expenseFormat = "-$10,382.45"
+            uiState = RegistrationPreferencesUiState(
+                exampleExpenseFormat = "-$1.234,50",
+                expensesFormat = ExpenseFormat.PARENTHESES,
+                decimalSeparator = DecimalSeparator.DOT,
+                thousandSeparator = ThousandSeparator.DOT,
+                currencySymbol = CurrencySymbol.DOLLAR,
+            ),
+            onEvent = {},
         )
     }
 }
-
