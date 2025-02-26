@@ -45,17 +45,18 @@ fun SpendLessSegmentedButton(
     val backgroundColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.08f)
     val selectedColor = MaterialTheme.colorScheme.surfaceContainer
 
-    var rowWidthPx by remember { mutableFloatStateOf(0f) }
+    var rowWidthPx by remember { mutableFloatStateOf(1f) }
     val density = LocalDensity.current
     val rowWidthDp = with(density) { rowWidthPx.toDp() }
 
     val segmentWidthDp = if (options.isNotEmpty()) rowWidthDp / options.size else 0.dp
     val offsetX = remember { Animatable(0f) }
 
-    LaunchedEffect(selectedIndex) {
-        val targetX = if (options.isNotEmpty()) (selectedIndex * segmentWidthDp.value) else 0f
+    LaunchedEffect(selectedIndex, rowWidthPx) {
+        val segmentWidthPx = rowWidthPx / options.size
+        val targetX = selectedIndex * segmentWidthPx
         offsetX.animateTo(
-            targetValue = with(density) { targetX.dp.toPx() },
+            targetValue = targetX,
             animationSpec = tween(300)
         )
     }
@@ -76,7 +77,9 @@ fun SpendLessSegmentedButton(
             .fillMaxWidth()
             .background(backgroundColor, shape = RoundedCornerShape(16.dp))
             .padding(4.dp)
-            .onSizeChanged { rowWidthPx = it.width.toFloat() }
+            .onSizeChanged { newSize ->
+                rowWidthPx = newSize.width.toFloat()
+            }
     ) {
         Box(
             modifier = Modifier
@@ -97,7 +100,7 @@ fun SpendLessSegmentedButton(
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxSize()
-                        .pointerInput(Unit) { detectTapGestures { onOptionSelected(selectedIndex) } },
+                        .pointerInput(Unit) { detectTapGestures { onOptionSelected(index) } },
                     contentAlignment = Alignment.Center
                 ) {
                     Text(

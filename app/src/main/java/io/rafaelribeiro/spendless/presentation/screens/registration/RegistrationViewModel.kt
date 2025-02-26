@@ -7,7 +7,12 @@ import io.rafaelribeiro.spendless.R
 import io.rafaelribeiro.spendless.core.presentation.UiText
 import io.rafaelribeiro.spendless.core.presentation.asUiText
 import io.rafaelribeiro.spendless.domain.AuthRepository
+import io.rafaelribeiro.spendless.domain.CurrencySymbol
+import io.rafaelribeiro.spendless.domain.DecimalSeparator
+import io.rafaelribeiro.spendless.domain.ExpenseFormat
+import io.rafaelribeiro.spendless.domain.ExpenseFormatter
 import io.rafaelribeiro.spendless.domain.Result
+import io.rafaelribeiro.spendless.domain.ThousandSeparator
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -45,21 +50,75 @@ class RegistrationViewModel @Inject constructor(
 			is RegistrationUiEvent.PinConfirmationDigitTapped -> pinConfirmationChanged(event.digit)
 			is RegistrationUiEvent.PinConfirmationBackspaceTapped -> backspaceConfirmationPinTapped()
 			is RegistrationUiEvent.ResetPinValues -> resetPinValues()
-		}
+			is RegistrationUiEvent.ExpensesFormatSelected -> {
+				updatePreferencesState { it.copy(expensesFormat = event.expensesFormat) }
+                formatExampleExpense()
+			}
+			is RegistrationUiEvent.DecimalSeparatorSelected -> {
+				updatePreferencesState { it.copy(decimalSeparator = event.decimalSeparator) }
+                formatExampleExpense()
+			}
+			is RegistrationUiEvent.ThousandSeparatorSelected -> {
+				updatePreferencesState { it.copy(thousandSeparator = event.thousandSeparator) }
+                formatExampleExpense()
+			}
+            is RegistrationUiEvent.CurrencySelected -> {
+                updatePreferencesState { it.copy(currencySymbol = event.currency) }
+                formatExampleExpense()
+            }
+            is RegistrationUiEvent.StartTrackingButtonTapped -> {
+                // TODO: Save user data.
+            }
+        }
 	}
+
+    /**
+     * Formats the example expense with the current preferences and updates the UI.
+     * The amount does not really matter, as the goal is to show the user how the expense will be formatted.
+     */
+    private fun formatExampleExpense() {
+        val amount = -10382.45
+        val formatter = ExpenseFormatter(
+            decimalSeparator = _uiState.value.preferences.decimalSeparator,
+            thousandSeparator = _uiState.value.preferences.thousandSeparator,
+            currencySymbol = _uiState.value.preferences.currencySymbol,
+            expensesFormat = _uiState.value.preferences.expensesFormat
+        )
+        updatePreferencesState { it.copy(exampleExpenseFormat = formatter.format(amount)) }
+        if (isSameSeparator()) {
+            enableStartTrackingButton(enabled = false)
+        } else {
+            enableStartTrackingButton(enabled = true)
+        }
+    }
+
+    private fun isSameSeparator() = _uiState.value.preferences.thousandSeparator.name == _uiState.value.preferences.decimalSeparator.name
+
+    private fun enableStartTrackingButton(enabled: Boolean) {
+        updatePreferencesState { it.copy(startTrackingButtonEnabled = enabled) }
+    }
+
+	private fun updateState(state: (RegistrationUiState) -> RegistrationUiState) {
+		_uiState.update { state(it) }
+	}
+
+    private fun updatePreferencesState(state: (RegistrationPreferencesUiState) -> RegistrationPreferencesUiState) {
+        updateState { it.copy(preferences = state(it.preferences)) }
+    }
 
 	private fun checkUserName() {
 		viewModelScope.launch {
 			setNextButtonEnabled(false)
 			when (val result = authRepository.checkUserName(_uiState.value.username)) {
 				is Result.Success -> {
+                    setNextButtonEnabled(true)
 					sendActionEvent(RegistrationActionEvent.UsernameCheckSuccess)
 				}
 				is Result.Failure -> {
+                    setNextButtonEnabled(false)
 					showErrorMessage(result.error.asUiText())
 				}
 			}
-			setNextButtonEnabled(true)
 		}
 	}
 
@@ -72,7 +131,7 @@ class RegistrationViewModel @Inject constructor(
 	private fun pinChanged(digit: String) {
 		val currentPin = _uiState.value.pin + digit
 		if (currentPin.length <= PIN_MAX_SIZE) {
-			_uiState.update { it.copy(pin = currentPin) }
+            updateState { it.copy(pin = currentPin) }
 			if (currentPin.length == PIN_MAX_SIZE) {
 				viewModelScope.launch {
 					delay(111) // in order to able to see last pin digit
@@ -85,7 +144,7 @@ class RegistrationViewModel @Inject constructor(
 	private fun pinConfirmationChanged(digit: String) {
 		val currentPin = _uiState.value.pinConfirmation + digit
 		if (currentPin.length <= PIN_MAX_SIZE) {
-			_uiState.update { it.copy(pinConfirmation = currentPin) }
+            updateState { it.copy(pinConfirmation = currentPin) }
 			if (currentPin.length == PIN_MAX_SIZE) {
 				if (_uiState.value.pin == currentPin) {
 					viewModelScope.launch {
@@ -102,31 +161,31 @@ class RegistrationViewModel @Inject constructor(
 	}
 
 	private fun backspacePinTapped() {
-		_uiState.update { it.copy(pin = _uiState.value.pin.dropLast(n = 1)) }
+        updateState { it.copy(pin = _uiState.value.pin.dropLast(n = 1)) }
 	}
 
 	private fun backspaceConfirmationPinTapped() {
-		_uiState.update { it.copy(pinConfirmation = _uiState.value.pinConfirmation.dropLast(n = 1)) }
+        updateState { it.copy(pinConfirmation = _uiState.value.pinConfirmation.dropLast(n = 1)) }
 	}
 
 	private fun resetPinValues() {
-		_uiState.update { it.copy(pinConfirmation = "", pin = "") }
+        updateState { it.copy(pinConfirmation = "", pin = "") }
 	}
 
 	private fun showErrorMessage(text: UiText) {
-		_uiState.update { it.copy(errorMessage = text) }
+        updateState { it.copy(errorMessage = text) }
 		viewModelScope.launch {
 			delay(ERROR_MESSAGE_DURATION)
-			_uiState.update { it.copy(errorMessage = UiText.Empty) }
+            updateState { it.copy(errorMessage = UiText.Empty) }
 		}
 	}
 
 	private fun setNextButtonEnabled(enabled: Boolean) {
-		_uiState.update { it.copy(nextButtonEnabled = enabled) }
+        updateState { it.copy(nextButtonEnabled = enabled) }
 	}
 
 	private fun updateUsername(username: String) {
-		_uiState.update { it.copy(username = username) }
+        updateState { it.copy(username = username) }
 	}
 
 	private fun sendActionEvent(actionEvent: RegistrationActionEvent) {
@@ -152,4 +211,10 @@ sealed interface RegistrationUiEvent {
 	data class PinConfirmationDigitTapped(val digit: String) : RegistrationUiEvent
 	data object PinConfirmationBackspaceTapped : RegistrationUiEvent
 	data object ResetPinValues : RegistrationUiEvent
+
+	data class ExpensesFormatSelected(val expensesFormat: ExpenseFormat) : RegistrationUiEvent
+	data class DecimalSeparatorSelected(val decimalSeparator: DecimalSeparator) : RegistrationUiEvent
+	data class ThousandSeparatorSelected(val thousandSeparator: ThousandSeparator) : RegistrationUiEvent
+    data class CurrencySelected(val currency: CurrencySymbol) : RegistrationUiEvent
+    data object StartTrackingButtonTapped : RegistrationUiEvent
 }

@@ -18,7 +18,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.DropdownMenuItem
@@ -44,10 +43,13 @@ import androidx.compose.ui.unit.times
 import io.rafaelribeiro.spendless.presentation.theme.SpendLessTheme
 
 @Composable
-fun SpendLessDropDown(
+fun <T>SpendLessDropDown(
     title: String? = null,
     itemBackgroundColor: Color,
-    values: List<SpendLessCategory> = emptyList()
+    values: List<T> = emptyList(),
+    getLeadingIcon: (T) -> String,
+    getText: (T) -> String,
+    onItemSelected: (T) -> Unit = {}
 ) {
     val isDropDownExpanded = remember { mutableStateOf(false) }
     val itemPosition = remember { mutableIntStateOf(0) }
@@ -106,12 +108,12 @@ fun SpendLessDropDown(
                             .background(itemBackgroundColor)
                     ) {
                         Text(
-                            text = values[itemPosition.intValue].emoji,
+                            text = getLeadingIcon(values[itemPosition.intValue]),
                             style = MaterialTheme.typography.labelMedium,
                         )
                     }
                     Text(
-                        text = values[itemPosition.intValue].name,
+                        text = getText(values[itemPosition.intValue]),
                         style = MaterialTheme.typography.labelMedium,
                     )
                 }
@@ -165,16 +167,16 @@ fun SpendLessDropDown(
                                                         .background(itemBackgroundColor)
                                                 ) {
                                                     Text(
-                                                        text = value.emoji,
+                                                        text = getLeadingIcon(value),
                                                         style = MaterialTheme.typography.labelMedium,
                                                     )
                                                 }
                                                 Text(
-                                                    text = value.name,
+                                                    text = getText(value),
                                                     style = MaterialTheme.typography.labelMedium
                                                 )
                                             }
-                                            if (values[itemPosition.intValue].name == value.name) {
+                                            if (getText(values[itemPosition.intValue]) == getText(value)) {
                                                 Icon(
                                                     imageVector = Icons.Default.Check,
                                                     contentDescription = "Expand dropdown",
@@ -189,6 +191,7 @@ fun SpendLessDropDown(
                                     onClick = {
                                         isDropDownExpanded.value = false
                                         itemPosition.intValue = index
+                                        onItemSelected(value)
                                     },
                                     modifier = Modifier.fillMaxWidth(),
                                     contentPadding = PaddingValues(start = 4.dp, top = 0.dp, bottom = 0.dp)
@@ -226,7 +229,9 @@ fun DropDownDemoPreview() {
     SpendLessTheme {
         SpendLessDropDown(
             values = ExpenseCategories.categories,
-            itemBackgroundColor = MaterialTheme.colorScheme.secondary
+            itemBackgroundColor = MaterialTheme.colorScheme.secondary,
+            getLeadingIcon = { it.emoji },
+            getText = { it.name }
         )
     }
 }
