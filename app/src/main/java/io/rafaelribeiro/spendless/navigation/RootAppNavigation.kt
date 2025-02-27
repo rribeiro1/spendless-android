@@ -113,6 +113,12 @@ fun RootAppNavigation(
 			composable(route = Screen.RegistrationSetPreferences.route) { entry ->
 				val viewModel = entry.sharedViewModel<RegistrationViewModel>(navigationState.navHostController)
 				val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+                ObserveAsEvents(flow = viewModel.actionEvents) { event ->
+                    if (event is RegistrationActionEvent.UserPreferencesSaved) {
+                        navigationState.navigateTo(Screen.LoginScreen.route)
+                    }
+                }
                 RegistrationPreferencesRootScreen(
 					uiState = uiState,
                     navigationState = navigationState,

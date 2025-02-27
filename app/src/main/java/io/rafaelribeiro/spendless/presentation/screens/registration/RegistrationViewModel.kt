@@ -6,6 +6,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.rafaelribeiro.spendless.R
 import io.rafaelribeiro.spendless.core.presentation.UiText
 import io.rafaelribeiro.spendless.core.presentation.asUiText
+import io.rafaelribeiro.spendless.data.UserPreferencesRepository
 import io.rafaelribeiro.spendless.domain.AuthRepository
 import io.rafaelribeiro.spendless.domain.CurrencySymbol
 import io.rafaelribeiro.spendless.domain.DecimalSeparator
@@ -26,6 +27,7 @@ import javax.inject.Inject
 @HiltViewModel
 class RegistrationViewModel @Inject constructor(
 	private val authRepository: AuthRepository,
+    private val userPreferencesRepository: UserPreferencesRepository,
 ) : ViewModel() {
 	private val _uiState: MutableStateFlow<RegistrationUiState> = MutableStateFlow(RegistrationUiState())
 	val uiState: StateFlow<RegistrationUiState> = _uiState.asStateFlow()
@@ -68,9 +70,18 @@ class RegistrationViewModel @Inject constructor(
             }
             is RegistrationUiEvent.StartTrackingButtonTapped -> {
                 // TODO: Save user data.
+                saveUserPreferences()
+                sendActionEvent(RegistrationActionEvent.UserPreferencesSaved)
             }
         }
 	}
+
+    private fun saveUserPreferences() {
+        viewModelScope.launch {
+            userPreferencesRepository.saveUserName(_uiState.value.username)
+            userPreferencesRepository.savePin(_uiState.value.pin)
+        }
+    }
 
     /**
      * Formats the example expense with the current preferences and updates the UI.
@@ -193,6 +204,7 @@ sealed interface RegistrationActionEvent {
 	data object PinConfirmed : RegistrationActionEvent
 	data object PinMismatch : RegistrationActionEvent
 	data object AlreadyHaveAccount : RegistrationActionEvent
+    data object UserPreferencesSaved : RegistrationActionEvent
 }
 
 sealed interface RegistrationUiEvent {
