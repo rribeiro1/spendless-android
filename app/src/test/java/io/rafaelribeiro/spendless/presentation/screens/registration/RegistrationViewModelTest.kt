@@ -39,7 +39,10 @@ class RegistrationViewModelTest {
     @BeforeEach
 	fun setup() {
         Dispatchers.setMain(testDispatcher)
-		registrationViewModel = RegistrationViewModel(authRepository = AuthRepositoryFake())
+		registrationViewModel = RegistrationViewModel(
+            authRepository = AuthRepositoryFake(),
+            userPreferencesRepository = UserPreferencesRepositoryFake(),
+        )
 	}
 
     @ExperimentalCoroutinesApi
