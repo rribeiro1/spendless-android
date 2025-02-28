@@ -27,4 +27,10 @@
     <string name="decimal_separator">Decimal separator</string>
     <string name="thousands_separator">Thousands separator</string>
     <string name="start_tracking">Start Tracking!</string>
+    <string name="largest_transaction">Largest transaction</string>
+    <string name="largest_transaction_description">Your largest transaction will appear here</string>
+    <string name="previous_week">Previous week</string>
+    <string name="account_balance">Account Balance</string>
+    <string name="latest_transactions">Latest transactions</string>
+    <string name="show_all">Show all</string>
 </resources>

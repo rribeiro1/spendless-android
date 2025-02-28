@@ -17,6 +17,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.navOptions
+import io.rafaelribeiro.spendless.presentation.screens.dashboard.DashboardRootScreen
+import io.rafaelribeiro.spendless.presentation.screens.dashboard.DashboardViewModel
 import io.rafaelribeiro.spendless.presentation.screens.login.LoginRootScreen
 import io.rafaelribeiro.spendless.presentation.screens.login.LoginViewModel
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationActionEvent
@@ -34,7 +36,7 @@ fun RootAppNavigation(
 ) {
 	NavHost(
 		navController = navigationState.navHostController,
-		startDestination = Screen.RegistrationFlow.route,
+		startDestination = Screen.DashboardScreen.route,
 		enterTransition = enterTransition(),
 		exitTransition = exitTransition(),
 		popEnterTransition = popEnterTransition(),
@@ -133,6 +135,17 @@ fun RootAppNavigation(
 				onEvent = viewModel::onEvent,
 			)
 		}
+        composable(
+            route = Screen.DashboardScreen.route,
+        ) {
+            val viewModel = hiltViewModel<DashboardViewModel>()
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            DashboardRootScreen(
+                modifier = modifier,
+                uiState = uiState,
+                onEvent = viewModel::onEvent,
+            )
+        }
 	}
 }
 

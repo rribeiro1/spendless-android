@@ -40,6 +40,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
+import io.rafaelribeiro.spendless.domain.TransactionCategory
 import io.rafaelribeiro.spendless.presentation.theme.SpendLessTheme
 
 @Composable
@@ -228,30 +229,10 @@ fun <T>SpendLessDropDown(
 fun DropDownDemoPreview() {
     SpendLessTheme {
         SpendLessDropDown(
-            values = ExpenseCategories.categories,
+            values = TransactionCategory.categories,
             itemBackgroundColor = MaterialTheme.colorScheme.secondary,
             getLeadingIcon = { it.emoji },
-            getText = { it.name }
+            getText = { it.displayName }
         )
     }
-}
-
-data class SpendLessCategory(
-    val emoji: String,
-    val name: String
-)
-
-object ExpenseCategories {
-    val categories = listOf(
-        SpendLessCategory("🏠", "Home"),
-        SpendLessCategory("🍕", "Food & Groceries"),
-        SpendLessCategory("💻", "Entertainment"),
-        SpendLessCategory("👔", "Clothing & Accessories"),
-        SpendLessCategory("❤️", "Health & Wellness"),
-        SpendLessCategory("🛁", "Personal Care"),
-        SpendLessCategory("🚗", "Transportation"),
-        SpendLessCategory("🎓", "Education"),
-        SpendLessCategory("💎", "Saving & Investments"),
-        SpendLessCategory("⚙️", "Other")
-    )
 }

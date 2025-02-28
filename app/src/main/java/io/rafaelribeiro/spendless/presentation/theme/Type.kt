@@ -55,6 +55,12 @@ val SpendLessTypography by lazy {
 			fontSize = 16.sp,
 			lineHeight = 24.sp,
 		),
+        titleLarge = TextStyle(
+            fontFamily = fontFamily,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 20.sp,
+            lineHeight = 26.sp,
+        ),
 		bodyLarge = TextStyle(
 			fontFamily = fontFamily,
 			fontWeight = FontWeight.Bold,
@@ -90,6 +96,12 @@ val SpendLessTypography by lazy {
             fontWeight = FontWeight.Bold,
             fontSize = 36.sp,
             lineHeight = 44.sp,
+        ),
+        displayLarge = TextStyle(
+            fontFamily = fontFamily,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 45.sp,
+            lineHeight = 52.sp,
         ),
 	)
 }
