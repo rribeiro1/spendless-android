@@ -27,7 +27,6 @@ import io.rafaelribeiro.spendless.core.presentation.PinPromptScreen
 import io.rafaelribeiro.spendless.navigation.NavigationState
 import io.rafaelribeiro.spendless.navigation.Screen
 import io.rafaelribeiro.spendless.navigation.rememberNavigationState
-import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -53,7 +52,7 @@ fun LoginPinPromptRootScreen(
                                 disabledContainerColor = Color.Transparent,
                                 disabledContentColor = MaterialTheme.colorScheme.error.copy(alpha = 0.3f),
                             ),
-                            shape = RoundedCornerShape(32.dp),
+                            shape = RoundedCornerShape(16.dp),
                             onClick = {
                                 // todo: trigger LOGOUT (remove saved username and pin from DataStore)
                                 navigationState.popBackStack() // this will clear the back stack due to triggerPinPromptScreen() navOptions
@@ -74,15 +73,12 @@ fun LoginPinPromptRootScreen(
             }
         ) { innerPadding ->
             val title = if (isPinLocked) stringResource(R.string.too_many_failed_attempts) else stringResource(R.string.hello_user, uiState.username)
-            val description = if (isPinLocked) {
-                stringResource(id = R.string.try_pin_again_in, uiState.pinLockRemainingSeconds.formatSecondsToMMSS())
-            }
-            else stringResource(id = R.string.login_enter_pin)
-
+            val description = if (isPinLocked) stringResource(id = R.string.try_pin_again_in) else stringResource(id = R.string.login_enter_pin)
             PinPromptScreen(
                 modifier = modifier.padding(innerPadding),
                 title = title,
                 description = description,
+                pinLockRemainingSeconds = uiState.pinLockRemainingSeconds,
                 currentPinSize = uiState.pin.length,
                 pinPadEnabled = uiState.pinPadEnabled,
                 onNumberClick = { onEvent(LoginUiEvent.PinDigitTapped(it)) },
@@ -104,11 +100,4 @@ fun PinPromptScreenPreview() {
         uiState = LoginUiState(),
         modifier = Modifier,
     )
-}
-
-
-fun Int.formatSecondsToMMSS(): String {
-    val minutes = this / 60
-    val remainingSeconds = this % 60
-    return String.format(Locale.getDefault(),"%02d:%02d", minutes, remainingSeconds)
 }

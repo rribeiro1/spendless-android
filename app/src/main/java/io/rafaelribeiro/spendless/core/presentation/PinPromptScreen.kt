@@ -35,6 +35,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.rafaelribeiro.spendless.R
+import io.rafaelribeiro.spendless.domain.FormattedText
+import io.rafaelribeiro.spendless.domain.formatSecondsToMMSS
 import io.rafaelribeiro.spendless.presentation.theme.SpendLessTheme
 
 @Composable
@@ -42,6 +44,7 @@ fun PinPromptScreen(
 	modifier: Modifier,
 	title: String,
 	description: String,
+    pinLockRemainingSeconds: Int = 0,
 	currentPinSize: Int = 0,
     pinPadEnabled: Boolean = true,
 	onNumberClick: (String) -> Unit = {},
@@ -50,9 +53,9 @@ fun PinPromptScreen(
 	Column(
 		horizontalAlignment = Alignment.CenterHorizontally,
 		modifier = modifier
-			.background(MaterialTheme.colorScheme.background)
+            .background(MaterialTheme.colorScheme.background)
             .padding(horizontal = 26.dp)
-			.fillMaxSize(),
+            .fillMaxSize(),
 	) {
 		Image(
 			painter = painterResource(id = R.drawable.icon),
@@ -66,13 +69,14 @@ fun PinPromptScreen(
 			textAlign = TextAlign.Center,
 			modifier = Modifier.padding(bottom = 8.dp),
 		)
-		Text(
-			text = description,
-			color = MaterialTheme.colorScheme.onSurface,
-			style = MaterialTheme.typography.bodyMedium,
-			textAlign = TextAlign.Center,
-			modifier = Modifier.padding(bottom = 55.dp),
-		)
+        FormattedText(
+            allText = description,
+            textToBeFormattedAsBold = if (pinLockRemainingSeconds == 0) null else pinLockRemainingSeconds.formatSecondsToMMSS(),
+            color = MaterialTheme.colorScheme.onSurface,
+            style = MaterialTheme.typography.bodyMedium,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(bottom = 55.dp),
+        )
 		PinCircleIndicator(
 			pinSize = 5,
 			switched = currentPinSize,
@@ -116,9 +120,9 @@ private fun PinCircle(
 	)
 	Box(
 		modifier = Modifier
-			.size(18.dp)
-			.clip(CircleShape)
-			.background(pinColor),
+            .size(18.dp)
+            .clip(CircleShape)
+            .background(pinColor),
 	)
 }
 
@@ -179,7 +183,12 @@ fun PinPadButton(
 	Button(
 		onClick = { onClick() },
 		shape = RoundedCornerShape(32.dp),
-		colors = ButtonDefaults.buttonColors(containerColor = color),
+		colors = ButtonDefaults.buttonColors(
+            containerColor = color,
+            contentColor = MaterialTheme.colorScheme.onSecondary,
+            disabledContainerColor = color.copy(alpha = 0.3f),
+            disabledContentColor = MaterialTheme.colorScheme.onSecondary.copy(alpha = 0.3f),
+        ),
 		modifier = Modifier.size(108.dp),
         enabled = enabled,
 	) {
