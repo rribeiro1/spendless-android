@@ -3,7 +3,7 @@ package io.rafaelribeiro.spendless.domain
 import kotlinx.coroutines.flow.Flow
 import io.rafaelribeiro.spendless.data.UserPreferences
 
-interface UserPreferencesRepositoryInterface {
+interface UserPreferencesRepository {
     val userPreferencesFlow: Flow<UserPreferences>
     suspend fun saveUserName(userName: String)
     suspend fun savePin(pin: String)

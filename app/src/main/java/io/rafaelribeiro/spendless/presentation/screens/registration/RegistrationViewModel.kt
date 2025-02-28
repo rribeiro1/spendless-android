@@ -13,7 +13,7 @@ import io.rafaelribeiro.spendless.domain.ExpenseFormat
 import io.rafaelribeiro.spendless.domain.ExpenseFormatter
 import io.rafaelribeiro.spendless.domain.Result
 import io.rafaelribeiro.spendless.domain.ThousandSeparator
-import io.rafaelribeiro.spendless.domain.UserPreferencesRepositoryInterface
+import io.rafaelribeiro.spendless.domain.UserPreferencesRepository
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,8 +26,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RegistrationViewModel @Inject constructor(
-	private val authRepository: AuthRepository,
-    private val userPreferencesRepository: UserPreferencesRepositoryInterface,
+    private val authRepository: AuthRepository,
+    private val userPreferencesRepository: UserPreferencesRepository,
 ) : ViewModel() {
 	private val _uiState: MutableStateFlow<RegistrationUiState> = MutableStateFlow(RegistrationUiState())
 	val uiState: StateFlow<RegistrationUiState> = _uiState.asStateFlow()

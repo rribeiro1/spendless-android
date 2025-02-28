@@ -4,7 +4,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
-import io.rafaelribeiro.spendless.domain.UserPreferencesRepositoryInterface
+import io.rafaelribeiro.spendless.domain.UserPreferencesRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -12,9 +12,9 @@ import javax.inject.Singleton
 
 
 @Singleton
-class UserPreferencesRepository @Inject constructor(
+class DataStoreUserPreferencesRepository @Inject constructor(
     private val dataStore: DataStore<Preferences>
-) : UserPreferencesRepositoryInterface {
+) : UserPreferencesRepository {
 
     companion object {
         private val USER_NAME = stringPreferencesKey("user_name")

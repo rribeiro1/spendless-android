@@ -5,9 +5,9 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import io.rafaelribeiro.spendless.data.OfflineAuthRepository
-import io.rafaelribeiro.spendless.data.UserPreferencesRepository
+import io.rafaelribeiro.spendless.data.DataStoreUserPreferencesRepository
 import io.rafaelribeiro.spendless.domain.AuthRepository
-import io.rafaelribeiro.spendless.domain.UserPreferencesRepositoryInterface
+import io.rafaelribeiro.spendless.domain.UserPreferencesRepository
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -20,5 +20,5 @@ abstract class RepositoryModule {
 @InstallIn(SingletonComponent::class)
 abstract class UserPreferencesRepositoryModule {
 	@Binds
-	abstract fun bindUserPreferencesRepository(impl: UserPreferencesRepository): UserPreferencesRepositoryInterface
+	abstract fun bindUserPreferencesRepository(impl: DataStoreUserPreferencesRepository): UserPreferencesRepository
 }

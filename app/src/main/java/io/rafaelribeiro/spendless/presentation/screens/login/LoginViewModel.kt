@@ -3,7 +3,7 @@ package io.rafaelribeiro.spendless.presentation.screens.login
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.rafaelribeiro.spendless.data.UserPreferencesRepository
+import io.rafaelribeiro.spendless.data.DataStoreUserPreferencesRepository
 import io.rafaelribeiro.spendless.domain.AuthRepository
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationViewModel.Companion.PIN_MAX_SIZE
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationViewModel.Companion.USERNAME_MAX_SIZE
@@ -18,7 +18,7 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val authRepository: AuthRepository,
-    userPreferencesRepository: UserPreferencesRepository,
+    dataStoreUserPreferencesRepository: DataStoreUserPreferencesRepository,
 ) : ViewModel() {
 
     private val _uiState: MutableStateFlow<LoginUiState> = MutableStateFlow(LoginUiState())
@@ -27,7 +27,7 @@ class LoginViewModel @Inject constructor(
     init {
         // Collect user preferences and update uiState
         viewModelScope.launch {
-            userPreferencesRepository.userPreferencesFlow.collect { userPreferences ->
+            dataStoreUserPreferencesRepository.userPreferencesFlow.collect { userPreferences ->
                 _uiState.update { it.copy(username = userPreferences.userName) }
             }
         }
