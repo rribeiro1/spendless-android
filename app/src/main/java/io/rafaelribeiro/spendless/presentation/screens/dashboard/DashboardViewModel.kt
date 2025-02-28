@@ -29,12 +29,17 @@ import javax.inject.Inject
 class DashboardViewModel @Inject constructor(
     private val transactionRepository: TransactionRepository,
 ) : ViewModel() {
+
+    companion object {
+        private const val WAIT_BEFORE_CONSUMERS_UNSUBSCRIBED = 5000L
+    }
+
     private val _uiState: MutableStateFlow<DashboardUiState> = MutableStateFlow(DashboardUiState())
     val uiState: StateFlow<DashboardUiState> = _uiState
         .onStart { loadData() }
         .stateIn(
             viewModelScope,
-            SharingStarted.WhileSubscribed(5000L),
+            SharingStarted.WhileSubscribed(WAIT_BEFORE_CONSUMERS_UNSUBSCRIBED),
             DashboardUiState()
         )
 
