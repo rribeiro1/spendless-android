@@ -15,4 +15,4 @@ val LimeGreen = Color(0xFFD2E750)
 val Yellow = Color(0xFFE5EA58)
 val VibrantYellowGreen = Color(0xFFC9CE3E)
 val Olive = Color(0xFF414300)
-
+val Success = Color(0xFF29AC08)

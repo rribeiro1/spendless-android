@@ -1,6 +1,8 @@
 package io.rafaelribeiro.spendless.presentation.screens.dashboard
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -8,14 +10,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.captionBar
-import androidx.compose.foundation.layout.exclude
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeContent
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -31,7 +31,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -39,9 +38,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.DefaultShadowColor
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -50,11 +51,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.rafaelribeiro.spendless.R
+import io.rafaelribeiro.spendless.core.presentation.formatDateTime
+import io.rafaelribeiro.spendless.data.TransactionCreator
 import io.rafaelribeiro.spendless.domain.Transaction
 import io.rafaelribeiro.spendless.domain.TransactionCategory
 import io.rafaelribeiro.spendless.domain.TransactionType
+import io.rafaelribeiro.spendless.domain.toUiModel
 import io.rafaelribeiro.spendless.presentation.theme.SpendLessTheme
-import kotlin.random.Random
+import io.rafaelribeiro.spendless.presentation.theme.Success
 
 @Composable
 fun DashboardRootScreen(
@@ -102,12 +106,14 @@ fun DashboardRootScreen(
                 accountBalance = uiState.accountBalance,
                 previousWeekAmount = uiState.previousWeekAmount,
                 largestTransaction = uiState.largestTransaction,
+                mostPopularCategory = uiState.mostPopularCategory,
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth()
             )
             DashboardLatestTransactions(
-                transactions = uiState.latestTransactions,
+                groupedTransactions = uiState.latestTransactions,
+                onEvent = onEvent,
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth()
@@ -120,6 +126,7 @@ fun DashboardRootScreen(
 fun DashboardSummaryScreen(
     accountBalance: String,
     previousWeekAmount: String,
+    mostPopularCategory: TransactionCategory? = null,
     largestTransaction: Transaction? = null,
     modifier: Modifier
 ) {
@@ -132,10 +139,18 @@ fun DashboardSummaryScreen(
             accountBalance = accountBalance,
             modifier = modifier
         )
+        if (mostPopularCategory != null) {
+            MostPopularCategory(
+                category = mostPopularCategory,
+                modifier = Modifier
+                    .padding(top = 16.dp)
+                    .fillMaxWidth()
+            )
+        }
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(start = 16.dp, end = 16.dp, bottom = 16.dp, top = 8.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             DashboardLargestTransaction(
@@ -171,6 +186,66 @@ fun DashboardBalance(
             color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f),
             modifier = Modifier.padding(top = 4.dp)
         )
+    }
+}
+
+@Composable
+fun MostPopularCategory(
+    modifier: Modifier,
+    category: TransactionCategory,
+) {
+    Column(
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier
+            .padding(horizontal = 16.dp)
+            .height(72.dp)
+            .background(
+                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.2f),
+                shape = RoundedCornerShape(16.dp)
+            )
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth().padding(start = 8.dp)
+        ) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .size(56.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(MaterialTheme.colorScheme.secondary)
+            ) {
+                Text(
+                    text = category.emoji,
+                    fontSize = 24.sp,
+                )
+            }
+            Column(
+                horizontalAlignment = Alignment.Start,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = 12.dp)
+            ) {
+                Text(
+                    text = category.displayName,
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    maxLines = 1,
+                    overflow = TextOverflow.Clip
+                )
+                Text(
+                    text = stringResource(R.string.most_popular_category),
+                    style = MaterialTheme.typography.bodySmall.copy(
+                        fontSize = 12.sp,
+                        lineHeight = 16.sp
+                    ),
+                    color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f),
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+            }
+        }
     }
 }
 
@@ -221,18 +296,18 @@ fun DashboardLargestTransaction(
                 Column(
                     horizontalAlignment = Alignment.End,
                     modifier = Modifier
-                        .weight(0.8f)
                         .padding(end = 12.dp)
                 ) {
                     Text(
                         text = transaction.amountDisplay,
-                        style = MaterialTheme.typography.titleLarge,
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            fontSize = 18.sp
+                        ),
                         color = MaterialTheme.colorScheme.onSurface,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
                     )
                     Text(
-                        text = transaction.date,
+                        text = formatDateTime(transaction.date),
                         style = MaterialTheme.typography.bodySmall.copy(
                             fontSize = 12.sp,
                             lineHeight = 16.sp
@@ -278,7 +353,9 @@ fun DashboardPreviousWeek(
     ) {
         Text(
             text = amountPreviousWeekDisplay,
-            style = MaterialTheme.typography.titleLarge,
+            style = MaterialTheme.typography.titleLarge.copy(
+                fontSize = 18.sp
+            ),
             color = MaterialTheme.colorScheme.onSurface,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
@@ -298,18 +375,25 @@ fun DashboardPreviousWeek(
 @Composable
 fun DashboardLatestTransactions(
     modifier: Modifier,
-    transactions: List<Transaction> = emptyList(),
+    groupedTransactions: List<GroupedTransactions> = emptyList(),
+    onEvent: (DashboardUiEvent) -> Unit = {}
 ) {
-    if (transactions.isNotEmpty()) {
-        LatestTransactions(transactions = transactions, modifier = modifier)
+    if (groupedTransactions.isNotEmpty()) {
+        LatestTransactions(
+            groupedTransactions = groupedTransactions,
+            onEvent = onEvent,
+            modifier = modifier
+        )
     } else {
         EmptyTransactionsScreen(modifier = modifier)
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun LatestTransactions(
-    transactions: List<Transaction>,
+    groupedTransactions: List<GroupedTransactions>,
+    onEvent: (DashboardUiEvent) -> Unit = {},
     modifier: Modifier
 ) {
     Column(
@@ -334,7 +418,8 @@ fun LatestTransactions(
             Text(
                 text = stringResource(R.string.show_all),
                 style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.clickable { onEvent(DashboardUiEvent.ShowAllTransactionsClicked) }
             )
         }
         LazyColumn(
@@ -342,8 +427,28 @@ fun LatestTransactions(
             horizontalAlignment = Alignment.CenterHorizontally,
 
         ) {
-            items(transactions) { transaction ->
-                TransactionItem(transaction = transaction, modifier = modifier)
+            groupedTransactions.forEach { group ->
+                stickyHeader {
+                    Text(
+                        text = group.dateHeader.uppercase(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(MaterialTheme.colorScheme.background)
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            fontSize = 12.sp,
+                            lineHeight = 16.sp,
+                        ),
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                    )
+                }
+                items(group.transactions) { transaction ->
+                    TransactionItem(
+                        transaction = transaction,
+                        modifier = Modifier,
+                        onEvent = onEvent
+                    )
+                }
             }
         }
     }
@@ -351,79 +456,124 @@ fun LatestTransactions(
 
 @Composable
 fun TransactionItem(
-    transaction: Transaction,
-    modifier: Modifier
+    transaction: TransactionUiModel,
+    modifier: Modifier,
+    onEvent: (DashboardUiEvent) -> Unit = {},
 ) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start,
-        modifier = modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 6.dp)
+    Box(
+        modifier = Modifier
+            .padding(
+                start = if (transaction.extended) 8.dp else 0.dp,
+                end = if (transaction.extended) 8.dp else 0.dp,
+                bottom = if (transaction.extended) 4.dp else 0.dp,
+                top = 0.dp,
+            )
+            .fillMaxWidth()
+            .shadow(
+                elevation = if (transaction.extended) 4.dp else 0.dp,
+                shape = RoundedCornerShape(16.dp),
+                spotColor = DefaultShadowColor.copy(
+                    red = 24 / 255f,
+                    green = 0 / 255f,
+                    blue = 64 / 255f,
+                    alpha = if (transaction.extended) 0.4f else 0f
+                ),
+            )
+            .background(if (transaction.extended) MaterialTheme.colorScheme.onPrimary else Color.Transparent)
     ) {
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier.size(44.dp)
-        ) {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .matchParentSize()
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(if (transaction.type == TransactionType.EXPENSE) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f))
+        Column {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = modifier
+                    .fillMaxWidth()
+                    .padding(
+                        horizontal = if (transaction.extended) 4.dp else 12.dp,
+                        vertical = if (transaction.extended) 4.dp else 6.dp
+                    )
             ) {
-                Text(
-                    text = transaction.category.emoji,
-                    fontSize = 18.sp,
-                )
-            }
-
-            if (transaction.note != null) {
                 Box(
-                    modifier = Modifier
-                        .size(20.dp)
-                        .align(Alignment.BottomEnd)
-                        .offset(x = 4.dp, y = 4.dp)
-                        .clip(RoundedCornerShape(6.dp))
-                        .background(MaterialTheme.colorScheme.onPrimary),
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier.size(44.dp)
                 ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.Segment,
-                        contentDescription = "Note attached",
-                        tint = if (transaction.type == TransactionType.EXPENSE) MaterialTheme.colorScheme.inversePrimary else MaterialTheme.colorScheme.surfaceDim,
+                    Box(
+                        contentAlignment = Alignment.Center,
                         modifier = Modifier
-                            .size(14.dp)
-                            .graphicsLayer(scaleX = -1f)
+                            .matchParentSize()
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(if (transaction.type == TransactionType.EXPENSE) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f))
+                    ) {
+                        Text(
+                            text = transaction.category.emoji,
+                            fontSize = 18.sp,
+                        )
+                    }
+
+                    if (transaction.note != null) {
+                        Box(
+                            modifier = Modifier
+                                .size(20.dp)
+                                .align(Alignment.BottomEnd)
+                                .offset(x = 4.dp, y = 4.dp)
+                                .clip(RoundedCornerShape(6.dp))
+                                .background(MaterialTheme.colorScheme.onPrimary)
+                                .clickable { onEvent(DashboardUiEvent.TransactionNoteClicked(transaction.id)) },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.Segment,
+                                contentDescription = "Note attached",
+                                tint = if (transaction.type == TransactionType.EXPENSE) MaterialTheme.colorScheme.inversePrimary else MaterialTheme.colorScheme.surfaceDim,
+                                modifier = Modifier
+                                    .size(14.dp)
+                                    .graphicsLayer(scaleX = -1f)
+                            )
+                        }
+                    }
+                }
+                Column(
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.Start,
+                    modifier = Modifier
+                        .padding(start = 12.dp)
+                        .weight(1f)
+                ) {
+                    Text(
+                        text = transaction.description,
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Text(
+                        text = transaction.category.displayName,
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            fontSize = 12.sp,
+                            lineHeight = 16.sp
+                        ),
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                     )
                 }
+                Spacer(modifier = Modifier.weight(0.1f))
+                Text(
+                    text = transaction.amountDisplay,
+                    style = MaterialTheme.typography.titleLarge,
+                    color = if (transaction.type == TransactionType.INCOME) Success else MaterialTheme.colorScheme.onSurface,
+                    modifier = modifier.padding(end = 4.dp)
+                )
+            }
+            if (transaction.extended && transaction.note != null) {
+                Text(
+                    text = transaction.note,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    maxLines = 3,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.padding(start = 60.dp, end = 12.dp, bottom = 12.dp)
+                )
             }
         }
-        Column(
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.Start,
-            modifier = Modifier.padding(start = 12.dp).weight(1f)
-        ) {
-            Text(
-                text = transaction.description,
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurface,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-            Text(
-                text = transaction.category.displayName,
-                style = MaterialTheme.typography.labelSmall.copy(
-                    fontSize = 12.sp,
-                    lineHeight = 16.sp
-                ),
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-            )
-        }
-        Spacer(modifier = Modifier.weight(0.1f))
-        Text(
-            text = transaction.amountDisplay,
-            style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.onSurface,
-        )
+
     }
 }
 
@@ -531,50 +681,47 @@ fun DashboardScreenPreview() {
             uiState = DashboardUiState(
                 username = "rockefeller74",
                 accountBalance = "$1,000.00",
-                previousWeekAmount = "$500",
-                latestTransactions = TransactionCreator.createTransactions(10),
-                largestTransaction = TransactionCreator.createTransaction()
+                previousWeekAmount = "-$12,450.00",
+                latestTransactions = listOf(
+                    GroupedTransactions(
+                        dateHeader = "Today",
+                        transactions = TransactionCreator.createTransactions(3).map { it.toUiModel() }
+                    ),
+                    GroupedTransactions(
+                        dateHeader = "Yesterday",
+                        transactions = TransactionCreator.createTransactions(2).map { it.toUiModel() }
+                    ),
+                    GroupedTransactions(
+                        dateHeader = "01 Jan 2022",
+                        transactions = TransactionCreator.createTransactions(1).map { it.toUiModel() }
+                    ),
+                ),
+                largestTransaction = TransactionCreator.createTransaction(),
+                mostPopularCategory = TransactionCategory.FOOD
             ),
             onEvent = {}
         )
     }
 }
 
-class TransactionCreator {
-    companion object {
-        fun createTransactions(quantity: Int): List<Transaction> {
-            return List(quantity) {
-                createTransaction()
-            }
-        }
+@Preview(showBackground = true)
+@Composable
+fun TransactionItemPreview() {
+    SpendLessTheme {
+        TransactionItem(
+            transaction = TransactionCreator.createTransaction().toUiModel(),
+            modifier = Modifier.fillMaxWidth()
+        )
+    }
+}
 
-        fun createTransaction(): Transaction {
-            val (description, category, type) = randomTransaction()
-            return Transaction(
-                id = Random.nextInt(),
-                amount = 100.00,
-                amountDisplay = listOf("$100.00", "-$50.00", "-$10.00", "-$12,492.50").random(),
-                description = description,
-                note = listOf("This is a note for $description", null).random(),
-                category = category,
-                type = type,
-                date = listOf("2025-01-01", "2025-02-27", "2025-02-28").random()
-            )
-        }
-
-        private fun randomTransaction(): Triple<String, TransactionCategory, TransactionType> {
-            val descriptions = listOf(
-                Triple("Amazon", TransactionCategory.HOME, TransactionType.EXPENSE),
-                Triple("McDonald's", TransactionCategory.FOOD, TransactionType.EXPENSE),
-                Triple("Netflix Monthly Subscription from Brazil", TransactionCategory.ENTERTAINMENT, TransactionType.EXPENSE),
-                Triple("Zara", TransactionCategory.CLOTHING, TransactionType.EXPENSE),
-                Triple("Gym - Monthly Membership John Reed", TransactionCategory.HEALTH, TransactionType.EXPENSE),
-                Triple("Haircut", TransactionCategory.PERSONAL_CARE, TransactionType.EXPENSE),
-                Triple("Uber", TransactionCategory.TRANSPORTATION, TransactionType.EXPENSE),
-                Triple("Udemy", TransactionCategory.EDUCATION, TransactionType.EXPENSE),
-                Triple("Rick's share - Birthday Present from Rafael", TransactionCategory.SAVINGS, TransactionType.INCOME),
-            )
-            return descriptions.random()
-        }
+@Preview(showBackground = true)
+@Composable
+fun TransactionSelectedItemPreview() {
+    SpendLessTheme {
+        TransactionItem(
+            transaction = TransactionCreator.createTransaction().toUiModel(),
+            modifier = Modifier.fillMaxWidth()
+        )
     }
 }
