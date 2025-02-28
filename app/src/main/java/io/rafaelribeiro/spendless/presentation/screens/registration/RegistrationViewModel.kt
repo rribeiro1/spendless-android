@@ -38,6 +38,7 @@ class RegistrationViewModel @Inject constructor(
 		const val USERNAME_MAX_SIZE = 14
 		const val USERNAME_MIN_SIZE = 3
 		const val PIN_MAX_SIZE = 5
+        const val LAST_PIN_DIGIT_DELAY = 111L
 	}
 
 	fun onEvent(event: RegistrationUiEvent) {
@@ -128,37 +129,37 @@ class RegistrationViewModel @Inject constructor(
 		setNextButtonEnabled(trimmedUsername.length >= USERNAME_MIN_SIZE)
 	}
 
-	private fun pinChanged(digit: String) {
-		val currentPin = _uiState.value.pin + digit
-		if (currentPin.length <= PIN_MAX_SIZE) {
+    private fun pinChanged(digit: String) {
+        val currentPin = _uiState.value.pin + digit
+        if (currentPin.length <= PIN_MAX_SIZE) {
             updateState { it.copy(pin = currentPin) }
-			if (currentPin.length == PIN_MAX_SIZE) {
-				viewModelScope.launch {
-					delay(111) // in order to able to see last pin digit
-					sendActionEvent(RegistrationActionEvent.PinCreated)
-				}
-			}
-		}
-	}
+            if (currentPin.length == PIN_MAX_SIZE) {
+                viewModelScope.launch {
+                    delay(LAST_PIN_DIGIT_DELAY) // in order to able to see last pin digit
+                    sendActionEvent(RegistrationActionEvent.PinCreated)
+                }
+            }
+        }
+    }
 
-	private fun pinConfirmationChanged(digit: String) {
-		val currentPin = _uiState.value.pinConfirmation + digit
-		if (currentPin.length <= PIN_MAX_SIZE) {
+    private fun pinConfirmationChanged(digit: String) {
+        val currentPin = _uiState.value.pinConfirmation + digit
+        if (currentPin.length <= PIN_MAX_SIZE) {
             updateState { it.copy(pinConfirmation = currentPin) }
-			if (currentPin.length == PIN_MAX_SIZE) {
-				if (_uiState.value.pin == currentPin) {
-					viewModelScope.launch {
-						delay(111) // in order to able to see last pin digit
-						sendActionEvent(RegistrationActionEvent.PinConfirmed)
-					}
-				} else {
-					resetPinValues()
-					sendActionEvent(RegistrationActionEvent.PinMismatch)
-					showErrorMessage(UiText.StringResource(R.string.registration_pin_mismatch))
-				}
-			}
-		}
-	}
+            if (currentPin.length == PIN_MAX_SIZE) {
+                if (_uiState.value.pin == currentPin) {
+                    viewModelScope.launch {
+                        delay(LAST_PIN_DIGIT_DELAY) // in order to able to see last pin digit
+                        sendActionEvent(RegistrationActionEvent.PinConfirmed)
+                    }
+                } else {
+                    resetPinValues()
+                    sendActionEvent(RegistrationActionEvent.PinMismatch)
+                    showErrorMessage(UiText.StringResource(R.string.registration_pin_mismatch))
+                }
+            }
+        }
+    }
 
 	private fun backspacePinTapped() {
         updateState { it.copy(pin = _uiState.value.pin.dropLast(n = 1)) }

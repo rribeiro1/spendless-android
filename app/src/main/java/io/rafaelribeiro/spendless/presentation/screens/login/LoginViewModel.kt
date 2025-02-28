@@ -27,6 +27,8 @@ class LoginViewModel @Inject constructor(
     companion object {
         const val PIN_MAX_WRONG_COUNT = 2
         const val PIN_LOCK_DURATION_SECONDS = 30
+        const val PIN_LOCK_TIMER_INTERVAL = 1000L
+        const val CLEAR_PIN_DIGIT_DELAY = 111L
     }
 
     private var pinLockTimerJob: Job? = null
@@ -91,7 +93,7 @@ class LoginViewModel @Inject constructor(
             for (seconds in PIN_LOCK_DURATION_SECONDS downTo 0) {
                 updateUiState { it.copy(pinLockRemainingSeconds = seconds) } // Ticking
                 if (seconds == 0) break
-                delay(1000) // Wait for 1 second
+                delay(PIN_LOCK_TIMER_INTERVAL) // Wait for 1 second
             }
             updateUiState { it.copy(pinPadEnabled = true, wrongPinCount = 0) } // Re-enable PinPad
         }
@@ -99,7 +101,7 @@ class LoginViewModel @Inject constructor(
 
     private fun resetPinValues(withDelay: Boolean = false) {
         viewModelScope.launch {
-            delay(if (withDelay) 222 else 0)
+            delay(if (withDelay) CLEAR_PIN_DIGIT_DELAY else 0)
             updateUiState { it.copy(pin = "") }
         }
     }
