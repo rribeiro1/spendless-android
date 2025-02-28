@@ -6,6 +6,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.rafaelribeiro.spendless.R
 import io.rafaelribeiro.spendless.core.presentation.UiText
 import io.rafaelribeiro.spendless.domain.AuthRepository
+import io.rafaelribeiro.spendless.domain.PinVerifier
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationViewModel.Companion.ERROR_MESSAGE_DURATION
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationViewModel.Companion.PIN_MAX_SIZE
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationViewModel.Companion.USERNAME_MAX_SIZE
@@ -22,6 +23,7 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val authRepository: AuthRepository,
+    private val pinVerifier: PinVerifier,
 ) : ViewModel() {
 
     companion object {
@@ -67,23 +69,27 @@ class LoginViewModel @Inject constructor(
         if (currentPin.length <= PIN_MAX_SIZE) {
             updateUiState { it.copy(pin = currentPin) }
             if (currentPin.length == PIN_MAX_SIZE) {
-                // TODO: Login Checking from DataStore if PIN prompt is correct!
-
-                //TOdo: Then pop back stack and navigate where it came from
-                // popBackStack?
-
-                val isWrongPinEntered = true // TODO: Check if PIN is correct
-                if (isWrongPinEntered) {
+                viewModelScope.launch {
                     resetPinValues(true)
-                    showErrorMessage(UiText.StringResource(R.string.wrong_pin))
-                    if (_uiState.value.wrongPinCount < PIN_MAX_WRONG_COUNT) {
-                        updateUiState { it.copy(wrongPinCount = it.wrongPinCount + 1) }
+                    if (pinVerifier.isPinCorrect(currentPin)) {
+                        println("Correct PIN entered!")
+                        //TOdo: Then pop back stack and navigate where it came from
+                        // triggering popBackStack is enough probably?
                     } else {
-                        updateUiState { it.copy(pinPadEnabled = false) } // Disable PinPad
-                        startPinLockTimer() // try your PIN again in 00:30
+                        handleWrongPinUiState()
                     }
                 }
             }
+        }
+    }
+
+    private fun handleWrongPinUiState() {
+        showErrorMessage(UiText.StringResource(R.string.wrong_pin))
+        if (_uiState.value.wrongPinCount < PIN_MAX_WRONG_COUNT) {
+            updateUiState { it.copy(wrongPinCount = it.wrongPinCount + 1) }
+        } else {
+            updateUiState { it.copy(pinPadEnabled = false) } // Disable PinPad
+            startPinLockTimer() // try your PIN again in 00:30
         }
     }
 
@@ -99,11 +105,9 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    private fun resetPinValues(withDelay: Boolean = false) {
-        viewModelScope.launch {
-            delay(if (withDelay) CLEAR_PIN_DIGIT_DELAY else 0)
-            updateUiState { it.copy(pin = "") }
-        }
+    private suspend fun resetPinValues(withDelay: Boolean = false) {
+        delay(if (withDelay) CLEAR_PIN_DIGIT_DELAY else 0)
+        updateUiState { it.copy(pin = "") }
     }
 
     private fun showErrorMessage(text: UiText) {
