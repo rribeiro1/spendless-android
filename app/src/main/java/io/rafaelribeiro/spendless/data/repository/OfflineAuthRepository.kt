@@ -4,6 +4,8 @@ import io.rafaelribeiro.spendless.domain.AuthRepository
 import io.rafaelribeiro.spendless.domain.RegistrationError
 import io.rafaelribeiro.spendless.domain.Result
 import io.rafaelribeiro.spendless.domain.User
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class OfflineAuthRepository @Inject constructor() : AuthRepository {

@@ -2,6 +2,7 @@ package io.rafaelribeiro.spendless.presentation.screens.dashboard.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,6 +19,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -30,10 +32,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.rafaelribeiro.spendless.data.repository.TransactionCreator
-import io.rafaelribeiro.spendless.domain.TransactionType
+import io.rafaelribeiro.spendless.domain.TransactionType.EXPENSE
+import io.rafaelribeiro.spendless.domain.TransactionType.INCOME
 import io.rafaelribeiro.spendless.domain.toUiModel
 import io.rafaelribeiro.spendless.presentation.screens.dashboard.DashboardUiEvent
 import io.rafaelribeiro.spendless.presentation.screens.dashboard.TransactionUiModel
+import io.rafaelribeiro.spendless.presentation.theme.LightOlive
 import io.rafaelribeiro.spendless.presentation.theme.SpendLessTheme
 import io.rafaelribeiro.spendless.presentation.theme.Success
 
@@ -84,7 +88,7 @@ fun DashboardTransactionItem(
                         modifier = Modifier
                             .matchParentSize()
                             .clip(RoundedCornerShape(12.dp))
-                            .background(if (transaction.type == TransactionType.EXPENSE) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f))
+                            .background(if (transaction.type == EXPENSE) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f))
                     ) {
                         Text(
                             text = transaction.category.emoji,
@@ -93,6 +97,13 @@ fun DashboardTransactionItem(
                     }
 
                     if (transaction.note != null) {
+                        val noteColor = when {
+                            transaction.type == EXPENSE && transaction.extended -> MaterialTheme.colorScheme.primaryContainer
+                            transaction.type == EXPENSE -> MaterialTheme.colorScheme.inversePrimary
+                            transaction.type == INCOME && transaction.extended -> LightOlive
+                            transaction.type == INCOME -> MaterialTheme.colorScheme.surfaceDim
+                            else -> MaterialTheme.colorScheme.surfaceDim
+                        }
                         Box(
                             modifier = Modifier
                                 .size(20.dp)
@@ -100,13 +111,16 @@ fun DashboardTransactionItem(
                                 .offset(x = 4.dp, y = 4.dp)
                                 .clip(RoundedCornerShape(6.dp))
                                 .background(MaterialTheme.colorScheme.onPrimary)
-                                .clickable { onEvent(DashboardUiEvent.TransactionNoteClicked(transaction.id)) },
+                                .clickable(
+                                    interactionSource = remember { MutableInteractionSource() },
+                                    indication = null
+                                ) { onEvent(DashboardUiEvent.TransactionNoteClicked(transaction.id)) },
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.Segment,
                                 contentDescription = "Note attached",
-                                tint = if (transaction.type == TransactionType.EXPENSE) MaterialTheme.colorScheme.inversePrimary else MaterialTheme.colorScheme.surfaceDim,
+                                tint = noteColor,
                                 modifier = Modifier
                                     .size(14.dp)
                                     .graphicsLayer(scaleX = -1f)
@@ -141,7 +155,7 @@ fun DashboardTransactionItem(
                 Text(
                     text = transaction.amountDisplay,
                     style = MaterialTheme.typography.titleLarge,
-                    color = if (transaction.type == TransactionType.INCOME) Success else MaterialTheme.colorScheme.onSurface,
+                    color = if (transaction.type == INCOME) Success else MaterialTheme.colorScheme.onSurface,
                     modifier = modifier.padding(end = 4.dp)
                 )
             }

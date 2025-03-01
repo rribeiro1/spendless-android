@@ -22,9 +22,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.rafaelribeiro.spendless.R
-import io.rafaelribeiro.spendless.core.presentation.formatDateTime
 import io.rafaelribeiro.spendless.data.repository.TransactionCreator
-import io.rafaelribeiro.spendless.domain.Transaction
 import io.rafaelribeiro.spendless.domain.toUiModel
 import io.rafaelribeiro.spendless.presentation.screens.dashboard.TransactionUiModel
 import io.rafaelribeiro.spendless.presentation.theme.SpendLessTheme
