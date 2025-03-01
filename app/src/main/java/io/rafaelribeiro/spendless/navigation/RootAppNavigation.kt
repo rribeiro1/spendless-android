@@ -36,7 +36,7 @@ fun RootAppNavigation(
 ) {
 	NavHost(
 		navController = navigationState.navHostController,
-		startDestination = Screen.DashboardScreen.route,
+		startDestination = Screen.RegistrationFlow.route,
 		enterTransition = enterTransition(),
 		exitTransition = exitTransition(),
 		popEnterTransition = popEnterTransition(),
