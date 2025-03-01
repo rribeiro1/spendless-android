@@ -6,6 +6,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.rafaelribeiro.spendless.R
 import io.rafaelribeiro.spendless.core.presentation.UiText
 import io.rafaelribeiro.spendless.core.presentation.asUiText
+import io.rafaelribeiro.spendless.data.toUserPreferences
 import io.rafaelribeiro.spendless.domain.AuthRepository
 import io.rafaelribeiro.spendless.domain.CurrencySymbol
 import io.rafaelribeiro.spendless.domain.DecimalSeparator
@@ -69,12 +70,19 @@ class RegistrationViewModel @Inject constructor(
                 formatExampleExpense()
             }
             is RegistrationUiEvent.StartTrackingButtonTapped -> {
-                // TODO: Save user data.
                 registerUser()
+                saveUserPreferences()
                 sendActionEvent(RegistrationActionEvent.UserPreferencesSaved)
             }
         }
 	}
+
+    private fun saveUserPreferences() {
+        viewModelScope.launch {
+            val userPreferences = _uiState.value.preferences.toUserPreferences()
+            userPreferencesRepository.saveUserPreferences(userPreferences)
+        }
+    }
 
     private fun registerUser() {
         viewModelScope.launch {

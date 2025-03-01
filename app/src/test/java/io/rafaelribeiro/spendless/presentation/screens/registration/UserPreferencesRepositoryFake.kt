@@ -9,31 +9,25 @@ import kotlinx.coroutines.flow.update
 
 class UserPreferencesRepositoryFake : UserPreferencesRepository {
 
-    private val _userPreferencesFlow = MutableStateFlow(UserPreferences("", ""))
+    private val initialUserPreferences = UserPreferences(0,0,0,0)
+    private val _userPreferencesFlow = MutableStateFlow(initialUserPreferences)
     override val userPreferences: Flow<UserPreferences> = _userPreferencesFlow.asStateFlow()
 
-    private var userName: String = ""
-    private var pin: String = ""
-
-//    override suspend fun saveUserName(userName: String) {
-//        this.userName = userName
-//        _userPreferencesFlow.update {
-//            it.copy(userName = userName)
-//        }
-//    }
-//
-//    override suspend fun savePin(pin: String) {
-//        this.pin = pin
-//        _userPreferencesFlow.update {
-//            it.copy(pin = pin)
-//        }
-//    }
 
     override suspend fun clearAllPreferences() {
-        userName = ""
-        pin = ""
         _userPreferencesFlow.update {
-            it.copy(userName = "", pin = "")
+            initialUserPreferences
+        }
+    }
+
+    override suspend fun saveUserPreferences(userPreferences: UserPreferences) {
+        _userPreferencesFlow.update {
+            it.copy(
+                expensesFormatOrdinal = userPreferences.expensesFormatOrdinal,
+                decimalSeparatorOrdinal = userPreferences.decimalSeparatorOrdinal,
+                thousandsSeparatorOrdinal = userPreferences.thousandsSeparatorOrdinal,
+                currencyOrdinal = userPreferences.currencyOrdinal,
+            )
         }
     }
 }

@@ -11,7 +11,7 @@ import io.rafaelribeiro.spendless.presentation.screens.registration.Registration
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -20,7 +20,7 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val authRepository: AuthRepository,
-    dataStoreUserPreferencesRepository: DataStoreUserPreferencesRepository,
+    private val dataStoreUserPreferencesRepository: DataStoreUserPreferencesRepository,
 ) : ViewModel() {
 
     private val initialUiState = LoginUiState(isLoading = true)
@@ -34,9 +34,11 @@ class LoginViewModel @Inject constructor(
         )
 
     private suspend fun loadData() {
-        val username = authRepository.userName.firstOrNull() ?: ""
+        val username = authRepository.userName.first()
         _uiState.update { it.copy(username = username, isLoading = false) }
-        println("LoginViewModel.loadData()")
+
+        val userPreferences = dataStoreUserPreferencesRepository.userPreferences.first()
+        println("userPreferences: $userPreferences")
     }
 
     fun onEvent(event: LoginUiEvent) {

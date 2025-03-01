@@ -6,4 +6,5 @@ import io.rafaelribeiro.spendless.data.UserPreferences
 interface UserPreferencesRepository {
     val userPreferences: Flow<UserPreferences>
     suspend fun clearAllPreferences()
+    suspend fun saveUserPreferences(userPreferences: UserPreferences)
 }
