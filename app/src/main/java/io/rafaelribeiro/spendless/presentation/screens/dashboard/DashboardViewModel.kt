@@ -3,6 +3,7 @@ package io.rafaelribeiro.spendless.presentation.screens.dashboard
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.rafaelribeiro.spendless.core.presentation.formatDateTime
 import io.rafaelribeiro.spendless.data.repository.TransactionCreator
 import io.rafaelribeiro.spendless.domain.CurrencySymbol
 import io.rafaelribeiro.spendless.domain.DecimalSeparator
@@ -11,7 +12,6 @@ import io.rafaelribeiro.spendless.domain.ExpenseFormatter
 import io.rafaelribeiro.spendless.domain.ThousandSeparator
 import io.rafaelribeiro.spendless.domain.Transaction
 import io.rafaelribeiro.spendless.domain.TransactionRepository
-import io.rafaelribeiro.spendless.domain.toUiModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -46,9 +46,9 @@ class DashboardViewModel @Inject constructor(
 
     fun onEvent(event: DashboardUiEvent) {
         when (event) {
-            is DashboardUiEvent.AddTransactionClicked -> addTransaction()
+            is DashboardUiEvent.AddTransactionClicked -> addTransaction() // TODO: Replace with screen to add transaction.
             is DashboardUiEvent.DownloadTransactionsClicked -> TODO()
-            is DashboardUiEvent.SettingsClicked -> deleteAllTransactions()
+            is DashboardUiEvent.SettingsClicked -> deleteAllTransactions() // TODO: Replace with settings screen.
             is DashboardUiEvent.TransactionNoteClicked -> showTransactionNote(event.transactionId)
             is DashboardUiEvent.ShowAllTransactionsClicked -> TODO()
         }
@@ -63,7 +63,7 @@ class DashboardViewModel @Inject constructor(
             transactionRepository.getTotalAmountLastWeek()
         ) { balance, largestTransaction, latestTransactions, mostPopularCategory, totalAmountLastWeek ->
             DashboardUiState(
-                username = "rafael87",
+                username = "rafael87", // TODO: Replace with user's name from auth repository.
                 accountBalance = balance?.formatExpense() ?: 0.toDouble().formatExpense(),
                 previousWeekAmount = totalAmountLastWeek?.formatExpense() ?: 0.toDouble().formatExpense(),
                 latestTransactions = groupedTransactions(latestTransactions),
@@ -76,7 +76,7 @@ class DashboardViewModel @Inject constructor(
     private fun groupedTransactions(latestTransactions: List<Transaction>): List<GroupedTransactions> {
         val groupedTransactions = latestTransactions
             .sortedByDescending { it.createdAt }
-            .groupBy { timestampToLocalDate(it.createdAt) }
+            .groupBy { it.createdAt.timestampToLocalDate() }
             .map { (date, transactions) ->
                 val formattedDate = when (date) {
                     LocalDate.now() -> "Today"
@@ -91,12 +91,7 @@ class DashboardViewModel @Inject constructor(
         return groupedTransactions
     }
 
-    private fun timestampToLocalDate(timestamp: Long): LocalDate {
-        return Instant.ofEpochMilli(timestamp)
-            .atZone(ZoneId.systemDefault())
-            .toLocalDate()
-    }
-
+    // TODO: Move to screen to add transaction.
     private fun addTransaction() {
         viewModelScope.launch {
             transactionRepository.saveTransaction(
@@ -105,6 +100,7 @@ class DashboardViewModel @Inject constructor(
         }
     }
 
+    // TODO: We should move this to settings page or debug screen to be able to delete all transactions.
     private fun deleteAllTransactions() {
         viewModelScope.launch {
             transactionRepository.deleteAllTransactions()
@@ -137,6 +133,25 @@ class DashboardViewModel @Inject constructor(
             expensesFormat = ExpenseFormat.NEGATIVE
         )
         return formatter.format(this)
+    }
+
+    private fun Long.timestampToLocalDate(): LocalDate {
+        return Instant.ofEpochMilli(this)
+            .atZone(ZoneId.systemDefault())
+            .toLocalDate()
+    }
+
+    private fun Transaction.toUiModel(): TransactionUiModel {
+        return TransactionUiModel(
+            id = id,
+            amount = amount,
+            amountDisplay = amount.formatExpense(),
+            description = description,
+            note = note,
+            category = category,
+            type = type,
+            createdAt = formatDateTime(createdAt),
+        )
     }
 }
 

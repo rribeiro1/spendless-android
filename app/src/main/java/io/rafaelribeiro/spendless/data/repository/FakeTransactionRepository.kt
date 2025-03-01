@@ -11,6 +11,10 @@ import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 import kotlin.random.Random
 
+/**
+ * Fake implementation of [TransactionRepository] to be used in tests.
+ * Change DI's [TransactionRepository] implementation to this one to use it in tests for convenience.
+ */
 class FakeTransactionRepository @Inject constructor() : TransactionRepository {
     override fun getBalance(): Flow<Double?> {
         return flow {
@@ -47,6 +51,9 @@ class FakeTransactionRepository @Inject constructor() : TransactionRepository {
     override suspend fun deleteAllTransactions() {}
 }
 
+/**
+ * Helper class to create transactions for tests.
+ */
 class TransactionCreator {
     companion object {
         data class TransactionTest(
@@ -80,15 +87,84 @@ class TransactionCreator {
 
         private fun randomTransaction(): TransactionTest {
             val transactions = listOf(
-                TransactionTest("Amazon", TransactionCategory.HOME, TransactionType.EXPENSE, 100.00, "-$100.00", randomTimestamp()),
-                TransactionTest("McDonald's", TransactionCategory.FOOD, TransactionType.EXPENSE, 50.00, "-$50.00", randomTimestamp(), "I was hungry today so I bought quite everything from the menu, I should stop doing this"),
-                TransactionTest("Netflix Monthly Subscription from Brazil", TransactionCategory.ENTERTAINMENT, TransactionType.EXPENSE, 10.00, "-$10.00",  randomTimestamp(), "Netflix subscription for the month of January"),
-                TransactionTest("Zara", TransactionCategory.CLOTHING, TransactionType.EXPENSE, 12492.50, "-$12,492.50", randomTimestamp(), "Bought a new suit for the wedding"),
-                TransactionTest("Gym - Monthly Membership John Reed", TransactionCategory.HEALTH, TransactionType.EXPENSE, 100.00, "-$100.00",  randomTimestamp()),
-                TransactionTest("Haircut", TransactionCategory.PERSONAL_CARE, TransactionType.EXPENSE, 50.00, "-$50.00", randomTimestamp()),
-                TransactionTest("Uber", TransactionCategory.TRANSPORTATION, TransactionType.EXPENSE, 10.00, "-$10.00", randomTimestamp(), "Uber ride to work"),
-                TransactionTest("Udemy", TransactionCategory.EDUCATION, TransactionType.EXPENSE, 140.50, "-$140.50", randomTimestamp()),
-                TransactionTest("Rick's share - Birthday Present from Rafael", TransactionCategory.SAVINGS, TransactionType.INCOME, 100.00, "$100.00", randomTimestamp(), "Birthday present from Rafael it was just a little but it is fine I will probably invest it."),
+                TransactionTest(
+                    description = "Amazon",
+                    category = TransactionCategory.HOME,
+                    type = TransactionType.EXPENSE,
+                    amount = 100.00,
+                    amountDisplay = "-$100.00",
+                    createdAt = randomTimestamp()
+                ),
+                TransactionTest(
+                    description = "McDonald's",
+                    category = TransactionCategory.FOOD,
+                    type = TransactionType.EXPENSE,
+                    amount = 1450.00,
+                    amountDisplay = "-$1450.00",
+                    createdAt = randomTimestamp(),
+                    note = "I was hungry today so I bought quite everything from the menu, I should stop doing this"
+                ),
+                TransactionTest(
+                    description = "Netflix Monthly Subscription from Brazil",
+                    category = TransactionCategory.ENTERTAINMENT,
+                    type = TransactionType.EXPENSE,
+                    amount = 10.00,
+                    amountDisplay = "-$10.00",
+                    createdAt = randomTimestamp()
+                ),
+                TransactionTest(
+                    description = "Zara",
+                    category = TransactionCategory.CLOTHING,
+                    type = TransactionType.EXPENSE,
+                    amount = 12492.50,
+                    amountDisplay = "-$12,492.50",
+                    createdAt = randomTimestamp()
+                ),
+                TransactionTest(
+                    description = "Gym - Monthly Membership John Reed",
+                    category = TransactionCategory.HEALTH,
+                    type = TransactionType.EXPENSE,
+                    amount = 100.00,
+                    amountDisplay = "-$100.00",
+                    createdAt = randomTimestamp(),
+                    note = "I am trying to get back in shape, let's see how it goes. But I am more like an gym investor because I just pay and don't go."
+                ),
+                TransactionTest(
+                    description = "Haircut",
+                    category = TransactionCategory.PERSONAL_CARE,
+                    type = TransactionType.EXPENSE,
+                    amount = 50.00,
+                    amountDisplay = "-$50.00",
+                    createdAt = randomTimestamp(),
+                    note = "I was looking like a caveman, so I decided to cut my hair."
+                ),
+                TransactionTest(
+                    description = "Uber",
+                    category = TransactionCategory.TRANSPORTATION,
+                    type = TransactionType.EXPENSE,
+                    amount = 10.00,
+                    amountDisplay = "-$10.00",
+                    createdAt = randomTimestamp(),
+                    note = "I was late for a meeting, so I had to take an Uber."
+                ),
+                TransactionTest(
+                    description = "Udemy",
+                    category = TransactionCategory.EDUCATION,
+                    type = TransactionType.EXPENSE,
+                    amount = 140.50,
+                    amountDisplay = "-$140.50",
+                    createdAt = randomTimestamp(),
+                    note = "I am learning this android thing, let's see if I can get a job with this."
+                ),
+                TransactionTest(
+                    description = "Rick's share - Birthday Present from Rafael",
+                    category = TransactionCategory.SAVINGS,
+                    type = TransactionType.INCOME,
+                    amount = 100.00,
+                    amountDisplay = "$100.00",
+                    createdAt = randomTimestamp(),
+                    note = "Birthday present from Rafael."
+                ),
             )
             return transactions.random()
         }
