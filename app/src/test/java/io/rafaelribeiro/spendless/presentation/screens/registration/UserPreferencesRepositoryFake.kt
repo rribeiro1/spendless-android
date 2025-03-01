@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.update
 
 class UserPreferencesRepositoryFake : UserPreferencesRepository {
 
-    private val initialUserPreferences = UserPreferences(0,0,0,0)
+    private val initialUserPreferences = UserPreferences()
     private val _userPreferencesFlow = MutableStateFlow(initialUserPreferences)
     override val userPreferences: Flow<UserPreferences> = _userPreferencesFlow.asStateFlow()
 
@@ -23,10 +23,10 @@ class UserPreferencesRepositoryFake : UserPreferencesRepository {
     override suspend fun saveUserPreferences(userPreferences: UserPreferences) {
         _userPreferencesFlow.update {
             it.copy(
-                expensesFormatOrdinal = userPreferences.expensesFormatOrdinal,
-                decimalSeparatorOrdinal = userPreferences.decimalSeparatorOrdinal,
-                thousandsSeparatorOrdinal = userPreferences.thousandsSeparatorOrdinal,
-                currencyOrdinal = userPreferences.currencyOrdinal,
+                expensesFormatName = userPreferences.expensesFormatName,
+                decimalSeparatorName = userPreferences.decimalSeparatorName,
+                thousandsSeparatorName = userPreferences.thousandsSeparatorName,
+                currencyName = userPreferences.currencyName,
             )
         }
     }

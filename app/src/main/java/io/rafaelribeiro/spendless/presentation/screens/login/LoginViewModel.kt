@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.rafaelribeiro.spendless.data.DataStoreUserPreferencesRepository
 import io.rafaelribeiro.spendless.domain.AuthRepository
+import io.rafaelribeiro.spendless.domain.CurrencySymbol
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationViewModel.Companion.PIN_MAX_SIZE
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationViewModel.Companion.USERNAME_MAX_SIZE
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationViewModel.Companion.USERNAME_MIN_SIZE
@@ -37,8 +38,10 @@ class LoginViewModel @Inject constructor(
         val username = authRepository.userName.first()
         _uiState.update { it.copy(username = username, isLoading = false) }
 
+        // todo: this can be removed later:
         val userPreferences = dataStoreUserPreferencesRepository.userPreferences.first()
-        println("userPreferences: $userPreferences")
+        val currencySymbol = CurrencySymbol.entries.first { it.name == userPreferences.currencyName }
+        println("userPreferences: $userPreferences, currencySymbol: $currencySymbol")
     }
 
     fun onEvent(event: LoginUiEvent) {

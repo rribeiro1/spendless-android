@@ -5,7 +5,7 @@ import androidx.datastore.core.IOException
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
-import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 import io.rafaelribeiro.spendless.domain.UserPreferencesRepository
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationPreferencesUiState
 import kotlinx.coroutines.flow.Flow
@@ -21,10 +21,10 @@ class DataStoreUserPreferencesRepository @Inject constructor(
 ) : UserPreferencesRepository {
 
     companion object {
-        private val EXPENSES_FORMAT = intPreferencesKey("expenses_format")
-        private val DECIMAL_SEPARATOR = intPreferencesKey("decimal_separator")
-        private val THOUSANDS_SEPARATOR = intPreferencesKey("thousands_separator")
-        private val CURRENCY = intPreferencesKey("currency_symbol")
+        private val EXPENSES_FORMAT = stringPreferencesKey("expenses_format")
+        private val DECIMAL_SEPARATOR = stringPreferencesKey("decimal_separator")
+        private val THOUSANDS_SEPARATOR = stringPreferencesKey("thousands_separator")
+        private val CURRENCY = stringPreferencesKey("currency_symbol")
     }
 
     override val userPreferences: Flow<UserPreferences> = dataStore.data
@@ -37,15 +37,15 @@ class DataStoreUserPreferencesRepository @Inject constructor(
             }
         }
         .map { preferences ->
-            val expensesFormat = preferences[EXPENSES_FORMAT] ?: 0
-            val decimalSeparator = preferences[DECIMAL_SEPARATOR] ?: 0
-            val thousandsSeparator = preferences[THOUSANDS_SEPARATOR] ?: 0
-            val currency = preferences[CURRENCY] ?: 0
+            val expensesFormat = preferences[EXPENSES_FORMAT] ?: ""
+            val decimalSeparator = preferences[DECIMAL_SEPARATOR] ?: ""
+            val thousandsSeparator = preferences[THOUSANDS_SEPARATOR] ?: ""
+            val currency = preferences[CURRENCY] ?: ""
             UserPreferences(
-                expensesFormatOrdinal = expensesFormat,
-                decimalSeparatorOrdinal = decimalSeparator,
-                thousandsSeparatorOrdinal = thousandsSeparator,
-                currencyOrdinal = currency
+                expensesFormatName = expensesFormat,
+                decimalSeparatorName = decimalSeparator,
+                thousandsSeparatorName = thousandsSeparator,
+                currencyName = currency
             )
         }
 
@@ -57,26 +57,26 @@ class DataStoreUserPreferencesRepository @Inject constructor(
 
     override suspend fun saveUserPreferences(userPreferences: UserPreferences) {
         dataStore.edit { preferences ->
-            preferences[EXPENSES_FORMAT] = userPreferences.expensesFormatOrdinal
-            preferences[DECIMAL_SEPARATOR] = userPreferences.decimalSeparatorOrdinal
-            preferences[THOUSANDS_SEPARATOR] = userPreferences.thousandsSeparatorOrdinal
-            preferences[CURRENCY] = userPreferences.currencyOrdinal
+            preferences[EXPENSES_FORMAT] = userPreferences.expensesFormatName
+            preferences[DECIMAL_SEPARATOR] = userPreferences.decimalSeparatorName
+            preferences[THOUSANDS_SEPARATOR] = userPreferences.thousandsSeparatorName
+            preferences[CURRENCY] = userPreferences.currencyName
         }
     }
 }
 
 data class UserPreferences(
-    val expensesFormatOrdinal: Int,
-    val decimalSeparatorOrdinal: Int,
-    val thousandsSeparatorOrdinal: Int,
-    val currencyOrdinal: Int,
+    val expensesFormatName: String = "",
+    val decimalSeparatorName: String = "",
+    val thousandsSeparatorName: String = "",
+    val currencyName: String = "",
 )
 
 fun RegistrationPreferencesUiState.toUserPreferences(): UserPreferences {
     return UserPreferences(
-        expensesFormatOrdinal = expensesFormat.ordinal,
-        decimalSeparatorOrdinal = decimalSeparator.ordinal,
-        thousandsSeparatorOrdinal = thousandSeparator.ordinal,
-        currencyOrdinal = currencySymbol.ordinal,
+        expensesFormatName = expensesFormat.name,
+        decimalSeparatorName = decimalSeparator.name,
+        thousandsSeparatorName = thousandSeparator.name,
+        currencyName = currencySymbol.name,
     )
 }
