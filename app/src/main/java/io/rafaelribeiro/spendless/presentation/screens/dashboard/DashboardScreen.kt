@@ -6,12 +6,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.captionBar
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -39,7 +41,7 @@ import androidx.core.view.WindowCompat
 import io.rafaelribeiro.spendless.R
 import io.rafaelribeiro.spendless.data.repository.TransactionCreator
 import io.rafaelribeiro.spendless.domain.TransactionCategory
-import io.rafaelribeiro.spendless.domain.toUiModel
+import io.rafaelribeiro.spendless.presentation.screens.dashboard.DashboardViewModel.Companion.toUiModel
 import io.rafaelribeiro.spendless.presentation.screens.dashboard.components.DashboardBalance
 import io.rafaelribeiro.spendless.presentation.screens.dashboard.components.DashboardLargestTransaction
 import io.rafaelribeiro.spendless.presentation.screens.dashboard.components.DashboardMostPopularCategory
@@ -54,9 +56,6 @@ fun DashboardRootScreen(
     modifier: Modifier,
     onEvent: (DashboardUiEvent) -> Unit
 ) {
-    /**
-     * This is a workaround to set the status bar icons color to white given the dashboard background is dark.
-     */
     val view = LocalView.current
     val window = (view.context as Activity).window
     LaunchedEffect(Unit) {
@@ -88,6 +87,7 @@ fun DashboardRootScreen(
                 onClick = { onEvent(DashboardUiEvent.AddTransactionClicked) },
                 containerColor = MaterialTheme.colorScheme.secondaryContainer,
                 contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                modifier = Modifier.offset(y = (-24).dp)
             ) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = "Add a new expense")
             }
@@ -215,7 +215,7 @@ fun LatestTransactions(
         LazyColumn(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
-
+            contentPadding = PaddingValues(bottom = 80.dp)
         ) {
             groupedTransactions.forEach { group ->
                 stickyHeader {

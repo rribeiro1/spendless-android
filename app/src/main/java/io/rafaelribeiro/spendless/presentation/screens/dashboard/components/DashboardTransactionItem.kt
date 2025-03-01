@@ -34,8 +34,8 @@ import androidx.compose.ui.unit.sp
 import io.rafaelribeiro.spendless.data.repository.TransactionCreator
 import io.rafaelribeiro.spendless.domain.TransactionType.EXPENSE
 import io.rafaelribeiro.spendless.domain.TransactionType.INCOME
-import io.rafaelribeiro.spendless.domain.toUiModel
 import io.rafaelribeiro.spendless.presentation.screens.dashboard.DashboardUiEvent
+import io.rafaelribeiro.spendless.presentation.screens.dashboard.DashboardViewModel.Companion.toUiModel
 import io.rafaelribeiro.spendless.presentation.screens.dashboard.TransactionUiModel
 import io.rafaelribeiro.spendless.presentation.theme.LightOlive
 import io.rafaelribeiro.spendless.presentation.theme.SpendLessTheme
@@ -57,13 +57,13 @@ fun DashboardTransactionItem(
             )
             .fillMaxWidth()
             .shadow(
-                elevation = if (transaction.extended) 4.dp else 0.dp,
+                elevation = if (transaction.extended) 2.dp else 0.dp,
                 shape = RoundedCornerShape(16.dp),
                 spotColor = DefaultShadowColor.copy(
                     red = 24 / 255f,
                     green = 0 / 255f,
                     blue = 64 / 255f,
-                    alpha = if (transaction.extended) 0.4f else 0f
+                    alpha = if (transaction.extended) 0.2f else 0f
                 ),
             )
             .background(if (transaction.extended) MaterialTheme.colorScheme.onPrimary else Color.Transparent)
@@ -109,7 +109,16 @@ fun DashboardTransactionItem(
                                 .size(20.dp)
                                 .align(Alignment.BottomEnd)
                                 .offset(x = 4.dp, y = 4.dp)
-                                .clip(RoundedCornerShape(6.dp))
+                                .shadow(
+                                    elevation = 16.dp,
+                                    shape = RoundedCornerShape(6.dp),
+                                    spotColor = DefaultShadowColor.copy(
+                                        red = 24 / 255f,
+                                        green = 0 / 255f,
+                                        blue = 64 / 255f,
+                                        alpha = 0.2f
+                                    ),
+                                )
                                 .background(MaterialTheme.colorScheme.onPrimary)
                                 .clickable(
                                     interactionSource = remember { MutableInteractionSource() },

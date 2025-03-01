@@ -81,7 +81,7 @@ class DashboardViewModel @Inject constructor(
                 val formattedDate = when (date) {
                     LocalDate.now() -> "Today"
                     LocalDate.now().minusDays(1) -> "Yesterday"
-                    else -> date.format(DateTimeFormatter.ofPattern("dd MMM yyyy"))
+                    else -> date.format(DateTimeFormatter.ofPattern("d MMMM yyyy"))
                 }
                 GroupedTransactions(
                     dateHeader = formattedDate,
@@ -121,37 +121,39 @@ class DashboardViewModel @Inject constructor(
         )
     }
 
-    /**
-     * Formats the expense amount according to the user's preferences.
-     * TODO: The preferences should come from the user's preferences repository.
-     */
-    private fun Double.formatExpense(): String {
-        val formatter = ExpenseFormatter(
-            decimalSeparator = DecimalSeparator.DOT,
-            thousandSeparator = ThousandSeparator.COMMA,
-            currencySymbol = CurrencySymbol.DOLLAR,
-            expensesFormat = ExpenseFormat.NEGATIVE
-        )
-        return formatter.format(this)
-    }
-
     private fun Long.timestampToLocalDate(): LocalDate {
         return Instant.ofEpochMilli(this)
             .atZone(ZoneId.systemDefault())
             .toLocalDate()
     }
 
-    private fun Transaction.toUiModel(): TransactionUiModel {
-        return TransactionUiModel(
-            id = id,
-            amount = amount,
-            amountDisplay = amount.formatExpense(),
-            description = description,
-            note = note,
-            category = category,
-            type = type,
-            createdAt = formatDateTime(createdAt),
-        )
+    companion object {
+        fun Transaction.toUiModel(): TransactionUiModel {
+            return TransactionUiModel(
+                id = id,
+                amount = amount,
+                amountDisplay = amount.formatExpense(),
+                description = description,
+                note = note,
+                category = category,
+                type = type,
+                createdAt = formatDateTime(createdAt),
+            )
+        }
+
+        /**
+         * Formats the expense amount according to the user's preferences.
+         * TODO: The preferences should come from the user's preferences repository.
+         */
+        private fun Double.formatExpense(): String {
+            val formatter = ExpenseFormatter(
+                decimalSeparator = DecimalSeparator.DOT,
+                thousandSeparator = ThousandSeparator.COMMA,
+                currencySymbol = CurrencySymbol.DOLLAR,
+                expensesFormat = ExpenseFormat.NEGATIVE
+            )
+            return formatter.format(this)
+        }
     }
 }
 
