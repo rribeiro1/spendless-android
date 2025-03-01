@@ -9,4 +9,7 @@ data class LoginUiState(
     val username: String = "",
     val pin: String = "",
     val loginButtonEnabled: Boolean = false,
+    val wrongPinCount: Int = 0,
+    val pinPadEnabled: Boolean = true,
+    val pinLockRemainingSeconds: Int = 0,
 )
