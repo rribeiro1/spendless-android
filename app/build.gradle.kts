@@ -59,6 +59,7 @@ dependencies {
     implementation(libs.androidx.ui.text.google.fonts)
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.foundation.layout.android)
+    implementation(libs.androidx.datastore)
     // -- Hilt
     kapt(libs.hilt.android.compiler)
     implementation(libs.hilt.android)

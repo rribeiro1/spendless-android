@@ -5,17 +5,22 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.rafaelribeiro.spendless.R
 import io.rafaelribeiro.spendless.core.presentation.UiText
+import io.rafaelribeiro.spendless.data.DataStoreUserPreferencesRepository
 import io.rafaelribeiro.spendless.domain.AuthRepository
 import io.rafaelribeiro.spendless.domain.PinVerifier
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationViewModel.Companion.ERROR_MESSAGE_DURATION
+import io.rafaelribeiro.spendless.domain.CurrencySymbol
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationViewModel.Companion.PIN_MAX_SIZE
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationViewModel.Companion.USERNAME_MAX_SIZE
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationViewModel.Companion.USERNAME_MIN_SIZE
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -24,6 +29,7 @@ import javax.inject.Inject
 class LoginViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val pinVerifier: PinVerifier,
+    private val dataStoreUserPreferencesRepository: DataStoreUserPreferencesRepository,
 ) : ViewModel() {
 
     companion object {
@@ -32,11 +38,27 @@ class LoginViewModel @Inject constructor(
         const val PIN_LOCK_TIMER_INTERVAL = 1000L
         const val CLEAR_PIN_DIGIT_DELAY = 111L
     }
-
     private var pinLockTimerJob: Job? = null
 
-    private val _uiState: MutableStateFlow<LoginUiState> = MutableStateFlow(LoginUiState())
-    val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
+    private val initialUiState = LoginUiState(isLoading = true)
+    private val _uiState: MutableStateFlow<LoginUiState> = MutableStateFlow(initialUiState)
+    val uiState: StateFlow<LoginUiState> = _uiState
+        .onStart { loadData() }
+        .stateIn(
+            scope = viewModelScope,
+            initialValue = initialUiState,
+            started = SharingStarted.WhileSubscribed(5000L),
+        )
+
+    private suspend fun loadData() {
+        val username = authRepository.userName.first()
+        _uiState.update { it.copy(username = username, isLoading = false) }
+
+        // todo: this can be removed later:
+        val userPreferences = dataStoreUserPreferencesRepository.userPreferences.first()
+        val currencySymbol = CurrencySymbol.entries.first { it.name == userPreferences.currencyName }
+        println("userPreferences: $userPreferences, currencySymbol: $currencySymbol")
+    }
 
     fun onEvent(event: LoginUiEvent) {
         when (event) {

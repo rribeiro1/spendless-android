@@ -4,6 +4,7 @@ import io.rafaelribeiro.spendless.core.presentation.UiText
 import io.rafaelribeiro.spendless.core.presentation.UiText.Companion.Empty
 
 data class LoginUiState(
+    val isLoading: Boolean = false,
     val errorMessage: UiText = Empty,
     val username: String = "",
     val pin: String = "",
