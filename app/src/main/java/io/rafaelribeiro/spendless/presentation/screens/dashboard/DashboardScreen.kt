@@ -33,7 +33,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.rafaelribeiro.spendless.R
-import io.rafaelribeiro.spendless.data.TransactionCreator
+import io.rafaelribeiro.spendless.data.repository.TransactionCreator
 import io.rafaelribeiro.spendless.domain.Transaction
 import io.rafaelribeiro.spendless.domain.TransactionCategory
 import io.rafaelribeiro.spendless.domain.toUiModel
@@ -112,7 +112,7 @@ fun DashboardSummaryScreen(
     accountBalance: String,
     previousWeekAmount: String,
     mostPopularCategory: TransactionCategory? = null,
-    largestTransaction: Transaction? = null,
+    largestTransaction: TransactionUiModel? = null,
     modifier: Modifier
 ) {
     Column(
@@ -273,7 +273,7 @@ fun DashboardScreenPreview() {
                         transactions = TransactionCreator.createTransactions(1).map { it.toUiModel() }
                     ),
                 ),
-                largestTransaction = TransactionCreator.createTransaction(),
+                largestTransaction = TransactionCreator.createTransaction().toUiModel(),
                 mostPopularCategory = TransactionCategory.FOOD
             ),
             onEvent = {}

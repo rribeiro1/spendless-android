@@ -2,7 +2,10 @@ package io.rafaelribeiro.spendless.presentation.screens.dashboard
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.rafaelribeiro.spendless.core.presentation.formatDateTime
+import io.rafaelribeiro.spendless.data.repository.TransactionCreator
 import io.rafaelribeiro.spendless.domain.CurrencySymbol
 import io.rafaelribeiro.spendless.domain.DecimalSeparator
 import io.rafaelribeiro.spendless.domain.ExpenseFormat
@@ -11,16 +14,22 @@ import io.rafaelribeiro.spendless.domain.ThousandSeparator
 import io.rafaelribeiro.spendless.domain.Transaction
 import io.rafaelribeiro.spendless.domain.TransactionRepository
 import io.rafaelribeiro.spendless.domain.toUiModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.Instant
 import java.time.LocalDate
-import java.time.LocalDateTime
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
@@ -29,88 +38,96 @@ import javax.inject.Inject
 class DashboardViewModel @Inject constructor(
     private val transactionRepository: TransactionRepository,
 ) : ViewModel() {
+    private val _uiState: MutableStateFlow<DashboardUiState> = MutableStateFlow(DashboardUiState())
+    val uiState: StateFlow<DashboardUiState> = _uiState.asStateFlow()
 
-    companion object {
-        private const val WAIT_BEFORE_CONSUMERS_UNSUBSCRIBED = 5000L
+    init {
+        subscribeToDashboardData()
     }
 
-    private val _uiState: MutableStateFlow<DashboardUiState> = MutableStateFlow(DashboardUiState())
-    val uiState: StateFlow<DashboardUiState> = _uiState
-        .onStart { loadData() }
-        .stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(WAIT_BEFORE_CONSUMERS_UNSUBSCRIBED),
-            DashboardUiState()
-        )
+    private fun subscribeToDashboardData() {
+        getDashboardData()
+            .onEach { _uiState.value = it }
+            .launchIn(viewModelScope)
+    }
 
     fun onEvent(event: DashboardUiEvent) {
         when (event) {
-            is DashboardUiEvent.AddTransactionClicked -> TODO()
+            is DashboardUiEvent.AddTransactionClicked -> addTransaction()
             is DashboardUiEvent.DownloadTransactionsClicked -> TODO()
-            is DashboardUiEvent.SettingsClicked -> TODO()
-            is DashboardUiEvent.TransactionNoteClicked -> extendTransaction(event.transactionId)
+            is DashboardUiEvent.SettingsClicked -> deleteAllTransactions()
+            is DashboardUiEvent.TransactionNoteClicked -> showTransactionNote(event.transactionId)
             is DashboardUiEvent.ShowAllTransactionsClicked -> TODO()
         }
     }
 
-    fun loadData() {
-        viewModelScope.launch {
-            val transactions = transactionRepository.getTransactions().toList()
-            val latestTransactions = groupTransactionsByDate(transactions)
-            val largestTransaction = transactions.maxByOrNull { it.amount }
-            val mostPopularCategory = transactions
-                .groupBy { it.category }
-                .maxByOrNull { it.value.size }
-                ?.key
-            updateState { state ->
-                state.copy(
-                    accountBalance = transactions.sumOf { it.amount }.formatExpense(),
-                    previousWeekAmount = transactions.filter { it.date.isAfter(LocalDateTime.now().minusWeeks(1)) }.sumOf { it.amount }.formatExpense(),
-                    latestTransactions = latestTransactions.map { group ->
-                        group.copy(transactions = group.transactions.map { transaction ->
-                            transaction.copy(amountDisplay = transaction.amount.formatExpense())
-                        })
-                    },
-                    largestTransaction = largestTransaction?.copy(amountDisplay = largestTransaction.amount.formatExpense()),
-                    mostPopularCategory = mostPopularCategory,
+    private fun getDashboardData(): Flow<DashboardUiState> {
+        return combine(
+            transactionRepository.getBalance(),
+            transactionRepository.getBiggestTransaction(),
+            transactionRepository.getLatestTransactions(),
+            transactionRepository.getMostPopularCategory(),
+            transactionRepository.getTotalAmountLastWeek()
+        ) { balance, largestTransaction, latestTransactions, mostPopularCategory, totalAmountLastWeek ->
+            DashboardUiState(
+                username = "rafael87",
+                accountBalance = balance?.formatExpense() ?: 0.toDouble().formatExpense(),
+                previousWeekAmount = totalAmountLastWeek?.formatExpense() ?: 0.toDouble().formatExpense(),
+                latestTransactions = groupedTransactions(latestTransactions),
+                largestTransaction = largestTransaction?.toUiModel()?.copy(amountDisplay = largestTransaction.amount.formatExpense()),
+                mostPopularCategory = mostPopularCategory
+            )
+        }
+    }
+
+    private fun groupedTransactions(latestTransactions: List<Transaction>): List<GroupedTransactions> {
+        val groupedTransactions = latestTransactions
+            .sortedByDescending { it.createdAt }
+            .groupBy { it.createdAt.toLocalDate() }
+            .map { (date, transactions) ->
+                val formattedDate = when (date) {
+                    LocalDate.now() -> "Today"
+                    LocalDate.now().minusDays(1) -> "Yesterday"
+                    else -> date.format(DateTimeFormatter.ofPattern("dd MMM yyyy"))
+                }
+                GroupedTransactions(
+                    dateHeader = formattedDate,
+                    transactions = transactions.map { it.toUiModel().copy(amountDisplay = it.amount.formatExpense()) }
                 )
             }
+        return groupedTransactions
+    }
+
+    private fun Instant.toLocalDate(): LocalDate {
+        return this.atZone(ZoneId.systemDefault()).toLocalDate()
+    }
+
+    private fun addTransaction() {
+        viewModelScope.launch {
+            transactionRepository.saveTransaction(
+                TransactionCreator.createTransaction()
+            )
         }
     }
 
-    private fun extendTransaction(transactionId: Int) {
-        val currentTransaction = _uiState.value.latestTransactions
-            .flatMap { it.transactions }
-            .find { it.id == transactionId }
-        if (currentTransaction != null) {
-            updateState {
-                it.copy(latestTransactions = it.latestTransactions.map { group ->
-                    group.copy(transactions = group.transactions.map { transaction ->
-                        if (transaction.id == transactionId) {
-                            transaction.copy(extended = !transaction.extended)
-                        } else {
-                            transaction
-                        }
-                    })
+    private fun deleteAllTransactions() {
+        viewModelScope.launch {
+            transactionRepository.deleteAllTransactions()
+        }
+    }
+
+    private fun showTransactionNote(transactionId: Long) {
+        _uiState.value = _uiState.value.copy(
+            latestTransactions = _uiState.value.latestTransactions.map { group ->
+                group.copy(transactions = group.transactions.map { transaction ->
+                    if (transaction.id == transactionId) {
+                        transaction.copy(extended = !transaction.extended)
+                    } else {
+                        transaction
+                    }
                 })
             }
-        }
-    }
-
-    private fun groupTransactionsByDate(transactions: List<Transaction>): List<GroupedTransactions> = transactions
-        .sortedByDescending { it.date }
-        .groupBy { it.date.toLocalDate() }
-        .map { (date, transactions) ->
-            val formattedDate = when (date) {
-                LocalDate.now() -> "Today"
-                LocalDate.now().minusDays(1) -> "Yesterday"
-                else -> date.format(DateTimeFormatter.ofPattern("dd MMM yyyy"))
-            }
-            GroupedTransactions(formattedDate, transactions.map { it.toUiModel() })
-        }
-
-    private fun updateState(state: (DashboardUiState) -> DashboardUiState) {
-        _uiState.update { state(it) }
+        )
     }
 
     /**
@@ -132,6 +149,6 @@ sealed interface DashboardUiEvent {
     data object SettingsClicked : DashboardUiEvent
     data object DownloadTransactionsClicked : DashboardUiEvent
     data object AddTransactionClicked : DashboardUiEvent
-    data class TransactionNoteClicked(val transactionId: Int) : DashboardUiEvent
+    data class TransactionNoteClicked(val transactionId: Long) : DashboardUiEvent
     data object ShowAllTransactionsClicked : DashboardUiEvent
 }

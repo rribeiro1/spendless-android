@@ -2,11 +2,12 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.ksp)
     // -- Spotless
     id("com.diffplug.spotless") version "7.0.2"
     // -- Hilt
     id("kotlin-kapt")
-    id("com.google.dagger.hilt.android")
+    alias(libs.plugins.hilt)
     // -- JUnit
     id("de.mannodermaus.android-junit5") version "1.11.3.0"
 }
@@ -64,6 +65,10 @@ dependencies {
     implementation(libs.hilt.android)
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.navigation.compose)
+    // -- Room
+    implementation(libs.room.runtime)
+    implementation(libs.room.core)
+    ksp(libs.room.compiler)
     // -- Tests
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

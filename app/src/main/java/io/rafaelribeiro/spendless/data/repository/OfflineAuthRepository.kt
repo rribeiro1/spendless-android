@@ -1,4 +1,4 @@
-package io.rafaelribeiro.spendless.data
+package io.rafaelribeiro.spendless.data.repository
 
 import io.rafaelribeiro.spendless.domain.AuthRepository
 import io.rafaelribeiro.spendless.domain.RegistrationError

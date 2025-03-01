@@ -1,6 +1,5 @@
 package io.rafaelribeiro.spendless.presentation.screens.dashboard
 
-import io.rafaelribeiro.spendless.domain.Transaction
 import io.rafaelribeiro.spendless.domain.TransactionCategory
 import io.rafaelribeiro.spendless.domain.TransactionType
 
@@ -9,7 +8,7 @@ data class DashboardUiState(
     val accountBalance: String = "",
     val previousWeekAmount: String = "",
     val latestTransactions: List<GroupedTransactions> = emptyList(),
-    val largestTransaction: Transaction? = null,
+    val largestTransaction: TransactionUiModel? = null,
     val mostPopularCategory: TransactionCategory? = null,
 )
 
@@ -19,13 +18,13 @@ data class GroupedTransactions(
 )
 
 data class TransactionUiModel(
-    val id: Int,
+    val id: Long,
     val amount: Double,
     val amountDisplay: String,
     val description: String,
     val note: String? = null,
     val category: TransactionCategory,
     val type: TransactionType,
-    val date: String,
+    val createdAt: String,
     val extended: Boolean = false,
 )

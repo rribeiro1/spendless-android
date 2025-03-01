@@ -23,14 +23,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.rafaelribeiro.spendless.R
 import io.rafaelribeiro.spendless.core.presentation.formatDateTime
-import io.rafaelribeiro.spendless.data.TransactionCreator
+import io.rafaelribeiro.spendless.data.repository.TransactionCreator
 import io.rafaelribeiro.spendless.domain.Transaction
+import io.rafaelribeiro.spendless.domain.toUiModel
+import io.rafaelribeiro.spendless.presentation.screens.dashboard.TransactionUiModel
 import io.rafaelribeiro.spendless.presentation.theme.SpendLessTheme
 
 @Composable
 fun DashboardLargestTransaction(
     modifier: Modifier = Modifier,
-    transaction: Transaction? = null
+    transaction: TransactionUiModel? = null
 ) {
     Column(
         verticalArrangement = Arrangement.Center,
@@ -85,7 +87,7 @@ fun DashboardLargestTransaction(
                         maxLines = 1,
                     )
                     Text(
-                        text = formatDateTime(transaction.date),
+                        text = transaction.createdAt,
                         style = MaterialTheme.typography.bodySmall.copy(
                             fontSize = 12.sp,
                             lineHeight = 16.sp
@@ -117,7 +119,7 @@ fun DashboardLargestTransaction(
 fun DashboardLargestTransactionPreview() {
     SpendLessTheme {
         DashboardLargestTransaction(
-            transaction = TransactionCreator.createTransaction()
+            transaction = TransactionCreator.createTransaction().toUiModel()
         )
     }
 }
