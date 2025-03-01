@@ -11,7 +11,7 @@ data class Transaction(
     val note: String? = null,
     val category: TransactionCategory,
     val type: TransactionType,
-    val createdAt: Instant,
+    val createdAt: Long,
 )
 
 fun Transaction.toUiModel(): TransactionUiModel {

@@ -6,7 +6,8 @@ import java.time.format.DateTimeFormatter
 import java.util.Locale
 import java.time.ZoneId.systemDefault
 
-fun formatDateTime(instant: Instant): String {
+fun formatDateTime(timestamp: Long): String {
+    val instant = Instant.ofEpochMilli(timestamp)
     val formatter = DateTimeFormatter.ofPattern("MMM d, yyyy", Locale.ENGLISH)
     return LocalDateTime.ofInstant(instant, systemDefault()).format(formatter)
 }

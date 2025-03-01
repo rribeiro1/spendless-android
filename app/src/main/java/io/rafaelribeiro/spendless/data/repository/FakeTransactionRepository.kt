@@ -55,7 +55,7 @@ class TransactionCreator {
             val type: TransactionType,
             val amount: Double,
             val amountDisplay: String,
-            val createdAt: Instant,
+            val createdAt: Long,
             val note: String? = null
         )
 
@@ -80,22 +80,22 @@ class TransactionCreator {
 
         private fun randomTransaction(): TransactionTest {
             val transactions = listOf(
-                TransactionTest("Amazon", TransactionCategory.HOME, TransactionType.EXPENSE, 100.00, "-$100.00", randomInstant()),
-                TransactionTest("McDonald's", TransactionCategory.FOOD, TransactionType.EXPENSE, 50.00, "-$50.00", randomInstant(), "I was hungry today so I bought quite everything from the menu, I should stop doing this"),
-                TransactionTest("Netflix Monthly Subscription from Brazil", TransactionCategory.ENTERTAINMENT, TransactionType.EXPENSE, 10.00, "-$10.00",  randomInstant(), "Netflix subscription for the month of January"),
-                TransactionTest("Zara", TransactionCategory.CLOTHING, TransactionType.EXPENSE, 12492.50, "-$12,492.50", randomInstant(), "Bought a new suit for the wedding"),
-                TransactionTest("Gym - Monthly Membership John Reed", TransactionCategory.HEALTH, TransactionType.EXPENSE, 100.00, "-$100.00",  randomInstant()),
-                TransactionTest("Haircut", TransactionCategory.PERSONAL_CARE, TransactionType.EXPENSE, 50.00, "-$50.00", randomInstant()),
-                TransactionTest("Uber", TransactionCategory.TRANSPORTATION, TransactionType.EXPENSE, 10.00, "-$10.00", randomInstant(), "Uber ride to work"),
-                TransactionTest("Udemy", TransactionCategory.EDUCATION, TransactionType.EXPENSE, 140.50, "-$140.50", randomInstant()),
-                TransactionTest("Rick's share - Birthday Present from Rafael", TransactionCategory.SAVINGS, TransactionType.INCOME, 100.00, "$100.00", randomInstant(), "Birthday present from Rafael it was just a little but it is fine I will probably invest it."),
+                TransactionTest("Amazon", TransactionCategory.HOME, TransactionType.EXPENSE, 100.00, "-$100.00", randomTimestamp()),
+                TransactionTest("McDonald's", TransactionCategory.FOOD, TransactionType.EXPENSE, 50.00, "-$50.00", randomTimestamp(), "I was hungry today so I bought quite everything from the menu, I should stop doing this"),
+                TransactionTest("Netflix Monthly Subscription from Brazil", TransactionCategory.ENTERTAINMENT, TransactionType.EXPENSE, 10.00, "-$10.00",  randomTimestamp(), "Netflix subscription for the month of January"),
+                TransactionTest("Zara", TransactionCategory.CLOTHING, TransactionType.EXPENSE, 12492.50, "-$12,492.50", randomTimestamp(), "Bought a new suit for the wedding"),
+                TransactionTest("Gym - Monthly Membership John Reed", TransactionCategory.HEALTH, TransactionType.EXPENSE, 100.00, "-$100.00",  randomTimestamp()),
+                TransactionTest("Haircut", TransactionCategory.PERSONAL_CARE, TransactionType.EXPENSE, 50.00, "-$50.00", randomTimestamp()),
+                TransactionTest("Uber", TransactionCategory.TRANSPORTATION, TransactionType.EXPENSE, 10.00, "-$10.00", randomTimestamp(), "Uber ride to work"),
+                TransactionTest("Udemy", TransactionCategory.EDUCATION, TransactionType.EXPENSE, 140.50, "-$140.50", randomTimestamp()),
+                TransactionTest("Rick's share - Birthday Present from Rafael", TransactionCategory.SAVINGS, TransactionType.INCOME, 100.00, "$100.00", randomTimestamp(), "Birthday present from Rafael it was just a little but it is fine I will probably invest it."),
             )
             return transactions.random()
         }
 
-        private fun randomInstant(): Instant {
+        private fun randomTimestamp(): Long {
             val daysAgo = Random.nextInt(0, 30)
-            return Instant.now().minus(daysAgo.toLong(), ChronoUnit.DAYS)
+            return Instant.now().minus(daysAgo.toLong(), ChronoUnit.DAYS).toEpochMilli()
         }
     }
 }

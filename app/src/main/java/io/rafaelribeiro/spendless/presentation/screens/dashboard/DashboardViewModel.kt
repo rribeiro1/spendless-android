@@ -76,7 +76,7 @@ class DashboardViewModel @Inject constructor(
     private fun groupedTransactions(latestTransactions: List<Transaction>): List<GroupedTransactions> {
         val groupedTransactions = latestTransactions
             .sortedByDescending { it.createdAt }
-            .groupBy { it.createdAt.toLocalDate() }
+            .groupBy { timestampToLocalDate(it.createdAt) }
             .map { (date, transactions) ->
                 val formattedDate = when (date) {
                     LocalDate.now() -> "Today"
@@ -91,8 +91,10 @@ class DashboardViewModel @Inject constructor(
         return groupedTransactions
     }
 
-    private fun Instant.toLocalDate(): LocalDate {
-        return this.atZone(ZoneId.systemDefault()).toLocalDate()
+    private fun timestampToLocalDate(timestamp: Long): LocalDate {
+        return Instant.ofEpochMilli(timestamp)
+            .atZone(ZoneId.systemDefault())
+            .toLocalDate()
     }
 
     private fun addTransaction() {
