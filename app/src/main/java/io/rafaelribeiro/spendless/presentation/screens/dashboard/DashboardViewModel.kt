@@ -71,7 +71,7 @@ class DashboardViewModel @Inject constructor(
                 accountBalance = balance?.formatExpense() ?: 0.toDouble().formatExpense(),
                 previousWeekAmount = totalAmountLastWeek?.formatExpense() ?: 0.toDouble().formatExpense(),
                 latestTransactions = groupedTransactions(latestTransactions),
-                largestTransaction = largestTransaction?.toUiModel()?.copy(amountDisplay = largestTransaction.amount.formatExpense()),
+                largestTransaction = largestTransaction?.toUiModel(),
                 mostPopularCategory = mostPopularCategory
             )
         }
@@ -89,7 +89,7 @@ class DashboardViewModel @Inject constructor(
                 }
                 GroupedTransactions(
                     dateHeader = formattedDate,
-                    transactions = transactions.map { it.toUiModel().copy(amountDisplay = it.amount.formatExpense()) }
+                    transactions = transactions.map { it.toUiModel() }
                 )
             }
         return groupedTransactions
