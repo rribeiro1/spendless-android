@@ -27,8 +27,8 @@ class LoginViewModel @Inject constructor(
     init {
         // Collect user preferences and update uiState
         viewModelScope.launch {
-            dataStoreUserPreferencesRepository.userPreferencesFlow.collect { userPreferences ->
-                _uiState.update { it.copy(username = userPreferences.userName) }
+            authRepository.userName.collect { username ->
+                _uiState.update { it.copy(username = username) }
             }
         }
     }

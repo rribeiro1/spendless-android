@@ -70,16 +70,15 @@ class RegistrationViewModel @Inject constructor(
             }
             is RegistrationUiEvent.StartTrackingButtonTapped -> {
                 // TODO: Save user data.
-                saveUserPreferences()
+                registerUser()
                 sendActionEvent(RegistrationActionEvent.UserPreferencesSaved)
             }
         }
 	}
 
-    private fun saveUserPreferences() {
+    private fun registerUser() {
         viewModelScope.launch {
-            userPreferencesRepository.saveUserName(_uiState.value.username)
-            userPreferencesRepository.savePin(_uiState.value.pin)
+            authRepository.register(_uiState.value.username, _uiState.value.pin)
         }
     }
 

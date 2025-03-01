@@ -115,7 +115,7 @@ fun RootAppNavigation(
                 val uiState by viewModel.uiState.collectAsStateWithLifecycle()
                 ObserveAsEvents(flow = viewModel.actionEvents) { event ->
                     if (event is RegistrationActionEvent.UserPreferencesSaved) {
-                        navigationState.navigateTo(Screen.LoginScreen.route)
+                        navigationState.navigateTo(Screen.LoginScreen.route) // todo: navigate to Dashboard screen here?
                     }
                 }
                 RegistrationPreferencesRootScreen(

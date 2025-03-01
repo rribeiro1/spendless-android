@@ -4,8 +4,6 @@ import kotlinx.coroutines.flow.Flow
 import io.rafaelribeiro.spendless.data.UserPreferences
 
 interface UserPreferencesRepository {
-    val userPreferencesFlow: Flow<UserPreferences>
-    suspend fun saveUserName(userName: String)
-    suspend fun savePin(pin: String)
+    val userPreferences: Flow<UserPreferences>
     suspend fun clearAllPreferences()
 }

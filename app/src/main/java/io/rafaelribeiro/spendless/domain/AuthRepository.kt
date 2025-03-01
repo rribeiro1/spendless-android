@@ -1,7 +1,10 @@
 package io.rafaelribeiro.spendless.domain
 
-interface AuthRepository {
-	fun checkUserName(username: String): Result<Unit, RegistrationError>
+import kotlinx.coroutines.flow.Flow
 
-	fun register(username: String, pin: String): Result<User, RegistrationError>
+interface AuthRepository {
+    val userName: Flow<String>
+    val pin: Flow<String>
+	fun checkUserName(username: String): Result<Unit, RegistrationError>
+	suspend fun register(username: String, pin: String): Result<User, RegistrationError>
 }

@@ -22,29 +22,17 @@ class DataStoreUserPreferencesRepository @Inject constructor(
         // Todo: Expenses Format can be store here..
     }
 
-    override val userPreferencesFlow: Flow<UserPreferences> = dataStore.data
+    override val userPreferences: Flow<UserPreferences> = dataStore.data
         .map { preferences ->
             val userName = preferences[USER_NAME] ?: ""
             val pin = preferences[PIN] ?: ""
             UserPreferences(userName, pin)
         }
 
-    override suspend fun saveUserName(userName: String) {
-        dataStore.edit { preferences ->
-            preferences[USER_NAME] = userName
-        }
-    }
-
-    override suspend fun savePin(pin: String) {
-        dataStore.edit { preferences ->
-            preferences[PIN] = pin
-        }
-    }
-
     // ❌ Clear all stored preferences
     override suspend fun clearAllPreferences() {
         dataStore.edit { preferences ->
-            preferences.clear() // Removes all stored keys and values
+            preferences.clear()
         }
     }
 }
