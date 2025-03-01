@@ -14,11 +14,13 @@ import io.rafaelribeiro.spendless.domain.Transaction
 import io.rafaelribeiro.spendless.domain.TransactionRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDate
@@ -32,17 +34,13 @@ class DashboardViewModel @Inject constructor(
     private val transactionRepository: TransactionRepository,
 ) : ViewModel() {
     private val _uiState: MutableStateFlow<DashboardUiState> = MutableStateFlow(DashboardUiState())
-    val uiState: StateFlow<DashboardUiState> = _uiState.asStateFlow()
-
-    init {
-        subscribeToDashboardData()
-    }
-
-    private fun subscribeToDashboardData() {
-        getDashboardData()
-            .onEach { _uiState.value = it }
-            .launchIn(viewModelScope)
-    }
+    val uiState: StateFlow<DashboardUiState> = _uiState
+        .onStart { subscribeToDashboardData() }
+        .stateIn(
+            viewModelScope,
+            started = SharingStarted.WhileSubscribed(WAIT_UNTIL_NO_CONSUMERS_IN_MILLIS),
+            initialValue = DashboardUiState()
+        )
 
     fun onEvent(event: DashboardUiEvent) {
         when (event) {
@@ -52,6 +50,12 @@ class DashboardViewModel @Inject constructor(
             is DashboardUiEvent.TransactionNoteClicked -> showTransactionNote(event.transactionId)
             is DashboardUiEvent.ShowAllTransactionsClicked -> TODO()
         }
+    }
+
+    private fun subscribeToDashboardData() {
+        getDashboardData()
+            .onEach { _uiState.value = it }
+            .launchIn(viewModelScope)
     }
 
     private fun getDashboardData(): Flow<DashboardUiState> {
@@ -128,6 +132,8 @@ class DashboardViewModel @Inject constructor(
     }
 
     companion object {
+        const val WAIT_UNTIL_NO_CONSUMERS_IN_MILLIS = 5000L
+
         fun Transaction.toUiModel(): TransactionUiModel {
             return TransactionUiModel(
                 id = id,
