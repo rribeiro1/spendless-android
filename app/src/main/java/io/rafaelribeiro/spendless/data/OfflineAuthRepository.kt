@@ -9,6 +9,7 @@ import io.rafaelribeiro.spendless.domain.RegistrationError
 import io.rafaelribeiro.spendless.domain.Result
 import io.rafaelribeiro.spendless.domain.User
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
@@ -30,10 +31,10 @@ class OfflineAuthRepository @Inject constructor(
             preferences[USER_NAME] ?: ""
         }
 
-	override fun checkUserName(username: String): Result<Unit, RegistrationError> =
+	override suspend fun checkUserName(username: String): Result<Unit, RegistrationError> =
 		if (!username.all { it.isLetterOrDigit() }) {
 			Result.Failure(RegistrationError.USERNAME_MUST_BE_ALPHANUMERIC)
-		} else if (username == "rafael") {
+		} else if (username == userName.first()) {
 			Result.Failure(RegistrationError.USERNAME_ALREADY_EXISTS)
 		} else {
 			Result.Success(Unit)
