@@ -9,10 +9,12 @@ import io.rafaelribeiro.spendless.presentation.screens.registration.Registration
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationViewModel.Companion.USERNAME_MAX_SIZE
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationViewModel.Companion.USERNAME_MIN_SIZE
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -21,16 +23,20 @@ class LoginViewModel @Inject constructor(
     dataStoreUserPreferencesRepository: DataStoreUserPreferencesRepository,
 ) : ViewModel() {
 
-    private val _uiState: MutableStateFlow<LoginUiState> = MutableStateFlow(LoginUiState())
-    val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
+    private val initialUiState = LoginUiState(isLoading = true)
+    private val _uiState: MutableStateFlow<LoginUiState> = MutableStateFlow(initialUiState)
+    val uiState: StateFlow<LoginUiState> = _uiState
+        .onStart { loadData() }
+        .stateIn(
+            scope = viewModelScope,
+            initialValue = initialUiState,
+            started = SharingStarted.WhileSubscribed(5000L),
+        )
 
-    init {
-        // Collect user preferences and update uiState
-        viewModelScope.launch {
-            authRepository.userName.collect { username ->
-                _uiState.update { it.copy(username = username) }
-            }
-        }
+    private suspend fun loadData() {
+        val username = authRepository.userName.firstOrNull() ?: ""
+        _uiState.update { it.copy(username = username, isLoading = false) }
+        println("LoginViewModel.loadData()")
     }
 
     fun onEvent(event: LoginUiEvent) {
