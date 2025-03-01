@@ -5,6 +5,7 @@ import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navOptions
 
 class NavigationState(
 	val navHostController: NavHostController,
@@ -13,6 +14,22 @@ class NavigationState(
 		navHostController.navigate(route, navOptions)
 	}
 	fun popBackStack() = navHostController.popBackStack()
+
+    /**
+     * This Screen should be triggered when user's session has expired. todo: idk how to detect it!
+     * Trigger the pin prompt screen anywhere in the app. This will clear the back stack and navigate to the pin prompt screen.
+     */
+    fun triggerPinPromptScreen() {
+        navigateTo(
+            route = Screen.PinPromptScreen.route,
+            navOptions = navOptions {
+                popUpTo(navHostController.graph.startDestinationId) {
+                    inclusive = true
+                }
+                launchSingleTop = true
+            }
+        )
+    }
 }
 
 @Composable
