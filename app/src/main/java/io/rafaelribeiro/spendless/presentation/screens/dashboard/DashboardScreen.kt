@@ -1,6 +1,5 @@
 package io.rafaelribeiro.spendless.presentation.screens.dashboard
 
-import android.app.Activity
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -26,18 +25,15 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.view.WindowCompat
 import io.rafaelribeiro.spendless.R
 import io.rafaelribeiro.spendless.data.repository.TransactionCreator
 import io.rafaelribeiro.spendless.domain.TransactionCategory
@@ -56,12 +52,6 @@ fun DashboardRootScreen(
     modifier: Modifier,
     onEvent: (DashboardUiEvent) -> Unit
 ) {
-    val view = LocalView.current
-    val window = (view.context as Activity).window
-    LaunchedEffect(Unit) {
-        WindowCompat.getInsetsController(window, window.decorView)
-            .isAppearanceLightStatusBars = false
-    }
     Scaffold(
         containerColor = Color.Transparent,
         modifier = modifier
