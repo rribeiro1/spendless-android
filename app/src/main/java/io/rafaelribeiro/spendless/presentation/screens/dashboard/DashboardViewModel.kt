@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.rafaelribeiro.spendless.core.presentation.formatDateTime
+import io.rafaelribeiro.spendless.core.presentation.timestampToLocalDate
 import io.rafaelribeiro.spendless.data.repository.TransactionCreator
 import io.rafaelribeiro.spendless.domain.CurrencySymbol
 import io.rafaelribeiro.spendless.domain.DecimalSeparator
@@ -123,12 +124,6 @@ class DashboardViewModel @Inject constructor(
                 })
             }
         )
-    }
-
-    private fun Long.timestampToLocalDate(): LocalDate {
-        return Instant.ofEpochMilli(this)
-            .atZone(ZoneId.systemDefault())
-            .toLocalDate()
     }
 
     companion object {
