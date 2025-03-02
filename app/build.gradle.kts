@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.jetbrains.kotlin.serialization)
     // -- Spotless
     id("com.diffplug.spotless") version "7.0.2"
     // -- Hilt
@@ -61,6 +62,7 @@ dependencies {
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.foundation.layout.android)
     implementation(libs.androidx.datastore)
+    implementation(libs.kotlinx.serialization.json)
     // -- Hilt
     kapt(libs.hilt.android.compiler)
     implementation(libs.hilt.android)
