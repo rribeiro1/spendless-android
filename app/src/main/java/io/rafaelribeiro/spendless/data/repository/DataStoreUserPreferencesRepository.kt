@@ -1,4 +1,4 @@
-package io.rafaelribeiro.spendless.data
+package io.rafaelribeiro.spendless.data.repository
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.IOException

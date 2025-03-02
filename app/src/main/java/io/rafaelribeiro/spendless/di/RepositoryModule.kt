@@ -4,9 +4,11 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import io.rafaelribeiro.spendless.data.OfflineAuthRepository
-import io.rafaelribeiro.spendless.data.DataStoreUserPreferencesRepository
+import io.rafaelribeiro.spendless.data.repository.OfflineAuthRepository
+import io.rafaelribeiro.spendless.data.repository.OfflineTransactionRepository
 import io.rafaelribeiro.spendless.domain.AuthRepository
+import io.rafaelribeiro.spendless.domain.TransactionRepository
+import io.rafaelribeiro.spendless.data.repository.DataStoreUserPreferencesRepository
 import io.rafaelribeiro.spendless.domain.UserPreferencesRepository
 
 @Module
@@ -14,11 +16,10 @@ import io.rafaelribeiro.spendless.domain.UserPreferencesRepository
 abstract class RepositoryModule {
 	@Binds
 	abstract fun bindAuthRepository(impl: OfflineAuthRepository): AuthRepository
-}
 
-@Module
-@InstallIn(SingletonComponent::class)
-abstract class UserPreferencesRepositoryModule {
-	@Binds
-	abstract fun bindUserPreferencesRepository(impl: DataStoreUserPreferencesRepository): UserPreferencesRepository
+    @Binds
+    abstract fun bindTransactionRepository(impl: OfflineTransactionRepository): TransactionRepository
+
+    @Binds
+    abstract fun bindUserPreferencesRepository(impl: DataStoreUserPreferencesRepository): UserPreferencesRepository
 }

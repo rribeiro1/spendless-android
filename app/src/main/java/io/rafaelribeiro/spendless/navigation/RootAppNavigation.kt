@@ -17,6 +17,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.navOptions
+import io.rafaelribeiro.spendless.presentation.screens.dashboard.DashboardScreen
+import io.rafaelribeiro.spendless.presentation.screens.dashboard.DashboardViewModel
+import io.rafaelribeiro.spendless.presentation.screens.login.LoginActionEvent
 import io.rafaelribeiro.spendless.presentation.screens.login.LoginRootScreen
 import io.rafaelribeiro.spendless.presentation.screens.login.LoginViewModel
 import io.rafaelribeiro.spendless.presentation.screens.login.LoginPinPromptRootScreen
@@ -116,7 +119,12 @@ fun RootAppNavigation(
                 val uiState by viewModel.uiState.collectAsStateWithLifecycle()
                 ObserveAsEvents(flow = viewModel.actionEvents) { event ->
                     if (event is RegistrationActionEvent.UserPreferencesSaved) {
-                        navigationState.navigateTo(Screen.LoginScreen.route) // todo: navigate to Dashboard screen here?
+                        navigationState.navigateTo(
+                            route = Screen.DashboardScreen.route,
+                            navOptions = navOptions {
+                                popUpTo(Screen.RegistrationFlow.route) { inclusive = true }
+                            }
+                        )
                     }
                 }
                 RegistrationPreferencesRootScreen(
@@ -127,11 +135,21 @@ fun RootAppNavigation(
                 )
 			}
 		}
-		composable(
-			route = Screen.LoginScreen.route,
-		) {
+		composable(route = Screen.LoginScreen.route) {
 			val viewModel = hiltViewModel<LoginViewModel>()
 			val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            ObserveAsEvents(flow = viewModel.actionEvents) { event ->
+                when (event) {
+                    is LoginActionEvent.LoginSucceed -> {
+                        navigationState.navigateTo(
+                            route = Screen.DashboardScreen.route,
+                            navOptions = navOptions {
+                                popUpTo(Screen.LoginScreen.route) { inclusive = true }
+                            }
+                        )
+                    }
+                }
+            }
 			LoginRootScreen(
 				modifier = modifier,
 				uiState = uiState,
@@ -139,17 +157,25 @@ fun RootAppNavigation(
 				onEvent = viewModel::onEvent,
 			)
 		}
-
-		composable(route = Screen.PinPromptScreen.route) { entry ->
-			val viewModel = entry.sharedViewModel<LoginViewModel>(navigationState.navHostController)
-			val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-			LoginPinPromptRootScreen(
-				navigationState = navigationState,
-				uiState = uiState,
+        composable(route = Screen.PinPromptScreen.route) { entry ->
+            val viewModel = entry.sharedViewModel<LoginViewModel>(navigationState.navHostController)
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            LoginPinPromptRootScreen(
+                navigationState = navigationState,
+                uiState = uiState,
                 onEvent = viewModel::onEvent,
-				modifier = modifier,
-			)
-		}
+                modifier = modifier,
+            )
+        }
+        composable(route = Screen.DashboardScreen.route) {
+            val viewModel = hiltViewModel<DashboardViewModel>()
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            DashboardScreen(
+                modifier = modifier,
+                uiState = uiState,
+                onEvent = viewModel::onEvent,
+            )
+        }
 	}
 }
 

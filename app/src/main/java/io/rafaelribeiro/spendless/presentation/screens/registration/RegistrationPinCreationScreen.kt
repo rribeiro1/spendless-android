@@ -23,6 +23,7 @@ import io.rafaelribeiro.spendless.core.presentation.ErrorDialog
 import io.rafaelribeiro.spendless.core.presentation.PinPromptScreen
 import io.rafaelribeiro.spendless.navigation.NavigationState
 import io.rafaelribeiro.spendless.navigation.rememberNavigationState
+import io.rafaelribeiro.spendless.presentation.theme.SpendLessTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -77,10 +78,12 @@ fun RegistrationPinPromptScreen(
 @Preview
 @Composable
 fun RegistrationPinPromptScreenPreview() {
-    RegistrationPinPromptScreen(
-        navigationState = rememberNavigationState(),
-        uiState = RegistrationUiState(),
-        onEvent = {},
-        modifier = Modifier,
-    )
+    SpendLessTheme {
+        RegistrationPinPromptScreen(
+            navigationState = rememberNavigationState(),
+            uiState = RegistrationUiState(),
+            onEvent = {},
+            modifier = Modifier,
+        )
+    }
 }

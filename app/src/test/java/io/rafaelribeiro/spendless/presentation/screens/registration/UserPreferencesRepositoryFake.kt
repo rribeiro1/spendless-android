@@ -1,6 +1,6 @@
 package io.rafaelribeiro.spendless.presentation.screens.registration
 
-import io.rafaelribeiro.spendless.data.UserPreferences
+import io.rafaelribeiro.spendless.data.repository.UserPreferences
 import io.rafaelribeiro.spendless.domain.UserPreferencesRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow

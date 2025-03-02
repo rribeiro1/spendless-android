@@ -1,4 +1,4 @@
-package io.rafaelribeiro.spendless.data
+package io.rafaelribeiro.spendless.data.repository
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -51,5 +51,9 @@ class OfflineAuthRepository @Inject constructor(
         }
 
         return Result.Success(User(username))
+    }
+
+    override suspend fun isPinCorrect(pin: String): Boolean {
+        return this.pin.first() == pin
     }
 }

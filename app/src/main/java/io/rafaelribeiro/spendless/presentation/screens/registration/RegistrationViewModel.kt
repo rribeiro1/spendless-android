@@ -6,7 +6,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.rafaelribeiro.spendless.R
 import io.rafaelribeiro.spendless.core.presentation.UiText
 import io.rafaelribeiro.spendless.core.presentation.asUiText
-import io.rafaelribeiro.spendless.data.toUserPreferences
+import io.rafaelribeiro.spendless.data.repository.toUserPreferences
 import io.rafaelribeiro.spendless.domain.AuthRepository
 import io.rafaelribeiro.spendless.domain.CurrencySymbol
 import io.rafaelribeiro.spendless.domain.DecimalSeparator
