@@ -190,6 +190,7 @@ fun LoginScreen(
         SpendLessButton(
             text = stringResource(R.string.login),
             modifier = Modifier.padding(16.dp),
+            enabled = uiState.loginButtonEnabled,
             onClick = {
                 onEvent(LoginUiEvent.ActionButtonLoginClicked)
             }

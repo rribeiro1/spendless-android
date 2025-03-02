@@ -21,6 +21,7 @@ import io.rafaelribeiro.spendless.presentation.screens.dashboard.DashboardRootSc
 import io.rafaelribeiro.spendless.presentation.screens.dashboard.DashboardViewModel
 import io.rafaelribeiro.spendless.presentation.screens.login.LoginRootScreen
 import io.rafaelribeiro.spendless.presentation.screens.login.LoginViewModel
+import io.rafaelribeiro.spendless.presentation.screens.login.LoginPinPromptRootScreen
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationActionEvent
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationPinConfirmationScreen
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationPinPromptScreen
@@ -113,19 +114,22 @@ fun RootAppNavigation(
 				)
 			}
 			composable(route = Screen.RegistrationSetPreferences.route) { entry ->
-				val viewModel = entry.sharedViewModel<RegistrationViewModel>(navigationState.navHostController)
-				val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+                val viewModel = entry.sharedViewModel<RegistrationViewModel>(navigationState.navHostController)
+                val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+                ObserveAsEvents(flow = viewModel.actionEvents) { event ->
+                    if (event is RegistrationActionEvent.UserPreferencesSaved) {
+                        navigationState.navigateTo(Screen.DashboardScreen.route)
+                    }
+                }
                 RegistrationPreferencesRootScreen(
-					uiState = uiState,
+                    uiState = uiState,
                     navigationState = navigationState,
                     modifier = modifier,
-					onEvent = viewModel::onEvent
+                    onEvent = viewModel::onEvent
                 )
 			}
 		}
-		composable(
-			route = Screen.LoginScreen.route,
-		) {
+		composable(route = Screen.LoginScreen.route) {
 			val viewModel = hiltViewModel<LoginViewModel>()
 			val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 			LoginRootScreen(
@@ -135,9 +139,17 @@ fun RootAppNavigation(
 				onEvent = viewModel::onEvent,
 			)
 		}
-        composable(
-            route = Screen.DashboardScreen.route,
-        ) {
+        composable(route = Screen.PinPromptScreen.route) { entry ->
+            val viewModel = entry.sharedViewModel<LoginViewModel>(navigationState.navHostController)
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            LoginPinPromptRootScreen(
+                navigationState = navigationState,
+                uiState = uiState,
+                onEvent = viewModel::onEvent,
+                modifier = modifier,
+            )
+        }
+        composable(route = Screen.DashboardScreen.route) {
             val viewModel = hiltViewModel<DashboardViewModel>()
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
             DashboardRootScreen(

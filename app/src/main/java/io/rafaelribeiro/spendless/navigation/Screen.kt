@@ -7,6 +7,7 @@ sealed class Screen(val route: String) {
 	data object RegistrationPinConfirmation : Screen(REGISTRATION_PIN_CONFIRMATION)
 	data object RegistrationSetPreferences : Screen(REGISTRATION_SET_PREFERENCES)
 	data object LoginScreen : Screen(LOGIN_SCREEN)
+    data object PinPromptScreen : Screen(PIN_PROMPT_SCREEN)
     data object DashboardScreen : Screen(DASHBOARD_SCREEN)
 
 	companion object {
@@ -16,6 +17,7 @@ sealed class Screen(val route: String) {
 		private const val REGISTRATION_PIN_CONFIRMATION = "registration_pin_confirmation_screen"
 		private const val REGISTRATION_SET_PREFERENCES = "registration_set_preferences_screen"
 		private const val LOGIN_SCREEN = "login_screen"
+        private const val PIN_PROMPT_SCREEN = "pin_prompt_screen"
         private const val DASHBOARD_SCREEN = "dashboard_screen"
 	}
 }

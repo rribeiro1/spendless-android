@@ -34,4 +34,9 @@
     <string name="latest_transactions">Latest transactions</string>
     <string name="show_all">Show all</string>
     <string name="most_popular_category">Most popular category</string>
+    <string name="wrong_pin">Wrong PIN</string>
+    <string name="login_enter_pin">Enter your PIN</string>
+    <string name="try_pin_again_in">Try your PIN again in %s</string>
+    <string name="too_many_failed_attempts">Too many failed attempts</string>
+    <string name="hello_user">Hello, %1$s</string>
 </resources>

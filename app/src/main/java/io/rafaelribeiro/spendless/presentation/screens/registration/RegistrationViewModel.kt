@@ -6,6 +6,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.rafaelribeiro.spendless.R
 import io.rafaelribeiro.spendless.core.presentation.UiText
 import io.rafaelribeiro.spendless.core.presentation.asUiText
+import io.rafaelribeiro.spendless.data.toUserPreferences
 import io.rafaelribeiro.spendless.domain.AuthRepository
 import io.rafaelribeiro.spendless.domain.CurrencySymbol
 import io.rafaelribeiro.spendless.domain.DecimalSeparator
@@ -13,6 +14,7 @@ import io.rafaelribeiro.spendless.domain.ExpenseFormat
 import io.rafaelribeiro.spendless.domain.ExpenseFormatter
 import io.rafaelribeiro.spendless.domain.Result
 import io.rafaelribeiro.spendless.domain.ThousandSeparator
+import io.rafaelribeiro.spendless.domain.UserPreferencesRepository
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,7 +27,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RegistrationViewModel @Inject constructor(
-	private val authRepository: AuthRepository,
+    private val authRepository: AuthRepository,
+    private val userPreferencesRepository: UserPreferencesRepository,
 ) : ViewModel() {
 	private val _uiState: MutableStateFlow<RegistrationUiState> = MutableStateFlow(RegistrationUiState())
 	val uiState: StateFlow<RegistrationUiState> = _uiState.asStateFlow()
@@ -38,6 +41,7 @@ class RegistrationViewModel @Inject constructor(
 		const val USERNAME_MAX_SIZE = 14
 		const val USERNAME_MIN_SIZE = 3
 		const val PIN_MAX_SIZE = 5
+        const val LAST_PIN_DIGIT_DELAY = 111L
 	}
 
 	fun onEvent(event: RegistrationUiEvent) {
@@ -67,10 +71,25 @@ class RegistrationViewModel @Inject constructor(
                 formatExampleExpense()
             }
             is RegistrationUiEvent.StartTrackingButtonTapped -> {
-                // TODO: Save user data.
+                registerUser()
+                saveUserPreferences()
+                sendActionEvent(RegistrationActionEvent.UserPreferencesSaved)
             }
         }
 	}
+
+    private fun saveUserPreferences() {
+        viewModelScope.launch {
+            val userPreferences = _uiState.value.preferences.toUserPreferences()
+            userPreferencesRepository.saveUserPreferences(userPreferences)
+        }
+    }
+
+    private fun registerUser() {
+        viewModelScope.launch {
+            authRepository.register(_uiState.value.username, _uiState.value.pin)
+        }
+    }
 
     /**
      * Formats the example expense with the current preferences and updates the UI.
@@ -128,31 +147,37 @@ class RegistrationViewModel @Inject constructor(
 		setNextButtonEnabled(trimmedUsername.length >= USERNAME_MIN_SIZE)
 	}
 
-	private fun pinChanged(digit: String) {
-		val currentPin = _uiState.value.pin + digit
-		if (currentPin.length <= PIN_MAX_SIZE) {
+    private fun pinChanged(digit: String) {
+        val currentPin = _uiState.value.pin + digit
+        if (currentPin.length <= PIN_MAX_SIZE) {
             updateState { it.copy(pin = currentPin) }
-			if (currentPin.length == PIN_MAX_SIZE) {
-				sendActionEvent(RegistrationActionEvent.PinCreated)
-			}
-		}
-	}
+            if (currentPin.length == PIN_MAX_SIZE) {
+                viewModelScope.launch {
+                    delay(LAST_PIN_DIGIT_DELAY) // in order to able to see last pin digit
+                    sendActionEvent(RegistrationActionEvent.PinCreated)
+                }
+            }
+        }
+    }
 
-	private fun pinConfirmationChanged(digit: String) {
-		val currentPin = _uiState.value.pinConfirmation + digit
-		if (currentPin.length <= PIN_MAX_SIZE) {
+    private fun pinConfirmationChanged(digit: String) {
+        val currentPin = _uiState.value.pinConfirmation + digit
+        if (currentPin.length <= PIN_MAX_SIZE) {
             updateState { it.copy(pinConfirmation = currentPin) }
-			if (currentPin.length == PIN_MAX_SIZE) {
-				if (_uiState.value.pin == currentPin) {
-					sendActionEvent(RegistrationActionEvent.PinConfirmed)
-				} else {
-					resetPinValues()
-					sendActionEvent(RegistrationActionEvent.PinMismatch)
-					showErrorMessage(UiText.StringResource(R.string.registration_pin_mismatch))
-				}
-			}
-		}
-	}
+            if (currentPin.length == PIN_MAX_SIZE) {
+                if (_uiState.value.pin == currentPin) {
+                    viewModelScope.launch {
+                        delay(LAST_PIN_DIGIT_DELAY) // in order to able to see last pin digit
+                        sendActionEvent(RegistrationActionEvent.PinConfirmed)
+                    }
+                } else {
+                    resetPinValues()
+                    sendActionEvent(RegistrationActionEvent.PinMismatch)
+                    showErrorMessage(UiText.StringResource(R.string.registration_pin_mismatch))
+                }
+            }
+        }
+    }
 
 	private fun backspacePinTapped() {
         updateState { it.copy(pin = _uiState.value.pin.dropLast(n = 1)) }
@@ -193,6 +218,7 @@ sealed interface RegistrationActionEvent {
 	data object PinConfirmed : RegistrationActionEvent
 	data object PinMismatch : RegistrationActionEvent
 	data object AlreadyHaveAccount : RegistrationActionEvent
+    data object UserPreferencesSaved : RegistrationActionEvent
 }
 
 sealed interface RegistrationUiEvent {

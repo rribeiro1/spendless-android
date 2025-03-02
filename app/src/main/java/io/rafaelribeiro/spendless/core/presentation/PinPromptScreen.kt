@@ -35,6 +35,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.rafaelribeiro.spendless.R
+import io.rafaelribeiro.spendless.domain.FormattedText
+import io.rafaelribeiro.spendless.domain.formatSecondsToMMSS
 import io.rafaelribeiro.spendless.presentation.theme.SpendLessTheme
 
 @Composable
@@ -42,16 +44,18 @@ fun PinPromptScreen(
 	modifier: Modifier,
 	title: String,
 	description: String,
+    pinLockRemainingSeconds: Int = 0,
 	currentPinSize: Int = 0,
+    pinPadEnabled: Boolean = true,
 	onNumberClick: (String) -> Unit = {},
 	onBackspaceClick: () -> Unit = {},
 ) {
 	Column(
 		horizontalAlignment = Alignment.CenterHorizontally,
 		modifier = modifier
-			.background(MaterialTheme.colorScheme.background)
+            .background(MaterialTheme.colorScheme.background)
             .padding(horizontal = 26.dp)
-			.fillMaxSize(),
+            .fillMaxSize(),
 	) {
 		Image(
 			painter = painterResource(id = R.drawable.icon),
@@ -65,13 +69,14 @@ fun PinPromptScreen(
 			textAlign = TextAlign.Center,
 			modifier = Modifier.padding(bottom = 8.dp),
 		)
-		Text(
-			text = description,
-			color = MaterialTheme.colorScheme.onSurface,
-			style = MaterialTheme.typography.bodyMedium,
-			textAlign = TextAlign.Center,
-			modifier = Modifier.padding(bottom = 55.dp),
-		)
+        FormattedText(
+            allText = description,
+            textToBeFormattedAsBold = if (pinLockRemainingSeconds == 0) null else pinLockRemainingSeconds.formatSecondsToMMSS(),
+            color = MaterialTheme.colorScheme.onSurface,
+            style = MaterialTheme.typography.bodyMedium,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(bottom = 55.dp),
+        )
 		PinCircleIndicator(
 			pinSize = 5,
 			switched = currentPinSize,
@@ -80,6 +85,7 @@ fun PinPromptScreen(
 		PinPad(
 			onNumberClick = { onNumberClick(it) },
 			onBackspaceClick = { onBackspaceClick() },
+            pinPadEnabled = pinPadEnabled,
 		)
 		Spacer(modifier = Modifier.height(62.dp))
 	}
@@ -114,9 +120,9 @@ private fun PinCircle(
 	)
 	Box(
 		modifier = Modifier
-			.size(18.dp)
-			.clip(CircleShape)
-			.background(pinColor),
+            .size(18.dp)
+            .clip(CircleShape)
+            .background(pinColor),
 	)
 }
 
@@ -124,6 +130,7 @@ private fun PinCircle(
 fun PinPad(
 	onNumberClick: (String) -> Unit,
 	onBackspaceClick: () -> Unit,
+    pinPadEnabled: Boolean = true,
 ) {
 	Column(
 		modifier = Modifier.fillMaxWidth(),
@@ -137,6 +144,7 @@ fun PinPad(
 				repeat(3) { columnIndex ->
 					PinPadButton(
 						text = "${rowIndex * 3 + columnIndex + 1}",
+                        enabled = pinPadEnabled,
 						onClick = { onNumberClick("${rowIndex * 3 + columnIndex + 1}") },
 					)
 				}
@@ -150,11 +158,13 @@ fun PinPad(
 			Spacer(modifier = Modifier.size(108.dp))
 			PinPadButton(
 				text = "0",
+                enabled = pinPadEnabled,
 				onClick = { onNumberClick("0") },
 			)
 			PinPadButton(
 				icon = Icons.AutoMirrored.Filled.Backspace,
 				color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.3f),
+                enabled = pinPadEnabled,
 				onClick = { onBackspaceClick() },
 			)
 		}
@@ -167,13 +177,20 @@ fun PinPadButton(
 	icon: ImageVector? = null,
 	iconDescription: String = "",
 	color: Color = MaterialTheme.colorScheme.secondary,
+    enabled: Boolean = true,
 	onClick: () -> Unit,
 ) {
 	Button(
 		onClick = { onClick() },
 		shape = RoundedCornerShape(32.dp),
-		colors = ButtonDefaults.buttonColors(containerColor = color),
+		colors = ButtonDefaults.buttonColors(
+            containerColor = color,
+            contentColor = MaterialTheme.colorScheme.onSecondary,
+            disabledContainerColor = color.copy(alpha = 0.3f),
+            disabledContentColor = MaterialTheme.colorScheme.onSecondary.copy(alpha = 0.3f),
+        ),
 		modifier = Modifier.size(108.dp),
+        enabled = enabled,
 	) {
 		if (icon != null) {
 			Icon(

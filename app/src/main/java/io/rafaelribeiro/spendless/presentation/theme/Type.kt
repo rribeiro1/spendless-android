@@ -72,12 +72,14 @@ val SpendLessTypography by lazy {
             fontWeight = FontWeight.Normal,
             fontSize = 16.sp,
             lineHeight = 24.sp,
+            fontFeatureSettings = "tnum"
         ),
         bodySmall = TextStyle(
             fontFamily = fontFamily,
             fontWeight = FontWeight.Normal,
             fontSize = 14.sp,
             lineHeight = 20.sp,
+            fontFeatureSettings = "tnum"
         ),
 		labelSmall = TextStyle(
 			fontFamily = fontFamily,
