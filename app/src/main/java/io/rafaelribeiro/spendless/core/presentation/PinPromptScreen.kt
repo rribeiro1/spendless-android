@@ -80,6 +80,7 @@ fun PinPromptScreen(
 		PinCircleIndicator(
 			pinSize = 5,
 			switched = currentPinSize,
+            pinPadEnabled = pinPadEnabled,
 			modifier = Modifier.padding(bottom = 51.dp),
 		)
 		PinPad(
@@ -95,6 +96,7 @@ fun PinPromptScreen(
 fun PinCircleIndicator(
 	pinSize: Int = 5,
 	switched: Int = 0,
+    pinPadEnabled: Boolean,
 	modifier: Modifier = Modifier,
 ) {
 	Row(
@@ -102,7 +104,7 @@ fun PinCircleIndicator(
 		horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
 	) {
 		repeat(pinSize) {
-			PinCircle(switched = it < switched)
+			PinCircle(switched = it < switched, pinPadEnabled = pinPadEnabled)
 		}
 	}
 }
@@ -110,12 +112,14 @@ fun PinCircleIndicator(
 @Composable
 private fun PinCircle(
 	switched: Boolean = false,
+    pinPadEnabled: Boolean,
 ) {
 	val pinColor by animateColorAsState(
-		targetValue = when (switched) {
-			true -> MaterialTheme.colorScheme.primary
-			false -> MaterialTheme.colorScheme.onBackground.copy(alpha = 0.12f)
-		},
+		targetValue = when {
+            !pinPadEnabled -> MaterialTheme.colorScheme.onBackground.copy(0.04f)
+            switched -> MaterialTheme.colorScheme.primary
+            else -> MaterialTheme.colorScheme.onBackground.copy(alpha = 0.12f)
+        },
 		animationSpec = tween(durationMillis = 400),
 	)
 	Box(
@@ -164,6 +168,7 @@ fun PinPad(
 			PinPadButton(
 				icon = Icons.AutoMirrored.Filled.Backspace,
 				color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.3f),
+                disabledContainerColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f),
                 enabled = pinPadEnabled,
 				onClick = { onBackspaceClick() },
 			)
@@ -177,6 +182,7 @@ fun PinPadButton(
 	icon: ImageVector? = null,
 	iconDescription: String = "",
 	color: Color = MaterialTheme.colorScheme.secondary,
+    disabledContainerColor: Color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.3f),
     enabled: Boolean = true,
 	onClick: () -> Unit,
 ) {
@@ -186,7 +192,7 @@ fun PinPadButton(
 		colors = ButtonDefaults.buttonColors(
             containerColor = color,
             contentColor = MaterialTheme.colorScheme.onSecondary,
-            disabledContainerColor = color.copy(alpha = 0.3f),
+            disabledContainerColor = disabledContainerColor,
             disabledContentColor = MaterialTheme.colorScheme.onSecondary.copy(alpha = 0.3f),
         ),
 		modifier = Modifier.size(108.dp),
@@ -196,13 +202,13 @@ fun PinPadButton(
 			Icon(
 				imageVector = icon,
 				contentDescription = iconDescription,
-				tint = MaterialTheme.colorScheme.tertiary,
+				tint = if (enabled) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.tertiary.copy(alpha = 0.3f),
 			)
 		} else {
 			Text(
 				text = text,
 				style = MaterialTheme.typography.headlineLarge,
-				color = MaterialTheme.colorScheme.tertiary,
+				color = if (enabled) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.tertiary.copy(alpha = 0.3f),
 			)
 		}
 	}

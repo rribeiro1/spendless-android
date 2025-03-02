@@ -27,6 +27,7 @@ import io.rafaelribeiro.spendless.core.presentation.PinPromptScreen
 import io.rafaelribeiro.spendless.navigation.NavigationState
 import io.rafaelribeiro.spendless.navigation.Screen
 import io.rafaelribeiro.spendless.navigation.rememberNavigationState
+import io.rafaelribeiro.spendless.presentation.theme.SpendLessTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -54,9 +55,9 @@ fun LoginPinPromptRootScreen(
                             ),
                             shape = RoundedCornerShape(16.dp),
                             onClick = {
-                                // todo: trigger LOGOUT (remove saved username and pin from DataStore)
-                                navigationState.popBackStack() // this will clear the back stack due to triggerPinPromptScreen() navOptions
-                                navigationState.navigateTo(Screen.LoginScreen.route) // Navigate to LoginScreen
+                                // TODO: Go to Login screen and clear all backstack.
+                                navigationState.popBackStack()
+                                navigationState.navigateTo(Screen.LoginScreen.route)
                             },
                         ) {
                             Icon(
@@ -95,9 +96,26 @@ fun LoginPinPromptRootScreen(
 @Preview
 @Composable
 fun PinPromptScreenPreview() {
-    LoginPinPromptRootScreen(
-        navigationState = rememberNavigationState(),
-        uiState = LoginUiState(),
-        modifier = Modifier,
-    )
+    SpendLessTheme {
+        LoginPinPromptRootScreen(
+            navigationState = rememberNavigationState(),
+            uiState = LoginUiState(),
+            modifier = Modifier,
+        )
+    }
+}
+
+@Preview
+@Composable
+fun PinPromptScreenPreviewLocked() {
+    SpendLessTheme {
+        LoginPinPromptRootScreen(
+            navigationState = rememberNavigationState(),
+            uiState = LoginUiState(
+                pinLockRemainingSeconds = 30,
+                pinPadEnabled = false,
+            ),
+            modifier = Modifier,
+        )
+    }
 }
