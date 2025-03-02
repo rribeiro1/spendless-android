@@ -10,15 +10,15 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import io.rafaelribeiro.spendless.data.crypto.UserSerializer
 import io.rafaelribeiro.spendless.domain.User
-import io.rafaelribeiro.spendless.domain.UserSerializer
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 object DataStoreModule {
     private const val USER_PREFERENCES_NAME = "user_preferences"
-    private const val USER_ENCRYPTED_DATASTORE_NAME = "user_encrypted_datastore"
+    private const val USER_ENCRYPTED_DATASTORE_NAME = "user_accounts"
 
     private val Context.dataStore by preferencesDataStore(name = USER_PREFERENCES_NAME)
     private val Context.dataStoreEncryptedUser by dataStore(fileName = USER_ENCRYPTED_DATASTORE_NAME, serializer = UserSerializer)
