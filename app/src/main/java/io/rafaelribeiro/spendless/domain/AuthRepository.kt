@@ -7,4 +7,5 @@ interface AuthRepository {
     val pin: Flow<String>
 	suspend fun checkUserName(username: String): Result<Unit, RegistrationError>
 	suspend fun register(username: String, pin: String): Result<User, RegistrationError>
+    suspend fun isPinCorrect(pin: String): Boolean
 }

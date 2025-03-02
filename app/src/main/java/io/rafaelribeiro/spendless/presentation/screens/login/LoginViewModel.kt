@@ -5,21 +5,23 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.rafaelribeiro.spendless.R
 import io.rafaelribeiro.spendless.core.presentation.UiText
-import io.rafaelribeiro.spendless.data.DataStoreUserPreferencesRepository
+import io.rafaelribeiro.spendless.data.repository.DataStoreUserPreferencesRepository
 import io.rafaelribeiro.spendless.domain.AuthRepository
-import io.rafaelribeiro.spendless.domain.PinVerifier
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationViewModel.Companion.ERROR_MESSAGE_DURATION
 import io.rafaelribeiro.spendless.domain.CurrencySymbol
+import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationActionEvent
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationViewModel.Companion.PIN_MAX_SIZE
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationViewModel.Companion.USERNAME_MAX_SIZE
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationViewModel.Companion.USERNAME_MIN_SIZE
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -28,7 +30,6 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val authRepository: AuthRepository,
-    private val pinVerifier: PinVerifier,
     private val dataStoreUserPreferencesRepository: DataStoreUserPreferencesRepository,
 ) : ViewModel() {
 
@@ -49,6 +50,9 @@ class LoginViewModel @Inject constructor(
             initialValue = initialUiState,
             started = SharingStarted.WhileSubscribed(5000L),
         )
+
+    private val _actionEvents = Channel<LoginActionEvent>()
+    val actionEvents = _actionEvents.receiveAsFlow()
 
     private suspend fun loadData() {
         val username = authRepository.userName.first()
@@ -93,10 +97,9 @@ class LoginViewModel @Inject constructor(
             if (currentPin.length == PIN_MAX_SIZE) {
                 viewModelScope.launch {
                     resetPinValues(true)
-                    if (pinVerifier.isPinCorrect(currentPin)) {
+                    if (authRepository.isPinCorrect(currentPin)) {
                         println("Correct PIN entered!")
-                        //TOdo: Then pop back stack and navigate where it came from
-                        // triggering popBackStack is enough probably?
+                        //TODO: Then pop back stack and navigate where it came from triggering popBackStack is enough probably?
                     } else {
                         handleWrongPinUiState()
                     }
@@ -148,20 +151,32 @@ class LoginViewModel @Inject constructor(
         updateUiState { it.copy(loginButtonEnabled = it.pin.length == PIN_MAX_SIZE && it.username.length >= USERNAME_MIN_SIZE) }
     }
 
+    // TODO: Validate username and pin against the data store.
     private fun loginClicked() {
         val username = _uiState.value.username
         val pin = _uiState.value.pin
-        // TODO: Login
-        println("Username: $username, Pin: $pin")
+        viewModelScope.launch {
+            if (authRepository.isPinCorrect(pin)) {
+                sendActionEvent(LoginActionEvent.LoginSucceed(username))
+            } else {
+                showErrorMessage(UiText.StringResource(R.string.invalid_credentials))
+            }
+        }
+    }
+
+    private fun sendActionEvent(actionEvent: LoginActionEvent) {
+        viewModelScope.launch { _actionEvents.send(actionEvent) }
     }
 
     override fun onCleared() {
         super.onCleared()
         pinLockTimerJob?.cancel()
     }
-
 }
 
+sealed interface LoginActionEvent {
+    data class LoginSucceed(val username: String) : LoginActionEvent
+}
 
 sealed interface LoginUiEvent {
     data class UsernameChanged(val username: String) : LoginUiEvent

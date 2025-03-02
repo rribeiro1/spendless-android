@@ -42,6 +42,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.navOptions
 import io.rafaelribeiro.spendless.R
+import io.rafaelribeiro.spendless.core.presentation.ErrorDialog
 import io.rafaelribeiro.spendless.core.presentation.SpendLessButton
 import io.rafaelribeiro.spendless.navigation.NavigationState
 import io.rafaelribeiro.spendless.navigation.Screen
@@ -55,33 +56,38 @@ fun LoginRootScreen(
     uiState: LoginUiState,
     onEvent: (LoginUiEvent) -> Unit = {},
 ) {
-    Scaffold(
-        modifier = modifier.fillMaxSize(),
-        topBar = {
-            TopAppBar(
-                title = {},
-                colors = TopAppBarDefaults.topAppBarColors().copy(
-                    containerColor = MaterialTheme.colorScheme.background,
+    Box {
+        Scaffold(
+            modifier = modifier.fillMaxSize(),
+            topBar = {
+                TopAppBar(
+                    title = {},
+                    colors = TopAppBarDefaults.topAppBarColors().copy(
+                        containerColor = MaterialTheme.colorScheme.background,
+                    )
                 )
+            }
+        ) { innerPadding ->
+            LoginScreen(
+                modifier = modifier.padding(innerPadding),
+                uiState = uiState,
+                onEvent = onEvent,
+                onNewAccountClick = {
+                    navigationState.navigateTo(
+                        route = Screen.RegistrationUsername.route,
+                        navOptions = navOptions {
+                            popUpTo(Screen.LoginScreen.route) { inclusive = true }
+                        }
+                    )
+                },
             )
         }
-    ) { innerPadding ->
-        LoginScreen(
-            modifier = modifier.padding(innerPadding),
-            uiState = uiState,
-            onEvent = onEvent,
-            onNewAccountClick = {
-                navigationState.navigateTo(
-                    route = Screen.RegistrationUsername.route,
-                    navOptions = navOptions {
-                        popUpTo(Screen.LoginScreen.route) { inclusive = true }
-                    }
-                )
-            },
+        ErrorDialog(
+            modifier = modifier.align(Alignment.BottomCenter),
+            errorMessage = uiState.errorMessage,
         )
     }
 }
-
 
 @Composable
 fun LoginScreen(

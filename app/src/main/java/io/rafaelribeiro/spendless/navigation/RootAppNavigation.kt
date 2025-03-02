@@ -19,6 +19,7 @@ import androidx.navigation.compose.navigation
 import androidx.navigation.navOptions
 import io.rafaelribeiro.spendless.presentation.screens.dashboard.DashboardRootScreen
 import io.rafaelribeiro.spendless.presentation.screens.dashboard.DashboardViewModel
+import io.rafaelribeiro.spendless.presentation.screens.login.LoginActionEvent
 import io.rafaelribeiro.spendless.presentation.screens.login.LoginRootScreen
 import io.rafaelribeiro.spendless.presentation.screens.login.LoginViewModel
 import io.rafaelribeiro.spendless.presentation.screens.login.LoginPinPromptRootScreen
@@ -118,7 +119,12 @@ fun RootAppNavigation(
                 val uiState by viewModel.uiState.collectAsStateWithLifecycle()
                 ObserveAsEvents(flow = viewModel.actionEvents) { event ->
                     if (event is RegistrationActionEvent.UserPreferencesSaved) {
-                        navigationState.navigateTo(Screen.DashboardScreen.route)
+                        navigationState.navigateTo(
+                            route = Screen.DashboardScreen.route,
+                            navOptions = navOptions {
+                                popUpTo(Screen.RegistrationFlow.route) { inclusive = true }
+                            }
+                        )
                     }
                 }
                 RegistrationPreferencesRootScreen(
@@ -132,6 +138,18 @@ fun RootAppNavigation(
 		composable(route = Screen.LoginScreen.route) {
 			val viewModel = hiltViewModel<LoginViewModel>()
 			val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            ObserveAsEvents(flow = viewModel.actionEvents) { event ->
+                when (event) {
+                    is LoginActionEvent.LoginSucceed -> {
+                        navigationState.navigateTo(
+                            route = Screen.DashboardScreen.route,
+                            navOptions = navOptions {
+                                popUpTo(Screen.LoginScreen.route) { inclusive = true }
+                            }
+                        )
+                    }
+                }
+            }
 			LoginRootScreen(
 				modifier = modifier,
 				uiState = uiState,

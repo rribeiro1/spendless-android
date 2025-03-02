@@ -52,4 +52,8 @@ class OfflineAuthRepository @Inject constructor(
 
         return Result.Success(User(username))
     }
+
+    override suspend fun isPinCorrect(pin: String): Boolean {
+        return this.pin.first() == pin
+    }
 }
