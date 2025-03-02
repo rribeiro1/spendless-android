@@ -6,6 +6,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.rafaelribeiro.spendless.core.presentation.formatDateTime
 import io.rafaelribeiro.spendless.core.presentation.timestampToLocalDate
 import io.rafaelribeiro.spendless.data.repository.TransactionCreator
+import io.rafaelribeiro.spendless.data.repository.UserPreferences
+import io.rafaelribeiro.spendless.domain.AuthRepository
 import io.rafaelribeiro.spendless.domain.CurrencySymbol
 import io.rafaelribeiro.spendless.domain.DecimalSeparator
 import io.rafaelribeiro.spendless.domain.ExpenseFormat
@@ -13,11 +15,13 @@ import io.rafaelribeiro.spendless.domain.ExpenseFormatter
 import io.rafaelribeiro.spendless.domain.ThousandSeparator
 import io.rafaelribeiro.spendless.domain.Transaction
 import io.rafaelribeiro.spendless.domain.TransactionRepository
+import io.rafaelribeiro.spendless.domain.UserPreferencesRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
@@ -33,6 +37,8 @@ import javax.inject.Inject
 @HiltViewModel
 class DashboardViewModel @Inject constructor(
     private val transactionRepository: TransactionRepository,
+    private val authRepository: AuthRepository,
+    userPreferencesRepository: UserPreferencesRepository,
 ) : ViewModel() {
     private val _uiState: MutableStateFlow<DashboardUiState> = MutableStateFlow(DashboardUiState())
     val uiState: StateFlow<DashboardUiState> = _uiState
@@ -42,6 +48,8 @@ class DashboardViewModel @Inject constructor(
             started = SharingStarted.WhileSubscribed(WAIT_UNTIL_NO_CONSUMERS_IN_MILLIS),
             initialValue = DashboardUiState()
         )
+
+    private val userPreferences: Flow<UserPreferences> = userPreferencesRepository.userPreferences
 
     fun onEvent(event: DashboardUiEvent) {
         when (event) {
@@ -67,18 +75,22 @@ class DashboardViewModel @Inject constructor(
             transactionRepository.getMostPopularCategory(),
             transactionRepository.getTotalAmountLastWeek()
         ) { balance, largestTransaction, latestTransactions, mostPopularCategory, totalAmountLastWeek ->
+            val userPreferences = this@DashboardViewModel.userPreferences.first()
             DashboardUiState(
-                username = "rafael87", // TODO: Replace with user's name from auth repository.
-                accountBalance = balance?.formatExpense() ?: 0.toDouble().formatExpense(),
-                previousWeekAmount = totalAmountLastWeek?.formatExpense() ?: 0.toDouble().formatExpense(),
-                latestTransactions = groupedTransactions(latestTransactions),
-                largestTransaction = largestTransaction?.toUiModel(),
+                username = authRepository.userName.first(),
+                accountBalance = balance?.formatExpense(userPreferences) ?: 0.toDouble().formatExpense(userPreferences),
+                previousWeekAmount = totalAmountLastWeek?.formatExpense(userPreferences) ?: 0.toDouble().formatExpense(userPreferences),
+                latestTransactions = groupedTransactions(latestTransactions, userPreferences),
+                largestTransaction = largestTransaction?.toUiModel(userPreferences),
                 mostPopularCategory = mostPopularCategory
             )
         }
     }
 
-    private fun groupedTransactions(latestTransactions: List<Transaction>): List<GroupedTransactions> {
+    private fun groupedTransactions(
+        latestTransactions: List<Transaction>,
+        userPreferences: UserPreferences,
+    ): List<GroupedTransactions> {
         val groupedTransactions = latestTransactions
             .sortedByDescending { it.createdAt }
             .groupBy { it.createdAt.timestampToLocalDate() }
@@ -90,7 +102,7 @@ class DashboardViewModel @Inject constructor(
                 }
                 GroupedTransactions(
                     dateHeader = formattedDate,
-                    transactions = transactions.map { it.toUiModel() }
+                    transactions = transactions.map { it.toUiModel(userPreferences) }
                 )
             }
         return groupedTransactions
@@ -129,11 +141,13 @@ class DashboardViewModel @Inject constructor(
     companion object {
         const val WAIT_UNTIL_NO_CONSUMERS_IN_MILLIS = 5000L
 
-        fun Transaction.toUiModel(): TransactionUiModel {
+        fun Transaction.toUiModel(
+            userPreferences: UserPreferences = UserPreferences(),
+        ): TransactionUiModel {
             return TransactionUiModel(
                 id = id,
                 amount = amount,
-                amountDisplay = amount.formatExpense(),
+                amountDisplay = amount.formatExpense(userPreferences),
                 description = description,
                 note = note,
                 category = category,
@@ -144,14 +158,17 @@ class DashboardViewModel @Inject constructor(
 
         /**
          * Formats the expense amount according to the user's preferences.
-         * TODO: The preferences should come from the user's preferences repository.
          */
-        private fun Double.formatExpense(): String {
+        private fun Double.formatExpense(userPreferences: UserPreferences): String {
+            val thousandSeparator = ThousandSeparator.entries.first { it.name == userPreferences.thousandsSeparatorName }
+            val decimalSeparator = DecimalSeparator.entries.first { it.name == userPreferences.decimalSeparatorName }
+            val expenseFormat = ExpenseFormat.entries.first { it.name == userPreferences.expensesFormatName }
+            val currencySymbol = CurrencySymbol.entries.first { it.name == userPreferences.currencyName }
             val formatter = ExpenseFormatter(
-                decimalSeparator = DecimalSeparator.DOT,
-                thousandSeparator = ThousandSeparator.COMMA,
-                currencySymbol = CurrencySymbol.DOLLAR,
-                expensesFormat = ExpenseFormat.NEGATIVE
+                thousandSeparator = thousandSeparator,
+                decimalSeparator = decimalSeparator,
+                expensesFormat = expenseFormat,
+                currencySymbol = currencySymbol,
             )
             return formatter.format(this)
         }
