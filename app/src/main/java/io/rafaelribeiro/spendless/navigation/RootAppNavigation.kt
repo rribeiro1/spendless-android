@@ -17,7 +17,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.navOptions
-import io.rafaelribeiro.spendless.presentation.screens.dashboard.DashboardRootScreen
+import io.rafaelribeiro.spendless.presentation.screens.dashboard.DashboardScreen
 import io.rafaelribeiro.spendless.presentation.screens.dashboard.DashboardViewModel
 import io.rafaelribeiro.spendless.presentation.screens.login.LoginActionEvent
 import io.rafaelribeiro.spendless.presentation.screens.login.LoginRootScreen
@@ -170,7 +170,7 @@ fun RootAppNavigation(
         composable(route = Screen.DashboardScreen.route) {
             val viewModel = hiltViewModel<DashboardViewModel>()
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-            DashboardRootScreen(
+            DashboardScreen(
                 modifier = modifier,
                 uiState = uiState,
                 onEvent = viewModel::onEvent,
