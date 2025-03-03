@@ -17,18 +17,21 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.navOptions
+import io.rafaelribeiro.spendless.presentation.screens.dashboard.DashboardActionEvent
 import io.rafaelribeiro.spendless.presentation.screens.dashboard.DashboardScreen
 import io.rafaelribeiro.spendless.presentation.screens.dashboard.DashboardViewModel
 import io.rafaelribeiro.spendless.presentation.screens.login.LoginActionEvent
+import io.rafaelribeiro.spendless.presentation.screens.login.LoginPinPromptRootScreen
 import io.rafaelribeiro.spendless.presentation.screens.login.LoginRootScreen
 import io.rafaelribeiro.spendless.presentation.screens.login.LoginViewModel
-import io.rafaelribeiro.spendless.presentation.screens.login.LoginPinPromptRootScreen
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationActionEvent
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationPinConfirmationScreen
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationPinPromptScreen
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationPreferencesRootScreen
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationUsernameRootScreen
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationViewModel
+import io.rafaelribeiro.spendless.presentation.screens.settings.SettingsRootScreen
+import io.rafaelribeiro.spendless.presentation.screens.settings.SettingsViewModel
 import kotlinx.coroutines.flow.Flow
 
 @Composable
@@ -38,7 +41,7 @@ fun RootAppNavigation(
 ) {
 	NavHost(
 		navController = navigationState.navHostController,
-		startDestination = Screen.RegistrationFlow.route,
+		startDestination = Screen.LoginScreen.route,
 		enterTransition = enterTransition(),
 		exitTransition = exitTransition(),
 		popEnterTransition = popEnterTransition(),
@@ -170,11 +173,32 @@ fun RootAppNavigation(
         composable(route = Screen.DashboardScreen.route) {
             val viewModel = hiltViewModel<DashboardViewModel>()
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            ObserveAsEvents(flow = viewModel.actionEvents) { event ->
+                when (event) {
+                    is DashboardActionEvent.OnSettingsClicked -> {
+                        navigationState.navigateTo(Screen.SettingsFlow.route)
+                    }
+                }
+            }
             DashboardScreen(
                 modifier = modifier,
                 uiState = uiState,
                 onEvent = viewModel::onEvent,
             )
+        }
+
+        navigation(
+            startDestination = Screen.SettingsScreen.route,
+            route = Screen.SettingsFlow.route,
+        ) {
+            composable(route = Screen.SettingsScreen.route) { entry ->
+                val viewModel = entry.sharedViewModel<SettingsViewModel>(navigationState.navHostController)
+                val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+                SettingsRootScreen(
+                    modifier = modifier,
+                    uiState = uiState,
+                )
+            }
         }
 	}
 }

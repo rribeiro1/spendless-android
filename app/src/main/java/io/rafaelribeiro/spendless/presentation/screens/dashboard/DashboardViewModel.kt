@@ -10,6 +10,7 @@ import io.rafaelribeiro.spendless.data.repository.TransactionCreator
 import io.rafaelribeiro.spendless.domain.AuthRepository
 import io.rafaelribeiro.spendless.domain.Transaction
 import io.rafaelribeiro.spendless.domain.TransactionRepository
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -19,6 +20,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -41,13 +43,22 @@ class DashboardViewModel @Inject constructor(
             initialValue = DashboardUiState()
         )
 
+    private val _actionEvents = Channel<DashboardActionEvent>()
+    val actionEvents = _actionEvents.receiveAsFlow()
+
     fun onEvent(event: DashboardUiEvent) {
         when (event) {
             is DashboardUiEvent.AddTransactionClicked -> addTransaction() // TODO: Replace with screen to add transaction.
             is DashboardUiEvent.DownloadTransactionsClicked -> TODO()
-            is DashboardUiEvent.SettingsClicked -> deleteAllTransactions() // TODO: Replace with settings screen.
+            is DashboardUiEvent.SettingsClicked -> sendActionEvent(DashboardActionEvent.OnSettingsClicked)
             is DashboardUiEvent.TransactionNoteClicked -> showTransactionNote(event.transactionId)
             is DashboardUiEvent.ShowAllTransactionsClicked -> TODO()
+        }
+    }
+
+    private fun sendActionEvent(event: DashboardActionEvent) {
+        viewModelScope.launch {
+            _actionEvents.send(event)
         }
     }
 
@@ -146,6 +157,10 @@ class DashboardViewModel @Inject constructor(
             )
         }
     }
+}
+
+sealed interface DashboardActionEvent {
+    data object OnSettingsClicked : DashboardActionEvent
 }
 
 sealed interface DashboardUiEvent {
