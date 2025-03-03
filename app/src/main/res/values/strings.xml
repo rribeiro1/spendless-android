@@ -44,4 +44,6 @@
     <string name="preferences">Preferences</string>
     <string name="security">Security</string>
     <string name="log_out">Log out</string>
+    <string name="session_expiry_duration">Session Expiry Duration</string>
+    <string name="lockout_duration">Locked out duration</string>
 </resources>

@@ -227,10 +227,12 @@ fun RootAppNavigation(
             }
             composable(route = Screen.SettingsSecurity.route) { entry ->
                 val viewModel = entry.sharedViewModel<SettingsViewModel>(navigationState.navHostController)
-//                val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+                val uiState by viewModel.uiState.collectAsStateWithLifecycle()
                 SettingsSecurityScreen(
                     modifier = modifier,
                     navigationState = navigationState,
+                    onEvent = viewModel::onSecurityEvent,
+                    uiState = uiState,
                 )
             }
         }

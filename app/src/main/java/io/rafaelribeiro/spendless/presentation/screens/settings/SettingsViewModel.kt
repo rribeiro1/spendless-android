@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -54,11 +55,27 @@ class SettingsViewModel @Inject constructor(
 
     }
 
+    fun onSecurityEvent(event: SettingsSecurityUiEvent) {
+        when (event) {
+            is SettingsSecurityUiEvent.SessionExpiryDurationSelected -> {
+                updateState { it.copy(sessionExpiryDuration = event.duration) }
+            }
+            is SettingsSecurityUiEvent.LockedOutDurationSelected -> {
+                updateState { it.copy(lockoutDuration = event.duration) }
+            }
+        }
+    }
+
     private fun sendActionEvent(event: SettingsActionEvent) {
         viewModelScope.launch {
             _actionEvents.send(event)
         }
     }
+
+    private fun updateState(state: (SettingsUiState) -> SettingsUiState) {
+        _uiState.update { state(it) }
+    }
+
 }
 
 sealed interface SettingsActionEvent {
@@ -75,3 +92,7 @@ sealed interface SettingsUiEvent {
     data object BackClicked: SettingsUiEvent
 }
 
+sealed interface SettingsSecurityUiEvent {
+    data class SessionExpiryDurationSelected(val duration: SessionExpiryDuration) : SettingsSecurityUiEvent
+    data class LockedOutDurationSelected(val duration: LockoutDuration) : SettingsSecurityUiEvent
+}
