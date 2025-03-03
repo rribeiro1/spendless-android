@@ -11,6 +11,8 @@ sealed class Screen(val route: String) {
     data object DashboardScreen : Screen(DASHBOARD_SCREEN)
     data object SettingsFlow : Screen(SETTINGS_FLOW)
     data object SettingsScreen : Screen(SETTINGS_SCREEN)
+    data object SettingsPreferences: Screen(SETTINGS_PREFERENCES)
+    data object SettingsSecurity: Screen(SETTINGS_SECURITY)
 
 	companion object {
 		private const val REGISTRATION_FLOW = "registration_flow"
@@ -23,5 +25,7 @@ sealed class Screen(val route: String) {
         private const val DASHBOARD_SCREEN = "dashboard_screen"
 		private const val SETTINGS_FLOW = "settings_flow"
         private const val SETTINGS_SCREEN = "settings_screen"
+        private const val SETTINGS_PREFERENCES = "settings_preferences"
+        private const val SETTINGS_SECURITY = "settings_security"
 	}
 }

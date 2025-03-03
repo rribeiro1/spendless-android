@@ -30,7 +30,10 @@ import io.rafaelribeiro.spendless.presentation.screens.registration.Registration
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationPreferencesRootScreen
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationUsernameRootScreen
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationViewModel
+import io.rafaelribeiro.spendless.presentation.screens.settings.SettingsActionEvent
+import io.rafaelribeiro.spendless.presentation.screens.settings.SettingsPreferencesScreen
 import io.rafaelribeiro.spendless.presentation.screens.settings.SettingsRootScreen
+import io.rafaelribeiro.spendless.presentation.screens.settings.SettingsSecurityScreen
 import io.rafaelribeiro.spendless.presentation.screens.settings.SettingsViewModel
 import kotlinx.coroutines.flow.Flow
 
@@ -193,10 +196,41 @@ fun RootAppNavigation(
         ) {
             composable(route = Screen.SettingsScreen.route) { entry ->
                 val viewModel = entry.sharedViewModel<SettingsViewModel>(navigationState.navHostController)
-                val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+//                val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+                ObserveAsEvents(flow = viewModel.actionEvents) { event ->
+                    when (event) {
+                        is SettingsActionEvent.OnBackClicked -> navigationState.popBackStack()
+
+                        is SettingsActionEvent.OnPreferencesClicked -> {
+                            navigationState.navigateTo(Screen.SettingsPreferences.route)
+                        }
+                        is SettingsActionEvent.OnSecurityClicked -> {
+                            navigationState.navigateTo(Screen.SettingsSecurity.route)
+                        }
+                        is SettingsActionEvent.OnLogoutClicked -> {
+                            navigationState.navigateAndClearBackStack(Screen.LoginScreen.route)
+                        }
+                    }
+                }
                 SettingsRootScreen(
                     modifier = modifier,
-                    uiState = uiState,
+                    onEvent = viewModel::onEvent
+                )
+            }
+            composable(route = Screen.SettingsPreferences.route) { entry ->
+                val viewModel = entry.sharedViewModel<SettingsViewModel>(navigationState.navHostController)
+//                val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+                SettingsPreferencesScreen(
+                    modifier = modifier,
+                    navigationState = navigationState,
+                )
+            }
+            composable(route = Screen.SettingsSecurity.route) { entry ->
+                val viewModel = entry.sharedViewModel<SettingsViewModel>(navigationState.navHostController)
+//                val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+                SettingsSecurityScreen(
+                    modifier = modifier,
+                    navigationState = navigationState,
                 )
             }
         }

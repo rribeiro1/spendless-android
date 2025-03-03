@@ -1,6 +1,5 @@
 package io.rafaelribeiro.spendless.presentation.screens.settings
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -32,63 +31,69 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import io.rafaelribeiro.spendless.R
 import io.rafaelribeiro.spendless.presentation.theme.SpendLessTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsRootScreen(modifier: Modifier, uiState: SettingsUiEvent) {
-    fun onBackPress() {
-//        onEvent(RegistrationUiEvent.ResetPinValues)
-//        navigationState.popBackStack()
-    }
-    BackHandler(onBack = ::onBackPress)
-        Scaffold(
-            modifier = modifier.fillMaxSize(),
-            topBar = {
-                TopAppBar(
-                    title = {},
-                    navigationIcon = {
-                        IconButton(onClick = ::onBackPress) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = "Go back"
-                            )
-                        }
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors().copy(
-                        containerColor = MaterialTheme.colorScheme.background,
-                    )
+fun SettingsRootScreen(
+    modifier: Modifier,
+    onEvent: (SettingsUiEvent) -> Unit,
+) {
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        topBar = {
+            TopAppBar(
+                title = { Text(text = stringResource(R.string.settings)) },
+                navigationIcon = {
+                    IconButton(onClick = { onEvent(SettingsUiEvent.BackClicked) }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Go back"
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors().copy(
+                    containerColor = MaterialTheme.colorScheme.background,
                 )
-            },
-        ) { innerPadding ->
-
+            )
+        },
+    ) { innerPadding ->
         SettingsScreen(
             modifier = Modifier.padding(innerPadding),
-            uiState = uiState
+            onEvent = onEvent,
         )
     }
 
 }
 
 @Composable
-fun SettingsScreen(modifier: Modifier, uiState: SettingsUiEvent) {
+fun SettingsScreen(
+    modifier: Modifier,
+    onEvent: (SettingsUiEvent) -> Unit = {}
+) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
             .fillMaxSize()
             .padding(16.dp),
 
-    ) {
+        ) {
         Column(
             modifier = Modifier.background(
                 color = Color.White,
                 shape = RoundedCornerShape(16.dp)
             )
         ) {
-            SettingItemList("Preferences", Icons.Default.Settings, onClick = {})
-            SettingItemList("Security", Icons.Default.Lock, onClick = {})
+            SettingItemList(stringResource(R.string.preferences), Icons.Default.Settings) {
+                onEvent(SettingsUiEvent.PreferencesClicked)
+            }
+            SettingItemList(stringResource(R.string.security), Icons.Default.Lock) {
+                onEvent(SettingsUiEvent.SecurityClicked)
+            }
         }
 
         Column(
@@ -100,13 +105,13 @@ fun SettingsScreen(modifier: Modifier, uiState: SettingsUiEvent) {
                 )
         ) {
             SettingItemList(
-                title = "Log out",
+                title = stringResource(R.string.log_out),
                 icon = Icons.AutoMirrored.Filled.Logout,
                 iconContainerColor = MaterialTheme.colorScheme.errorContainer,
                 iconTint = MaterialTheme.colorScheme.error,
                 textColor = MaterialTheme.colorScheme.error,
                 onClick = {
-//                    onEvent(RegistrationUiEvent.Logout)
+                    onEvent(SettingsUiEvent.LogoutClicked)
                 }
             )
         }
@@ -162,6 +167,9 @@ private fun SettingItemList(
 @Composable
 fun SettingsScreenPreview() {
     SpendLessTheme {
-        SettingsRootScreen(modifier = Modifier, uiState = SettingsUiEvent())
+        SettingsRootScreen(
+            modifier = Modifier,
+            onEvent = {},
+        )
     }
 }
