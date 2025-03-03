@@ -5,11 +5,8 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.rafaelribeiro.spendless.R
 import io.rafaelribeiro.spendless.core.presentation.UiText
-import io.rafaelribeiro.spendless.data.repository.DataStoreUserPreferencesRepository
 import io.rafaelribeiro.spendless.domain.AuthRepository
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationViewModel.Companion.ERROR_MESSAGE_DURATION
-import io.rafaelribeiro.spendless.domain.CurrencySymbol
-import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationActionEvent
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationViewModel.Companion.PIN_MAX_SIZE
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationViewModel.Companion.USERNAME_MAX_SIZE
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationViewModel.Companion.USERNAME_MIN_SIZE
@@ -30,7 +27,6 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val authRepository: AuthRepository,
-    private val dataStoreUserPreferencesRepository: DataStoreUserPreferencesRepository,
 ) : ViewModel() {
 
     companion object {
@@ -57,11 +53,6 @@ class LoginViewModel @Inject constructor(
     private suspend fun loadData() {
         val username = authRepository.userName.first()
         _uiState.update { it.copy(username = username, isLoading = false) }
-
-        // todo: this can be removed later:
-        val userPreferences = dataStoreUserPreferencesRepository.userPreferences.first()
-        val currencySymbol = CurrencySymbol.entries.first { it.name == userPreferences.currencyName }
-        println("userPreferences: $userPreferences, currencySymbol: $currencySymbol")
     }
 
     fun onEvent(event: LoginUiEvent) {
@@ -151,12 +142,11 @@ class LoginViewModel @Inject constructor(
         updateUiState { it.copy(loginButtonEnabled = it.pin.length == PIN_MAX_SIZE && it.username.length >= USERNAME_MIN_SIZE) }
     }
 
-    // TODO: Validate username and pin against the data store.
     private fun loginClicked() {
         val username = _uiState.value.username
         val pin = _uiState.value.pin
         viewModelScope.launch {
-            if (authRepository.isPinCorrect(pin)) {
+            if (authRepository.authenticateCredentials(pin, username)) {
                 sendActionEvent(LoginActionEvent.LoginSucceed(username))
             } else {
                 showErrorMessage(UiText.StringResource(R.string.invalid_credentials))

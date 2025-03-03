@@ -1,9 +1,6 @@
 package io.rafaelribeiro.spendless.data.repository
 
 import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.stringPreferencesKey
 import io.rafaelribeiro.spendless.domain.AuthRepository
 import io.rafaelribeiro.spendless.domain.RegistrationError
 import io.rafaelribeiro.spendless.domain.Result
@@ -14,22 +11,12 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class OfflineAuthRepository @Inject constructor(
-    private val dataStore: DataStore<Preferences>,
+    private val dataStore: DataStore<User>,
 ) : AuthRepository {
 
-    companion object {
-        private val USER_NAME = stringPreferencesKey("user_name")
-        private val PIN = stringPreferencesKey("pin")
-    }
+    override val pin: Flow<String> = dataStore.data.map { it.pin }
 
-    override val pin: Flow<String> = dataStore.data
-        .map { preferences ->
-            preferences[PIN] ?: ""
-        }
-    override val userName: Flow<String> = dataStore.data
-        .map { preferences ->
-            preferences[USER_NAME] ?: ""
-        }
+    override val userName: Flow<String> = dataStore.data.map { it.username }
 
 	override suspend fun checkUserName(username: String): Result<Unit, RegistrationError> =
 		if (!username.all { it.isLetterOrDigit() }) {
@@ -45,15 +32,17 @@ class OfflineAuthRepository @Inject constructor(
 		pin: String,
 	): Result<User, RegistrationError> {
 
-        dataStore.edit {
-            it[USER_NAME] = username
-            it[PIN] = pin // TODO: encrypt it
+        dataStore.updateData {
+            User(username, pin)
         }
-
-        return Result.Success(User(username))
+        return Result.Success(User(username, pin))
     }
 
     override suspend fun isPinCorrect(pin: String): Boolean {
         return this.pin.first() == pin
+    }
+
+    override suspend fun authenticateCredentials(pin: String, username: String): Boolean {
+        return this.pin.first() == pin && this.userName.first() == username
     }
 }
