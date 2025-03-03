@@ -40,4 +40,5 @@
     <string name="too_many_failed_attempts">Too many failed attempts</string>
     <string name="hello_user">Hello, %1$s</string>
     <string name="invalid_credentials">Invalid credentials, please try again!</string>
+    <string name="all_transactions">All Transactions</string>
 </resources>

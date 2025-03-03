@@ -1,13 +1,25 @@
 package io.rafaelribeiro.spendless.data.repository
 
+import io.rafaelribeiro.spendless.domain.CurrencySymbol
+import io.rafaelribeiro.spendless.domain.DecimalSeparator
+import io.rafaelribeiro.spendless.domain.ExpenseFormat
+import io.rafaelribeiro.spendless.domain.ExpenseFormatter
+import io.rafaelribeiro.spendless.domain.ThousandSeparator
 import io.rafaelribeiro.spendless.domain.Transaction
 import io.rafaelribeiro.spendless.domain.TransactionCategory
+import io.rafaelribeiro.spendless.domain.TransactionFormatter
 import io.rafaelribeiro.spendless.domain.TransactionRepository
 import io.rafaelribeiro.spendless.domain.TransactionType
+import io.rafaelribeiro.spendless.domain.toUIModel
+import io.rafaelribeiro.spendless.presentation.screens.dashboard.TransactionUiModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId.systemDefault
+import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
+import java.util.Locale
 import javax.inject.Inject
 import kotlin.random.Random
 
@@ -19,6 +31,12 @@ class FakeTransactionRepository @Inject constructor() : TransactionRepository {
     override fun getBalance(): Flow<Double?> {
         return flow {
             emit(1000.toDouble())
+        }
+    }
+
+    override fun getAllTransactions(): Flow<List<Transaction>> {
+        return flow {
+            emit(TransactionCreator.createTransactions(40))
         }
     }
 
@@ -56,6 +74,24 @@ class FakeTransactionRepository @Inject constructor() : TransactionRepository {
  */
 class TransactionCreator {
     companion object {
+        private val testTransactionFormatter: TransactionFormatter = object : TransactionFormatter {
+            override fun formatAmount(amount: Double, preferences: UserPreferences): String {
+                val formatter = ExpenseFormatter(
+                    thousandSeparator = ThousandSeparator.DOT,
+                    decimalSeparator = DecimalSeparator.COMMA,
+                    expensesFormat = ExpenseFormat.NEGATIVE,
+                    currencySymbol = CurrencySymbol.DOLLAR,
+                )
+                return formatter.format(amount)
+            }
+
+            override fun formatDateTime(timestamp: Long): String {
+                val instant = Instant.ofEpochMilli(timestamp)
+                val formatter = DateTimeFormatter.ofPattern("MMM d, yyyy", Locale.ENGLISH)
+                return LocalDateTime.ofInstant(instant, systemDefault()).format(formatter)
+            }
+        }
+
         data class TransactionTest(
             val description: String,
             val category: TransactionCategory,
@@ -67,9 +103,7 @@ class TransactionCreator {
         )
 
         fun createTransactions(quantity: Int): List<Transaction> {
-            return List(quantity) {
-                createTransaction()
-            }
+            return List(quantity) { createTransaction() }
         }
 
         fun createTransaction(): Transaction {
@@ -83,6 +117,14 @@ class TransactionCreator {
                 type = transaction.type,
                 createdAt = transaction.createdAt
             )
+        }
+
+        fun createTransactionUiModel(): TransactionUiModel {
+            return createTransaction().toUIModel(testTransactionFormatter, UserPreferences())
+        }
+
+        fun createTransactionUiModels(quantity: Int): List<TransactionUiModel> {
+            return List(quantity) { createTransactionUiModel() }
         }
 
         private fun randomTransaction(): TransactionTest {

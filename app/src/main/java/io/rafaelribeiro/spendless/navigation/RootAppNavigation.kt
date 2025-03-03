@@ -17,6 +17,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.navOptions
+import io.rafaelribeiro.spendless.presentation.screens.dashboard.DashboardActionEvent
 import io.rafaelribeiro.spendless.presentation.screens.dashboard.DashboardScreen
 import io.rafaelribeiro.spendless.presentation.screens.dashboard.DashboardViewModel
 import io.rafaelribeiro.spendless.presentation.screens.login.LoginActionEvent
@@ -29,6 +30,9 @@ import io.rafaelribeiro.spendless.presentation.screens.registration.Registration
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationPreferencesRootScreen
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationUsernameRootScreen
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationViewModel
+import io.rafaelribeiro.spendless.presentation.screens.transactions.TransactionsActionEvent
+import io.rafaelribeiro.spendless.presentation.screens.transactions.TransactionsRootScreen
+import io.rafaelribeiro.spendless.presentation.screens.transactions.TransactionsViewModel
 import kotlinx.coroutines.flow.Flow
 
 @Composable
@@ -170,10 +174,37 @@ fun RootAppNavigation(
         composable(route = Screen.DashboardScreen.route) {
             val viewModel = hiltViewModel<DashboardViewModel>()
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            ObserveAsEvents(flow = viewModel.actionEvents) { event ->
+                when (event) {
+                    is DashboardActionEvent.ShowAllTransactions -> {
+                        navigationState.navigateTo(Screen.TransactionsScreen.route)
+                    }
+                    is DashboardActionEvent.AddTransaction -> {
+                        // TODO: Navigate to add transaction screen.
+                    }
+                }
+            }
             DashboardScreen(
                 modifier = modifier,
                 uiState = uiState,
                 onEvent = viewModel::onEvent,
+            )
+        }
+        composable(route = Screen.TransactionsScreen.route) {
+            val viewModel = hiltViewModel<TransactionsViewModel>()
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            ObserveAsEvents(flow = viewModel.actionEvents) { event ->
+                when (event) {
+                    is TransactionsActionEvent.NavigateToAddTransaction -> {
+                        // TODO: Navigate to add transaction screen.
+                    }
+                }
+            }
+            TransactionsRootScreen(
+                modifier = modifier,
+                uiState = uiState,
+                onEvent = viewModel::onEvent,
+                navigationState = navigationState,
             )
         }
 	}
