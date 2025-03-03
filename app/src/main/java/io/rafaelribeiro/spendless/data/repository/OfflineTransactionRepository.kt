@@ -19,7 +19,7 @@ class OfflineTransactionRepository @Inject constructor(
     }
 
     override fun getAllTransactions(): Flow<List<Transaction>> {
-        return transactionDao.getLatestTransactions().map { it.toTransactions() }
+        return transactionDao.getAllTransactions().map { it.toTransactions() }
     }
 
     override fun getLatestTransactions(): Flow<List<Transaction>> {
