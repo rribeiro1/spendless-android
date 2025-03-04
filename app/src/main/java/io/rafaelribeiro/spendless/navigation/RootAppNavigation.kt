@@ -197,7 +197,7 @@ fun RootAppNavigation(
             route = Screen.SettingsFlow.route,
         ) {
             composable(route = Screen.SettingsScreen.route) { entry ->
-                val viewModel = entry.sharedViewModel<SettingsViewModel>(navigationState.navHostController)
+                val viewModel = hiltViewModel<SettingsViewModel>()
 //                val uiState by viewModel.uiState.collectAsStateWithLifecycle()
                 ObserveAsEvents(flow = viewModel.actionEvents) { event ->
                     when (event) {
@@ -220,7 +220,7 @@ fun RootAppNavigation(
                 )
             }
             composable(route = Screen.SettingsPreferences.route) { entry ->
-                val viewModel = entry.sharedViewModel<SettingsViewModel>(navigationState.navHostController)
+                val viewModel = hiltViewModel<SettingsViewModel>()
 //                val uiState by viewModel.uiState.collectAsStateWithLifecycle()
                 SettingsPreferencesScreen(
                     modifier = modifier,

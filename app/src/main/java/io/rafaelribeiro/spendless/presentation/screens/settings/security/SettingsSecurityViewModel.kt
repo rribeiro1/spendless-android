@@ -9,12 +9,13 @@ import io.rafaelribeiro.spendless.domain.SessionExpiryDuration
 import io.rafaelribeiro.spendless.domain.UserPreferencesRepository
 import io.rafaelribeiro.spendless.presentation.screens.settings.SettingsSecurityUiEvent
 import io.rafaelribeiro.spendless.presentation.screens.settings.SettingsUiState
-import io.rafaelribeiro.spendless.presentation.screens.settings.security.SettingsSecurityActionEvent.*
+import io.rafaelribeiro.spendless.presentation.screens.settings.security.SettingsSecurityActionEvent.OnBackClicked
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
@@ -32,7 +33,7 @@ class SettingsSecurityViewModel @Inject constructor(
 
     private val _uiState: MutableStateFlow<SettingsUiState> = MutableStateFlow(SettingsUiState())
     val uiState: StateFlow<SettingsUiState> = _uiState
-        .onStart { loadSettings() }
+        .onStart { subscribeToSecurityData() }
         .stateIn(
             viewModelScope,
             started = SharingStarted.WhileSubscribed(WAIT_UNTIL_NO_CONSUMERS_IN_MILLIS),
@@ -42,17 +43,26 @@ class SettingsSecurityViewModel @Inject constructor(
     private val _actionEvents = Channel<SettingsSecurityActionEvent>()
     val actionEvents = _actionEvents.receiveAsFlow()
 
-    private fun loadSettings() {
-        viewModelScope.launch {
-            val securityPreferences = userPreferencesRepository.securityPreferences.first()
-            val sessionExpiryDuration = securityPreferences.sessionExpiryDuration
-            val lockedOutDuration = securityPreferences.lockedOutDuration
-            updateState {
-                it.copy(
-                    sessionExpiryDuration = SessionExpiryDuration.fromValue(sessionExpiryDuration),
-                    lockoutDuration = LockoutDuration.fromValue(lockedOutDuration)
-                )
-            }
+    private val securityPreferences = userPreferencesRepository
+        .securityPreferences
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(WAIT_UNTIL_NO_CONSUMERS_IN_MILLIS),
+            initialValue = SecurityPreferences()
+        )
+
+    private fun subscribeToSecurityData() {
+        securityPreferences
+            .onEach { updateSecuritySettings(it) }
+            .launchIn(viewModelScope)
+    }
+
+    private fun updateSecuritySettings(preferences: SecurityPreferences) {
+        updateState {
+            it.copy(
+                sessionExpiryDuration = SessionExpiryDuration.fromValue(preferences.sessionExpiryDuration),
+                lockoutDuration = LockoutDuration.fromValue(preferences.lockedOutDuration)
+            )
         }
     }
 
