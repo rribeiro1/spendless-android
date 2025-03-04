@@ -61,7 +61,7 @@ class DashboardViewModel @Inject constructor(
         when (event) {
             is DashboardUiEvent.AddTransactionClicked -> sendActionEvent(DashboardActionEvent.AddTransaction)
             is DashboardUiEvent.DownloadTransactionsClicked -> addTransaction() // TODO: Replace with download screen.
-            is DashboardUiEvent.SettingsClicked -> deleteAllTransactions() // TODO: Replace with settings screen.
+            is DashboardUiEvent.SettingsClicked -> sendActionEvent(DashboardActionEvent.OnSettingsClicked)
             is DashboardUiEvent.TransactionNoteClicked -> showTransactionNote(event.transactionId)
             is DashboardUiEvent.ShowAllTransactionsClicked -> sendActionEvent(DashboardActionEvent.ShowAllTransactions)
         }
@@ -132,6 +132,7 @@ class DashboardViewModel @Inject constructor(
 sealed interface DashboardActionEvent {
     data object ShowAllTransactions : DashboardActionEvent
     data object AddTransaction : DashboardActionEvent
+    data object OnSettingsClicked : DashboardActionEvent
 }
 
 sealed interface DashboardUiEvent {
