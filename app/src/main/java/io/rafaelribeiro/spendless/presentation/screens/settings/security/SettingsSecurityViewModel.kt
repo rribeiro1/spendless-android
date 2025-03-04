@@ -26,12 +26,16 @@ import javax.inject.Inject
 class SettingsSecurityViewModel @Inject constructor(
     private val userPreferencesRepository: UserPreferencesRepository,
 ) : ViewModel() {
+    companion object{
+        const val WAIT_UNTIL_NO_CONSUMERS_IN_MILLIS = 5000L
+    }
+
     private val _uiState: MutableStateFlow<SettingsUiState> = MutableStateFlow(SettingsUiState())
     val uiState: StateFlow<SettingsUiState> = _uiState
         .onStart { loadSettings() }
         .stateIn(
             viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
+            started = SharingStarted.WhileSubscribed(WAIT_UNTIL_NO_CONSUMERS_IN_MILLIS),
             initialValue = SettingsUiState()
         )
 
