@@ -40,7 +40,6 @@ class LoginViewModel @Inject constructor(
     private val initialUiState = LoginUiState(isLoading = true)
     private val _uiState: MutableStateFlow<LoginUiState> = MutableStateFlow(initialUiState)
     val uiState: StateFlow<LoginUiState> = _uiState
-        .onStart { loadData() }
         .stateIn(
             scope = viewModelScope,
             initialValue = initialUiState,
@@ -50,11 +49,6 @@ class LoginViewModel @Inject constructor(
     private val _actionEvents = Channel<LoginActionEvent>()
     val actionEvents = _actionEvents.receiveAsFlow()
 
-    private suspend fun loadData() {
-        val username = authRepository.userName.first()
-        _uiState.update { it.copy(username = username, isLoading = false) }
-    }
-
     fun onEvent(event: LoginUiEvent) {
         when (event) {
             is LoginUiEvent.UsernameChanged -> usernameChanged(event.username)
@@ -62,6 +56,8 @@ class LoginViewModel @Inject constructor(
             is LoginUiEvent.ActionButtonLoginClicked -> loginClicked()
             is LoginUiEvent.PinDigitTapped -> pinChanged(event.digit)
             is LoginUiEvent.PinBackspaceTapped -> backspacePinTapped()
+            is LoginUiEvent.UsernameFocusChanged -> updateUiState { it.copy(isUsernameFocused = event.isFocused) }
+            is LoginUiEvent.PinFocusChanged -> updateUiState { it.copy(isPinFocused = event.isFocused) }
         }
     }
 
@@ -174,4 +170,6 @@ sealed interface LoginUiEvent {
     data object ActionButtonLoginClicked : LoginUiEvent
     data class PinDigitTapped(val digit: String) : LoginUiEvent
     data object PinBackspaceTapped : LoginUiEvent
+    data class UsernameFocusChanged(val isFocused: Boolean) : LoginUiEvent
+    data class PinFocusChanged(val isFocused: Boolean) : LoginUiEvent
 }

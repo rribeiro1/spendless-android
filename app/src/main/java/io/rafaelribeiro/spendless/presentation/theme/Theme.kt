@@ -23,6 +23,7 @@ private val SpendLessColorScheme =
         surfaceVariant = Yellow, // Secondary Fixed in Figma.
         inversePrimary = PastelPurple,
         surfaceDim = VibrantYellowGreen, // Secondary Fixed Dim in Figma.
+        onSurfaceVariant = Charcoal,
 	/* Other default colors to override
 	background = Color(0xFFFFFBFE),
 	surface = Color(0xFFFFFBFE),

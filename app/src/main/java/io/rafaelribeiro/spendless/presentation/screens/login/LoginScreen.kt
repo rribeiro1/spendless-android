@@ -6,37 +6,27 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.capitalize
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -44,6 +34,7 @@ import androidx.navigation.navOptions
 import io.rafaelribeiro.spendless.R
 import io.rafaelribeiro.spendless.core.presentation.ErrorDialog
 import io.rafaelribeiro.spendless.core.presentation.SpendLessButton
+import io.rafaelribeiro.spendless.core.presentation.SpendLessTextField
 import io.rafaelribeiro.spendless.navigation.NavigationState
 import io.rafaelribeiro.spendless.navigation.Screen
 import io.rafaelribeiro.spendless.presentation.theme.SpendLessTheme
@@ -96,13 +87,15 @@ fun LoginScreen(
     onEvent: (LoginUiEvent) -> Unit,
     onNewAccountClick: () -> Unit = {},
 ) {
-    var passwordVisible by remember { mutableStateOf(false) }
-
+    val focusManager = LocalFocusManager.current
+    val focusRequester = remember { FocusRequester() }
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
             .background(MaterialTheme.colorScheme.background)
-            .padding(horizontal = 26.dp)
             .fillMaxSize(),
     ) {
         Image(
@@ -119,87 +112,52 @@ fun LoginScreen(
         )
         Text(
             text = stringResource(R.string.enter_details),
-            color = MaterialTheme.colorScheme.onSurface,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center,
+            maxLines = 1,
             modifier = Modifier.padding(bottom = 36.dp),
         )
-        OutlinedTextField(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp), // Add padding here,
-            value = uiState.username,
-            onValueChange = {
-                onEvent(LoginUiEvent.UsernameChanged(it))
-            },
-            textStyle = MaterialTheme.typography.bodyMedium.copy(
-                textAlign = TextAlign.Start,
-                fontWeight = FontWeight.Normal,
+        SpendLessTextField(
+            text = uiState.username,
+            textPlaceholder = stringResource(R.string.username_placeholder),
+            onValueChange = { onEvent(LoginUiEvent.UsernameChanged(it)) },
+            isFocused = uiState.isUsernameFocused,
+            onFocusChange = { onEvent(LoginUiEvent.UsernameFocusChanged(it)) },
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Text,
+                imeAction = ImeAction.Next,
             ),
-            singleLine = true,
-            shape = RoundedCornerShape(16.dp),
-            placeholder = {
-                Box(
-                    modifier = Modifier,
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Text(
-                        text = stringResource(R.string.username_placeholder).capitalize(Locale.current),
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Normal,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
-                    )
-                }
-            },
+            keyboardActions = KeyboardActions(
+                onNext = { focusManager.moveFocus(FocusDirection.Down) },
+            ),
+            focusRequester = focusRequester,
+            modifier = Modifier.padding(bottom = 16.dp),
         )
-        OutlinedTextField(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp), // Add padding here,
-            value = uiState.pin,
-            onValueChange = {
-                onEvent(LoginUiEvent.PinChanged(it))
-            },
-            textStyle = MaterialTheme.typography.bodyMedium.copy(
-                textAlign = TextAlign.Start,
-                fontWeight = FontWeight.Normal,
+        SpendLessTextField(
+            text = uiState.pin,
+            textPlaceholder = stringResource(R.string.pin_placeholder),
+            onValueChange = { onEvent(LoginUiEvent.PinChanged(it)) },
+            isFocused = uiState.isPinFocused,
+            onFocusChange = { onEvent(LoginUiEvent.PinFocusChanged(it)) },
+            isPassword = true,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Done,
             ),
-            singleLine = true,
-            shape = RoundedCornerShape(16.dp),
-            placeholder = {
-                Box(
-                    modifier = Modifier,
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Text(
-                        text = stringResource(R.string.pin).uppercase(),
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Normal,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
-                    )
-                }
-            },
-            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
-            trailingIcon = {
-                val image = if (passwordVisible)
-                    Icons.Filled.Visibility
-                else Icons.Filled.VisibilityOff
-
-                val description = if (passwordVisible) R.string.hide_password else R.string.show_password
-
-                IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                    Icon(imageVector = image, contentDescription =  stringResource(description))
-                }
-            }
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    focusManager.clearFocus()
+                    onEvent(LoginUiEvent.ActionButtonLoginClicked)
+                },
+            ),
+            modifier = Modifier.padding(bottom = 24.dp),
         )
         SpendLessButton(
             text = stringResource(R.string.login),
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(horizontal = 16.dp),
             enabled = uiState.loginButtonEnabled,
-            onClick = {
-                onEvent(LoginUiEvent.ActionButtonLoginClicked)
-            }
+            onClick = { onEvent(LoginUiEvent.ActionButtonLoginClicked) }
         )
         Text(
             text = stringResource(R.string.new_to_spendless),
@@ -207,7 +165,7 @@ fun LoginScreen(
             style = MaterialTheme.typography.titleMedium,
             textAlign = TextAlign.Center,
             modifier = Modifier
-                .padding(top = 28.dp)
+                .padding(top = 40.dp)
                 .clickable(onClick = onNewAccountClick),
         )
     }
