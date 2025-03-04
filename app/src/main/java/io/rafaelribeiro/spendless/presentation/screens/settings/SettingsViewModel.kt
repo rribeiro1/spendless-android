@@ -52,9 +52,3 @@ sealed interface SettingsUiEvent {
     data object LogoutClicked: SettingsUiEvent
     data object BackClicked: SettingsUiEvent
 }
-
-sealed interface SettingsSecurityUiEvent {
-    data object SaveClicked : SettingsSecurityUiEvent
-    data class SessionExpiryDurationSelected(val duration: SessionExpiryDuration) : SettingsSecurityUiEvent
-    data class LockedOutDurationSelected(val duration: LockoutDuration) : SettingsSecurityUiEvent
-}

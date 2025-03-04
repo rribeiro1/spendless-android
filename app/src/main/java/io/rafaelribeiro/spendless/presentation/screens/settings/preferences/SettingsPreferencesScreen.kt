@@ -1,6 +1,7 @@
-package io.rafaelribeiro.spendless.presentation.screens.settings
+package io.rafaelribeiro.spendless.presentation.screens.settings.preferences
 
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -14,16 +15,26 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import io.rafaelribeiro.spendless.R
+import io.rafaelribeiro.spendless.core.presentation.PreferencesScreen
 import io.rafaelribeiro.spendless.navigation.NavigationState
+import io.rafaelribeiro.spendless.navigation.rememberNavigationState
+import io.rafaelribeiro.spendless.presentation.screens.registration.PreferencesUiEvent
+import io.rafaelribeiro.spendless.presentation.screens.settings.SettingsUiState
+import io.rafaelribeiro.spendless.presentation.theme.SpendLessTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsPreferencesScreen(
     modifier: Modifier,
     navigationState: NavigationState,
+    uiState: SettingsUiState,
+    onEvent: (PreferencesUiEvent) -> Unit,
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -44,10 +55,34 @@ fun SettingsPreferencesScreen(
             )
         },
     ) { innerPadding ->
-
-        Box(modifier = Modifier.padding(innerPadding)){
-
+        Column (
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = modifier
+                .background(MaterialTheme.colorScheme.background)
+                .padding(innerPadding)
+                .padding(horizontal = 16.dp)
+                .fillMaxSize()
+        ) {
+            PreferencesScreen(
+                uiState = uiState.preferences,
+                onEvent = onEvent,
+                buttonText = stringResource(R.string.save),
+            )
         }
     }
 
+}
+
+
+@Preview
+@Composable
+fun SettingsPreferencesScreenPreview() {
+    SpendLessTheme {
+        SettingsPreferencesScreen(
+            modifier = Modifier,
+            navigationState = rememberNavigationState(),
+            uiState = SettingsUiState(),
+            onEvent = {},
+        )
+    }
 }

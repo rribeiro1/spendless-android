@@ -24,7 +24,6 @@ import io.rafaelribeiro.spendless.domain.LockoutDuration
 import io.rafaelribeiro.spendless.domain.SessionExpiryDuration
 import io.rafaelribeiro.spendless.navigation.NavigationState
 import io.rafaelribeiro.spendless.presentation.screens.registration.components.SpendLessSegmentedButton
-import io.rafaelribeiro.spendless.presentation.screens.settings.SettingsSecurityUiEvent
 import io.rafaelribeiro.spendless.presentation.screens.settings.SettingsUiState
 
 @OptIn(ExperimentalMaterial3Api::class)

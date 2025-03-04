@@ -7,7 +7,6 @@ import io.rafaelribeiro.spendless.data.repository.SecurityPreferences
 import io.rafaelribeiro.spendless.domain.LockoutDuration
 import io.rafaelribeiro.spendless.domain.SessionExpiryDuration
 import io.rafaelribeiro.spendless.domain.UserPreferencesRepository
-import io.rafaelribeiro.spendless.presentation.screens.settings.SettingsSecurityUiEvent
 import io.rafaelribeiro.spendless.presentation.screens.settings.SettingsUiState
 import io.rafaelribeiro.spendless.presentation.screens.settings.security.SettingsSecurityActionEvent.OnBackClicked
 import kotlinx.coroutines.channels.Channel
@@ -33,7 +32,7 @@ class SettingsSecurityViewModel @Inject constructor(
 
     private val _uiState: MutableStateFlow<SettingsUiState> = MutableStateFlow(SettingsUiState())
     val uiState: StateFlow<SettingsUiState> = _uiState
-        .onStart { subscribeToSecurityData() }
+        .onStart { subscribeToSecurityPreferences() }
         .stateIn(
             viewModelScope,
             started = SharingStarted.WhileSubscribed(WAIT_UNTIL_NO_CONSUMERS_IN_MILLIS),
@@ -43,54 +42,12 @@ class SettingsSecurityViewModel @Inject constructor(
     private val _actionEvents = Channel<SettingsSecurityActionEvent>()
     val actionEvents = _actionEvents.receiveAsFlow()
 
-    private val securityPreferences = userPreferencesRepository
-        .securityPreferences
+    private val securityPreferences = userPreferencesRepository.securityPreferences
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(WAIT_UNTIL_NO_CONSUMERS_IN_MILLIS),
             initialValue = SecurityPreferences()
         )
-
-    private fun subscribeToSecurityData() {
-        securityPreferences
-            .onEach { updateSecuritySettings(it) }
-            .launchIn(viewModelScope)
-    }
-
-    private fun updateSecuritySettings(preferences: SecurityPreferences) {
-        updateState {
-            it.copy(
-                sessionExpiryDuration = SessionExpiryDuration.fromValue(preferences.sessionExpiryDuration),
-                lockoutDuration = LockoutDuration.fromValue(preferences.lockedOutDuration)
-            )
-        }
-    }
-
-    fun onSecurityEvent(event: SettingsSecurityUiEvent) {
-        when (event) {
-            is SettingsSecurityUiEvent.SessionExpiryDurationSelected -> {
-                updateState { it.copy(sessionExpiryDuration = event.duration) }
-            }
-            is SettingsSecurityUiEvent.LockedOutDurationSelected -> {
-                updateState { it.copy(lockoutDuration = event.duration) }
-            }
-            is SettingsSecurityUiEvent.SaveClicked -> {
-                saveSecurityPreferences()
-                sendActionEvent(OnBackClicked)
-            }
-        }
-    }
-
-    private fun saveSecurityPreferences() {
-        viewModelScope.launch {
-            userPreferencesRepository.saveSecurityPreferences(
-                SecurityPreferences(
-                    sessionExpiryDuration = _uiState.value.sessionExpiryDuration.value,
-                    lockedOutDuration = _uiState.value.lockoutDuration.value
-                )
-            )
-        }
-    }
 
     private fun sendActionEvent(event: SettingsSecurityActionEvent) {
         viewModelScope.launch {
@@ -106,8 +63,56 @@ class SettingsSecurityViewModel @Inject constructor(
         super.onCleared()
         _uiState.update { SettingsUiState() }
     }
+
+
+    private fun subscribeToSecurityPreferences() {
+        securityPreferences
+            .onEach { updateUiState(it) }
+            .launchIn(viewModelScope)
+    }
+
+    private fun updateUiState(preferences: SecurityPreferences) {
+        updateState {
+            it.copy(
+                sessionExpiryDuration = SessionExpiryDuration.fromValue(preferences.sessionExpiryDuration),
+                lockoutDuration = LockoutDuration.fromValue(preferences.lockedOutDuration)
+            )
+        }
+    }
+
+    private fun saveSecurityPreferencesToDataStore() {
+        viewModelScope.launch {
+            val securityPreferences = SecurityPreferences(
+                sessionExpiryDuration = _uiState.value.sessionExpiryDuration.value,
+                lockedOutDuration = _uiState.value.lockoutDuration.value
+            )
+            userPreferencesRepository.saveSecurityPreferences(securityPreferences)
+        }
+    }
+
+    fun onSecurityEvent(event: SettingsSecurityUiEvent) {
+        when (event) {
+            is SettingsSecurityUiEvent.SessionExpiryDurationSelected -> {
+                updateState { it.copy(sessionExpiryDuration = event.duration) }
+            }
+            is SettingsSecurityUiEvent.LockedOutDurationSelected -> {
+                updateState { it.copy(lockoutDuration = event.duration) }
+            }
+            is SettingsSecurityUiEvent.SaveClicked -> {
+                saveSecurityPreferencesToDataStore()
+                sendActionEvent(OnBackClicked)
+            }
+        }
+    }
 }
 
 sealed interface SettingsSecurityActionEvent {
     data object OnBackClicked : SettingsSecurityActionEvent
+}
+
+
+sealed interface SettingsSecurityUiEvent {
+    data object SaveClicked : SettingsSecurityUiEvent
+    data class SessionExpiryDurationSelected(val duration: SessionExpiryDuration) : SettingsSecurityUiEvent
+    data class LockedOutDurationSelected(val duration: LockoutDuration) : SettingsSecurityUiEvent
 }

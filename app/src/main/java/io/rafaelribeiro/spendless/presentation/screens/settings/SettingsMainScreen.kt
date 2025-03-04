@@ -62,7 +62,7 @@ fun SettingsRootScreen(
             )
         },
     ) { innerPadding ->
-        SettingsScreen(
+        SettingsMainScreen(
             modifier = Modifier.padding(innerPadding),
             onEvent = onEvent,
         )
@@ -71,7 +71,7 @@ fun SettingsRootScreen(
 }
 
 @Composable
-fun SettingsScreen(
+fun SettingsMainScreen(
     modifier: Modifier,
     onEvent: (SettingsUiEvent) -> Unit = {}
 ) {

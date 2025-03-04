@@ -15,6 +15,7 @@ import io.rafaelribeiro.spendless.domain.ExpenseFormatter
 import io.rafaelribeiro.spendless.domain.Result
 import io.rafaelribeiro.spendless.domain.ThousandSeparator
 import io.rafaelribeiro.spendless.domain.UserPreferencesRepository
+import io.rafaelribeiro.spendless.presentation.screens.settings.preferences.PreferencesUiState
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -54,23 +55,23 @@ class RegistrationViewModel @Inject constructor(
 			is RegistrationUiEvent.PinConfirmationDigitTapped -> pinConfirmationChanged(event.digit)
 			is RegistrationUiEvent.PinConfirmationBackspaceTapped -> backspaceConfirmationPinTapped()
 			is RegistrationUiEvent.ResetPinValues -> resetPinValues()
-			is RegistrationUiEvent.ExpensesFormatSelected -> {
+			is PreferencesUiEvent.ExpensesFormatSelected -> {
 				updatePreferencesState { it.copy(expensesFormat = event.expensesFormat) }
                 formatExampleExpense()
 			}
-			is RegistrationUiEvent.DecimalSeparatorSelected -> {
+			is PreferencesUiEvent.DecimalSeparatorSelected -> {
 				updatePreferencesState { it.copy(decimalSeparator = event.decimalSeparator) }
                 formatExampleExpense()
 			}
-			is RegistrationUiEvent.ThousandSeparatorSelected -> {
+			is PreferencesUiEvent.ThousandSeparatorSelected -> {
 				updatePreferencesState { it.copy(thousandSeparator = event.thousandSeparator) }
                 formatExampleExpense()
 			}
-            is RegistrationUiEvent.CurrencySelected -> {
+            is PreferencesUiEvent.CurrencySelected -> {
                 updatePreferencesState { it.copy(currencySymbol = event.currency) }
                 formatExampleExpense()
             }
-            is RegistrationUiEvent.StartTrackingButtonTapped -> {
+            is PreferencesUiEvent.ButtonClicked -> {
                 registerUser()
                 saveUserPreferences()
                 sendActionEvent(RegistrationActionEvent.UserPreferencesSaved)
@@ -114,14 +115,14 @@ class RegistrationViewModel @Inject constructor(
     private fun isSameSeparator() = _uiState.value.preferences.thousandSeparator.name == _uiState.value.preferences.decimalSeparator.name
 
     private fun enableStartTrackingButton(enabled: Boolean) {
-        updatePreferencesState { it.copy(startTrackingButtonEnabled = enabled) }
+        updatePreferencesState { it.copy(buttonEnabled = enabled) }
     }
 
 	private fun updateState(state: (RegistrationUiState) -> RegistrationUiState) {
 		_uiState.update { state(it) }
 	}
 
-    private fun updatePreferencesState(state: (RegistrationPreferencesUiState) -> RegistrationPreferencesUiState) {
+    private fun updatePreferencesState(state: (PreferencesUiState) -> PreferencesUiState) {
         updateState { it.copy(preferences = state(it.preferences)) }
     }
 
@@ -232,9 +233,12 @@ sealed interface RegistrationUiEvent {
 	data object PinConfirmationBackspaceTapped : RegistrationUiEvent
 	data object ResetPinValues : RegistrationUiEvent
 
-	data class ExpensesFormatSelected(val expensesFormat: ExpenseFormat) : RegistrationUiEvent
-	data class DecimalSeparatorSelected(val decimalSeparator: DecimalSeparator) : RegistrationUiEvent
-	data class ThousandSeparatorSelected(val thousandSeparator: ThousandSeparator) : RegistrationUiEvent
-    data class CurrencySelected(val currency: CurrencySymbol) : RegistrationUiEvent
-    data object StartTrackingButtonTapped : RegistrationUiEvent
+}
+
+sealed interface PreferencesUiEvent: RegistrationUiEvent {
+    data object ButtonClicked : PreferencesUiEvent
+    data class ExpensesFormatSelected(val expensesFormat: ExpenseFormat) : PreferencesUiEvent
+    data class DecimalSeparatorSelected(val decimalSeparator: DecimalSeparator) : PreferencesUiEvent
+    data class ThousandSeparatorSelected(val thousandSeparator: ThousandSeparator) : PreferencesUiEvent
+    data class CurrencySelected(val currency: CurrencySymbol) : PreferencesUiEvent
 }

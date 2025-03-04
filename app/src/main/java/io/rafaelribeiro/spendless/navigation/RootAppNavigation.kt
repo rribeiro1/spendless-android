@@ -31,10 +31,12 @@ import io.rafaelribeiro.spendless.presentation.screens.registration.Registration
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationUsernameRootScreen
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationViewModel
 import io.rafaelribeiro.spendless.presentation.screens.settings.SettingsActionEvent
-import io.rafaelribeiro.spendless.presentation.screens.settings.SettingsPreferencesScreen
+import io.rafaelribeiro.spendless.presentation.screens.settings.preferences.SettingsPreferencesScreen
 import io.rafaelribeiro.spendless.presentation.screens.settings.SettingsRootScreen
 import io.rafaelribeiro.spendless.presentation.screens.settings.security.SettingsSecurityScreen
 import io.rafaelribeiro.spendless.presentation.screens.settings.SettingsViewModel
+import io.rafaelribeiro.spendless.presentation.screens.settings.preferences.SettingsPreferencesActionEvent
+import io.rafaelribeiro.spendless.presentation.screens.settings.preferences.SettingsPreferencesViewModel
 import io.rafaelribeiro.spendless.presentation.screens.settings.security.SettingsSecurityActionEvent
 import io.rafaelribeiro.spendless.presentation.screens.settings.security.SettingsSecurityViewModel
 import kotlinx.coroutines.flow.Flow
@@ -193,12 +195,11 @@ fun RootAppNavigation(
         }
 
         navigation(
-            startDestination = Screen.SettingsScreen.route,
+            startDestination = Screen.SettingsMainScreen.route,
             route = Screen.SettingsFlow.route,
         ) {
-            composable(route = Screen.SettingsScreen.route) { entry ->
+            composable(route = Screen.SettingsMainScreen.route) {
                 val viewModel = hiltViewModel<SettingsViewModel>()
-//                val uiState by viewModel.uiState.collectAsStateWithLifecycle()
                 ObserveAsEvents(flow = viewModel.actionEvents) { event ->
                     when (event) {
                         is SettingsActionEvent.OnBackClicked -> navigationState.popBackStack()
@@ -219,15 +220,22 @@ fun RootAppNavigation(
                     onEvent = viewModel::onEvent
                 )
             }
-            composable(route = Screen.SettingsPreferences.route) { entry ->
-                val viewModel = hiltViewModel<SettingsViewModel>()
-//                val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            composable(route = Screen.SettingsPreferences.route) {
+                val viewModel = hiltViewModel<SettingsPreferencesViewModel>()
+                val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+                ObserveAsEvents(flow = viewModel.actionEvents) { event ->
+                    when (event) {
+                        is SettingsPreferencesActionEvent.OnBackClicked -> navigationState.popBackStack()
+                    }
+                }
                 SettingsPreferencesScreen(
                     modifier = modifier,
                     navigationState = navigationState,
+                    uiState = uiState,
+                    onEvent = viewModel::onEvent,
                 )
             }
-            composable(route = Screen.SettingsSecurity.route) { entry ->
+            composable(route = Screen.SettingsSecurity.route) {
                 val viewModel = hiltViewModel<SettingsSecurityViewModel>()
                 val uiState by viewModel.uiState.collectAsStateWithLifecycle()
                 ObserveAsEvents(flow = viewModel.actionEvents) { event ->

@@ -50,13 +50,23 @@ fun <T>SpendLessDropDown(
     values: List<T> = emptyList(),
     getLeadingIcon: (T) -> String,
     getText: (T) -> String,
+    selectedValue: T? = null,
+    selectedPosition: Int? = null,
     onItemSelected: (T) -> Unit = {}
 ) {
     val isDropDownExpanded = remember { mutableStateOf(false) }
-    val itemPosition = remember { mutableIntStateOf(0) }
     val boxWidth = remember { mutableIntStateOf(0) }
     val density = LocalDensity.current
     val sharedScrollState = rememberScrollState()
+    val itemPosition = remember(selectedValue, selectedPosition) {
+        mutableIntStateOf(
+            when {
+                selectedValue != null -> values.indexOf(selectedValue).takeIf { it >= 0 } ?: 0
+                selectedPosition != null && selectedPosition in values.indices -> selectedPosition
+                else -> 0
+            }
+        )
+    }
 
     if (title != null) {
         Text(
