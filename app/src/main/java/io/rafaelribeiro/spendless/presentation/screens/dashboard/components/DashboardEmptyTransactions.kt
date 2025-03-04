@@ -1,4 +1,4 @@
-package io.rafaelribeiro.spendless.presentation.screens.dashboard
+package io.rafaelribeiro.spendless.presentation.screens.dashboard.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.sp
 import io.rafaelribeiro.spendless.presentation.theme.SpendLessTheme
 
 @Composable
-fun EmptyTransactionsScreen(modifier: Modifier) {
+fun DashboardEmptyTransactions(modifier: Modifier) {
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -44,7 +44,7 @@ fun EmptyTransactionsScreen(modifier: Modifier) {
 @Composable
 fun EmptyTransactionsScreenPreview() {
     SpendLessTheme {
-        EmptyTransactionsScreen(
+        DashboardEmptyTransactions(
             modifier = Modifier
                 .background(MaterialTheme.colorScheme.primary)
                 .padding(start = 8.dp, end = 8.dp, top = 8.dp)

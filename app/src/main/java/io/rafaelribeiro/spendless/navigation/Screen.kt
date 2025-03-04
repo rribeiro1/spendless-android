@@ -9,6 +9,7 @@ sealed class Screen(val route: String) {
 	data object LoginScreen : Screen(LOGIN_SCREEN)
     data object PinPromptScreen : Screen(PIN_PROMPT_SCREEN)
     data object DashboardScreen : Screen(DASHBOARD_SCREEN)
+    data object TransactionsScreen : Screen(TRANSACTIONS_SCREEN)
 
 	companion object {
 		private const val REGISTRATION_FLOW = "registration_flow"
@@ -19,5 +20,6 @@ sealed class Screen(val route: String) {
 		private const val LOGIN_SCREEN = "login_screen"
         private const val PIN_PROMPT_SCREEN = "pin_prompt_screen"
         private const val DASHBOARD_SCREEN = "dashboard_screen"
+        private const val TRANSACTIONS_SCREEN = "transactions_screen"
 	}
 }
