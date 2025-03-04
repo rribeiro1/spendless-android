@@ -1,7 +1,9 @@
 package io.rafaelribeiro.spendless.presentation.screens.settings
 
+import io.rafaelribeiro.spendless.domain.LockoutDuration
+import io.rafaelribeiro.spendless.domain.SessionExpiryDuration
+
 data class SettingsUiState(
-    val isLoading: Boolean = false,
-    val sessionExpiryDuration: SessionExpiryDuration = SessionExpiryDuration.MINUTES_15,
-    val lockoutDuration: LockoutDuration = LockoutDuration.SECONDS_15,
+    val sessionExpiryDuration: SessionExpiryDuration = SessionExpiryDuration.MINUTES_5,
+    val lockoutDuration: LockoutDuration = LockoutDuration.SECONDS_30,
 )

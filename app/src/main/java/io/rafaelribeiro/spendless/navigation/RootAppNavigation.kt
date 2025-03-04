@@ -33,8 +33,10 @@ import io.rafaelribeiro.spendless.presentation.screens.registration.Registration
 import io.rafaelribeiro.spendless.presentation.screens.settings.SettingsActionEvent
 import io.rafaelribeiro.spendless.presentation.screens.settings.SettingsPreferencesScreen
 import io.rafaelribeiro.spendless.presentation.screens.settings.SettingsRootScreen
-import io.rafaelribeiro.spendless.presentation.screens.settings.SettingsSecurityScreen
+import io.rafaelribeiro.spendless.presentation.screens.settings.security.SettingsSecurityScreen
 import io.rafaelribeiro.spendless.presentation.screens.settings.SettingsViewModel
+import io.rafaelribeiro.spendless.presentation.screens.settings.security.SettingsSecurityActionEvent
+import io.rafaelribeiro.spendless.presentation.screens.settings.security.SettingsSecurityViewModel
 import kotlinx.coroutines.flow.Flow
 
 @Composable
@@ -226,8 +228,13 @@ fun RootAppNavigation(
                 )
             }
             composable(route = Screen.SettingsSecurity.route) { entry ->
-                val viewModel = entry.sharedViewModel<SettingsViewModel>(navigationState.navHostController)
+                val viewModel = hiltViewModel<SettingsSecurityViewModel>()
                 val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+                ObserveAsEvents(flow = viewModel.actionEvents) { event ->
+                    when (event) {
+                        is SettingsSecurityActionEvent.OnBackClicked -> navigationState.popBackStack()
+                    }
+                }
                 SettingsSecurityScreen(
                     modifier = modifier,
                     navigationState = navigationState,

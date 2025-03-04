@@ -18,7 +18,7 @@ class NavigationState(
     fun navigateAndClearBackStack(route: String) {
         navHostController.navigate(route) {
             launchSingleTop = true
-            popUpTo(navHostController.graph.startDestinationId) { inclusive = true }
+            popUpTo(0) { inclusive = true }
         }
     }
 
