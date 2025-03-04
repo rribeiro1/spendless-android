@@ -31,11 +31,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import io.rafaelribeiro.spendless.data.repository.TransactionCreator
+import io.rafaelribeiro.spendless.core.data.TransactionCreator
 import io.rafaelribeiro.spendless.domain.TransactionType.EXPENSE
 import io.rafaelribeiro.spendless.domain.TransactionType.INCOME
-import io.rafaelribeiro.spendless.presentation.screens.dashboard.DashboardUiEvent
-import io.rafaelribeiro.spendless.presentation.screens.dashboard.DashboardViewModel.Companion.toUiModel
 import io.rafaelribeiro.spendless.presentation.screens.dashboard.TransactionUiModel
 import io.rafaelribeiro.spendless.presentation.theme.LightOlive
 import io.rafaelribeiro.spendless.presentation.theme.SpendLessTheme
@@ -45,7 +43,7 @@ import io.rafaelribeiro.spendless.presentation.theme.Success
 fun DashboardTransactionItem(
     transaction: TransactionUiModel,
     modifier: Modifier,
-    onEvent: (DashboardUiEvent) -> Unit = {},
+    onShowTransactionNoteClicked: (Long) -> Unit = {}
 ) {
     Box(
         modifier = Modifier
@@ -123,7 +121,7 @@ fun DashboardTransactionItem(
                                 .clickable(
                                     interactionSource = remember { MutableInteractionSource() },
                                     indication = null
-                                ) { onEvent(DashboardUiEvent.TransactionNoteClicked(transaction.id)) },
+                                ) { onShowTransactionNoteClicked(transaction.id) },
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
@@ -187,7 +185,7 @@ fun DashboardTransactionItem(
 fun TransactionItemPreview() {
     SpendLessTheme {
         DashboardTransactionItem(
-            transaction = TransactionCreator.createTransaction().toUiModel(),
+            transaction = TransactionCreator.createTransactionUiModel(),
             modifier = Modifier.background(MaterialTheme.colorScheme.background)
         )
     }
@@ -203,11 +201,11 @@ fun TransactionSelectedItemPreview() {
                 .padding(top = 8.dp, bottom = 4.dp)
         ) {
             DashboardTransactionItem(
-                transaction = TransactionCreator.createTransaction().toUiModel(),
+                transaction = TransactionCreator.createTransactionUiModel(),
                 modifier = Modifier.background(MaterialTheme.colorScheme.background)
             )
             DashboardTransactionItem(
-                transaction = TransactionCreator.createTransaction().toUiModel().copy(
+                transaction = TransactionCreator.createTransactionUiModel().copy(
                     extended = true,
                     note = "This is a note attached to this transaction"
                 ),

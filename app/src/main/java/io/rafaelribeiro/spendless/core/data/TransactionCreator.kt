@@ -1,61 +1,48 @@
-package io.rafaelribeiro.spendless.data.repository
+package io.rafaelribeiro.spendless.core.data
 
+import io.rafaelribeiro.spendless.data.repository.UserPreferences
+import io.rafaelribeiro.spendless.domain.CurrencySymbol
+import io.rafaelribeiro.spendless.domain.DecimalSeparator
+import io.rafaelribeiro.spendless.domain.ExpenseFormat
+import io.rafaelribeiro.spendless.domain.ExpenseFormatter
+import io.rafaelribeiro.spendless.domain.ThousandSeparator
 import io.rafaelribeiro.spendless.domain.Transaction
 import io.rafaelribeiro.spendless.domain.TransactionCategory
-import io.rafaelribeiro.spendless.domain.TransactionRepository
+import io.rafaelribeiro.spendless.domain.TransactionFormatter
 import io.rafaelribeiro.spendless.domain.TransactionType
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import io.rafaelribeiro.spendless.domain.toUIModel
+import io.rafaelribeiro.spendless.presentation.screens.dashboard.TransactionUiModel
 import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId.systemDefault
+import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
-import javax.inject.Inject
+import java.util.Locale
 import kotlin.random.Random
-
-/**
- * Fake implementation of [TransactionRepository] to be used in tests.
- * Change DI's [TransactionRepository] implementation to this one to use it in tests for convenience.
- */
-class FakeTransactionRepository @Inject constructor() : TransactionRepository {
-    override fun getBalance(): Flow<Double?> {
-        return flow {
-            emit(1000.toDouble())
-        }
-    }
-
-    override fun getLatestTransactions(): Flow<List<Transaction>> {
-        return flow {
-            emit(TransactionCreator.createTransactions(10))
-        }
-    }
-
-    override fun getTotalAmountLastWeek(): Flow<Double?> {
-        return flow {
-            emit(10000.toDouble())
-        }
-    }
-
-    override fun getBiggestTransaction(): Flow<Transaction?> {
-        return flow {
-            emit(TransactionCreator.createTransaction())
-        }
-    }
-
-    override fun getMostPopularCategory(): Flow<TransactionCategory?> {
-        return flow {
-            emit(TransactionCategory.FOOD)
-        }
-    }
-
-    override suspend fun saveTransaction(transaction: Transaction) {}
-
-    override suspend fun deleteAllTransactions() {}
-}
 
 /**
  * Helper class to create transactions for tests.
  */
 class TransactionCreator {
     companion object {
+        private val testTransactionFormatter: TransactionFormatter = object : TransactionFormatter {
+            override fun formatAmount(amount: Double, preferences: UserPreferences): String {
+                val formatter = ExpenseFormatter(
+                    thousandSeparator = ThousandSeparator.DOT,
+                    decimalSeparator = DecimalSeparator.COMMA,
+                    expensesFormat = ExpenseFormat.NEGATIVE,
+                    currencySymbol = CurrencySymbol.DOLLAR,
+                )
+                return formatter.format(amount)
+            }
+
+            override fun formatDateTime(timestamp: Long): String {
+                val instant = Instant.ofEpochMilli(timestamp)
+                val formatter = DateTimeFormatter.ofPattern("MMM d, yyyy", Locale.ENGLISH)
+                return LocalDateTime.ofInstant(instant, systemDefault()).format(formatter)
+            }
+        }
+
         data class TransactionTest(
             val description: String,
             val category: TransactionCategory,
@@ -67,9 +54,7 @@ class TransactionCreator {
         )
 
         fun createTransactions(quantity: Int): List<Transaction> {
-            return List(quantity) {
-                createTransaction()
-            }
+            return List(quantity) { createTransaction() }
         }
 
         fun createTransaction(): Transaction {
@@ -83,6 +68,14 @@ class TransactionCreator {
                 type = transaction.type,
                 createdAt = transaction.createdAt
             )
+        }
+
+        fun createTransactionUiModel(): TransactionUiModel {
+            return createTransaction().toUIModel(testTransactionFormatter, UserPreferences())
+        }
+
+        fun createTransactionUiModels(quantity: Int): List<TransactionUiModel> {
+            return List(quantity) { createTransactionUiModel() }
         }
 
         private fun randomTransaction(): TransactionTest {

@@ -30,6 +30,9 @@ import io.rafaelribeiro.spendless.presentation.screens.registration.Registration
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationPreferencesRootScreen
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationUsernameRootScreen
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationViewModel
+import io.rafaelribeiro.spendless.presentation.screens.transactions.TransactionsActionEvent
+import io.rafaelribeiro.spendless.presentation.screens.transactions.TransactionsRootScreen
+import io.rafaelribeiro.spendless.presentation.screens.transactions.TransactionsViewModel
 import io.rafaelribeiro.spendless.presentation.screens.settings.SettingsActionEvent
 import io.rafaelribeiro.spendless.presentation.screens.settings.preferences.SettingsPreferencesScreen
 import io.rafaelribeiro.spendless.presentation.screens.settings.SettingsRootScreen
@@ -182,6 +185,12 @@ fun RootAppNavigation(
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
             ObserveAsEvents(flow = viewModel.actionEvents) { event ->
                 when (event) {
+                    is DashboardActionEvent.ShowAllTransactions -> {
+                        navigationState.navigateTo(Screen.TransactionsScreen.route)
+                    }
+                    is DashboardActionEvent.AddTransaction -> {
+                        // TODO: Navigate to add transaction screen.
+                    }
                     is DashboardActionEvent.OnSettingsClicked -> {
                         navigationState.navigateTo(Screen.SettingsFlow.route)
                     }
@@ -191,6 +200,23 @@ fun RootAppNavigation(
                 modifier = modifier,
                 uiState = uiState,
                 onEvent = viewModel::onEvent,
+            )
+        }
+        composable(route = Screen.TransactionsScreen.route) {
+            val viewModel = hiltViewModel<TransactionsViewModel>()
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            ObserveAsEvents(flow = viewModel.actionEvents) { event ->
+                when (event) {
+                    is TransactionsActionEvent.NavigateToAddTransaction -> {
+                        // TODO: Navigate to add transaction screen.
+                    }
+                }
+            }
+            TransactionsRootScreen(
+                modifier = modifier,
+                uiState = uiState,
+                onEvent = viewModel::onEvent,
+                navigationState = navigationState,
             )
         }
 

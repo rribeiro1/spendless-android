@@ -70,6 +70,7 @@ private fun isFadeTransitionActive(initialState: NavBackStackEntry, targetState:
     fun isFadeScreen(route: String?): Boolean {
         return when (route) {
             Screen.LoginScreen.route -> true
+            Screen.TransactionsScreen.route -> true
             // Add more screens here as needed
             else -> false
         }

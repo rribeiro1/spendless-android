@@ -25,15 +25,15 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import io.rafaelribeiro.spendless.data.repository.TransactionCreator
+import io.rafaelribeiro.spendless.core.data.TransactionCreator
 import io.rafaelribeiro.spendless.domain.TransactionCategory
-import io.rafaelribeiro.spendless.presentation.screens.dashboard.DashboardViewModel.Companion.toUiModel
 import io.rafaelribeiro.spendless.presentation.screens.dashboard.components.DashboardBalance
+import io.rafaelribeiro.spendless.presentation.screens.dashboard.components.DashboardEmptyTransactions
 import io.rafaelribeiro.spendless.presentation.screens.dashboard.components.DashboardLargestTransaction
+import io.rafaelribeiro.spendless.presentation.screens.dashboard.components.DashboardLatestTransactions
 import io.rafaelribeiro.spendless.presentation.screens.dashboard.components.DashboardMostPopularCategory
 import io.rafaelribeiro.spendless.presentation.screens.dashboard.components.DashboardPreviousWeek
 import io.rafaelribeiro.spendless.presentation.screens.dashboard.components.DashboardTopBar
-import io.rafaelribeiro.spendless.presentation.screens.dashboard.components.LatestTransactions
 import io.rafaelribeiro.spendless.presentation.theme.SpendLessTheme
 
 @Composable
@@ -149,13 +149,13 @@ fun DashboardLatestTransactionsScreen(
     onEvent: (DashboardUiEvent) -> Unit = {}
 ) {
     if (groupedTransactions.isNotEmpty()) {
-        LatestTransactions(
+        DashboardLatestTransactions(
             groupedTransactions = groupedTransactions,
             onEvent = onEvent,
             modifier = modifier
         )
     } else {
-        EmptyTransactionsScreen(modifier = modifier)
+        DashboardEmptyTransactions(modifier = modifier)
     }
 }
 
@@ -189,22 +189,21 @@ fun DashboardScreenPreview() {
                 latestTransactions = listOf(
                     GroupedTransactions(
                         dateHeader = "Today",
-                        transactions = TransactionCreator.createTransactions(3).map { it.toUiModel() }
+                        transactions = TransactionCreator.createTransactionUiModels(quantity = 5)
                     ),
                     GroupedTransactions(
                         dateHeader = "Yesterday",
-                        transactions = TransactionCreator.createTransactions(2).map { it.toUiModel() }
+                        transactions = TransactionCreator.createTransactionUiModels(quantity = 2)
                     ),
                     GroupedTransactions(
                         dateHeader = "01 Jan 2022",
-                        transactions = TransactionCreator.createTransactions(1).map { it.toUiModel() }
+                        transactions = TransactionCreator.createTransactionUiModels(quantity = 1)
                     ),
                 ),
-                largestTransaction = TransactionCreator.createTransaction().toUiModel(),
+                largestTransaction = TransactionCreator.createTransactionUiModel(),
                 mostPopularCategory = TransactionCategory.FOOD
             ),
             onEvent = {}
         )
     }
 }
-
