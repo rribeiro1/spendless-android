@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.rafaelribeiro.spendless.core.presentation.combine
 import io.rafaelribeiro.spendless.data.repository.DefaultTransactionFormatter
-import io.rafaelribeiro.spendless.data.repository.TransactionCreator
+import io.rafaelribeiro.spendless.core.data.TransactionCreator
 import io.rafaelribeiro.spendless.data.repository.UserPreferences
 import io.rafaelribeiro.spendless.domain.AuthRepository
 import io.rafaelribeiro.spendless.domain.TransactionRepository

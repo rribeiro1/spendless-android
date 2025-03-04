@@ -16,7 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import io.rafaelribeiro.spendless.data.repository.TransactionCreator
+import io.rafaelribeiro.spendless.core.data.TransactionCreator
 import io.rafaelribeiro.spendless.presentation.screens.dashboard.GroupedTransactions
 import io.rafaelribeiro.spendless.presentation.screens.dashboard.components.DashboardTransactionItem
 import io.rafaelribeiro.spendless.presentation.theme.SpendLessTheme

@@ -1,6 +1,5 @@
 package io.rafaelribeiro.spendless.presentation.screens.transactions
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -22,7 +21,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.rafaelribeiro.spendless.R
 import io.rafaelribeiro.spendless.core.presentation.SpendLessGroupedTransactions
-import io.rafaelribeiro.spendless.data.repository.TransactionCreator
+import io.rafaelribeiro.spendless.core.data.TransactionCreator
 import io.rafaelribeiro.spendless.navigation.NavigationState
 import io.rafaelribeiro.spendless.presentation.screens.dashboard.GroupedTransactions
 import io.rafaelribeiro.spendless.presentation.theme.SpendLessTheme
@@ -34,15 +33,11 @@ fun TransactionsRootScreen(
     onEvent: (TransactionsUiEvent) -> Unit,
     navigationState: NavigationState
 ) {
-    fun onBackPress() {
-        navigationState.popBackStack()
-    }
-    BackHandler(onBack = ::onBackPress)
     TransactionsScreen(
         uiState = uiState,
         onEvent = onEvent,
         modifier = modifier,
-        onBackPress = { onBackPress() }
+        onBackPress = { navigationState.popBackStack() }
     )
 }
 
