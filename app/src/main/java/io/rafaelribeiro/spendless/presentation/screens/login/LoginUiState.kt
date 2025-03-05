@@ -12,4 +12,6 @@ data class LoginUiState(
     val wrongPinCount: Int = 0,
     val pinPadEnabled: Boolean = true,
     val pinLockRemainingSeconds: Int = 0,
+    val isUsernameFocused: Boolean = false,
+    val isPinFocused: Boolean = false,
 )
