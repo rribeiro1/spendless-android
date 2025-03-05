@@ -3,8 +3,6 @@ package io.rafaelribeiro.spendless.presentation.screens.settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.rafaelribeiro.spendless.domain.LockoutDuration
-import io.rafaelribeiro.spendless.domain.SessionExpiryDuration
 import io.rafaelribeiro.spendless.presentation.screens.settings.SettingsActionEvent.OnBackClicked
 import io.rafaelribeiro.spendless.presentation.screens.settings.SettingsActionEvent.OnLogoutClicked
 import io.rafaelribeiro.spendless.presentation.screens.settings.SettingsActionEvent.OnPreferencesClicked

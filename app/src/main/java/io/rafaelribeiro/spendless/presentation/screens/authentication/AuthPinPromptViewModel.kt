@@ -69,7 +69,7 @@ class AuthPinPromptViewModel @Inject constructor(
             AuthPinUiState(
                 isLoading = false,
                 username = username,
-                totalPinLockDuration = securityPreferences.lockedOutDuration.toInt()/1000, //todo
+                totalPinLockDuration = securityPreferences.lockedOutDuration,
             )
         }
     }
