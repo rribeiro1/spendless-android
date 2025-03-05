@@ -17,6 +17,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.navOptions
+import io.rafaelribeiro.spendless.MainActionEvent
+import io.rafaelribeiro.spendless.MainViewModel
 import io.rafaelribeiro.spendless.presentation.screens.authentication.AuthPinActionEvent
 import io.rafaelribeiro.spendless.presentation.screens.authentication.AuthPinPromptScreen
 import io.rafaelribeiro.spendless.presentation.screens.authentication.AuthPinPromptViewModel
@@ -51,6 +53,12 @@ fun RootAppNavigation(
 	navigationState: NavigationState,
 	modifier: Modifier = Modifier,
 ) {
+    val mainViewModel = hiltViewModel<MainViewModel>()
+    ObserveAsEvents(flow = mainViewModel.actionEvents) { event ->
+        if (event == MainActionEvent.SessionExpired)
+            navigationState.triggerPinPromptScreen()
+    }
+
 	NavHost(
 		navController = navigationState.navHostController,
 		startDestination = Screen.RegistrationFlow.route,
