@@ -96,10 +96,6 @@ class SettingsPreferencesViewModel @Inject constructor(
         }
     }
 
-//    private fun updatePreferencesState(state: (PreferencesUiState) -> PreferencesUiState) {
-//        updateState { state(it) }
-//    }
-
     private fun formatExampleExpense() {
         val amount = -10382.45
         val formatter = ExpenseFormatter(

@@ -65,12 +65,12 @@ fun SettingsPreferencesScreen(
             PreferencesScreen(
                 onEvent = onEvent,
                 buttonText = stringResource(R.string.save),
+                buttonEnabled = uiState.buttonEnabled,
                 exampleExpenseFormat = uiState.exampleExpenseFormat,
                 expensesFormat = uiState.expensesFormat,
                 decimalSeparator = uiState.decimalSeparator,
                 thousandSeparator = uiState.thousandSeparator,
                 currencySymbol = uiState.currencySymbol,
-                buttonEnabled = uiState.buttonEnabled
             )
         }
     }
