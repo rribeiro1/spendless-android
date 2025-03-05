@@ -7,7 +7,6 @@ import io.rafaelribeiro.spendless.data.repository.SecurityPreferences
 import io.rafaelribeiro.spendless.domain.LockoutDuration
 import io.rafaelribeiro.spendless.domain.SessionExpiryDuration
 import io.rafaelribeiro.spendless.domain.UserPreferencesRepository
-import io.rafaelribeiro.spendless.presentation.screens.settings.SettingsUiState
 import io.rafaelribeiro.spendless.presentation.screens.settings.security.SettingsSecurityActionEvent.OnBackClicked
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,13 +29,13 @@ class SettingsSecurityViewModel @Inject constructor(
         const val WAIT_UNTIL_NO_CONSUMERS_IN_MILLIS = 5000L
     }
 
-    private val _uiState: MutableStateFlow<SettingsUiState> = MutableStateFlow(SettingsUiState())
-    val uiState: StateFlow<SettingsUiState> = _uiState
+    private val _uiState: MutableStateFlow<SecurityUiState> = MutableStateFlow(SecurityUiState())
+    val uiState: StateFlow<SecurityUiState> = _uiState
         .onStart { subscribeToSecurityPreferences() }
         .stateIn(
             viewModelScope,
             started = SharingStarted.WhileSubscribed(WAIT_UNTIL_NO_CONSUMERS_IN_MILLIS),
-            initialValue = SettingsUiState()
+            initialValue = SecurityUiState()
         )
 
     private val _actionEvents = Channel<SettingsSecurityActionEvent>()
@@ -55,13 +54,13 @@ class SettingsSecurityViewModel @Inject constructor(
         }
     }
 
-    private fun updateState(state: (SettingsUiState) -> SettingsUiState) {
+    private fun updateState(state: (SecurityUiState) -> SecurityUiState) {
         _uiState.update { state(it) }
     }
 
     override fun onCleared() {
         super.onCleared()
-        _uiState.update { SettingsUiState() }
+        _uiState.update { SecurityUiState() }
     }
 
 

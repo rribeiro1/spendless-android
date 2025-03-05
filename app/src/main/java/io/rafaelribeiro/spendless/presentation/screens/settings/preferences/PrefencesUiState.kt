@@ -5,12 +5,12 @@ import io.rafaelribeiro.spendless.domain.DecimalSeparator
 import io.rafaelribeiro.spendless.domain.ExpenseFormat
 import io.rafaelribeiro.spendless.domain.ThousandSeparator
 
-data class PreferencesUiState(
-    val exampleExpenseFormat: String,
-    val expensesFormat: ExpenseFormat,
-    val decimalSeparator: DecimalSeparator,
-    val thousandSeparator: ThousandSeparator,
-    val currencySymbol: CurrencySymbol,
+data class SettingsPreferencesUiState(
+    val exampleExpenseFormat: String = "-$10,382.45",
+    val expensesFormat: ExpenseFormat = ExpenseFormat.NEGATIVE,
+    val decimalSeparator: DecimalSeparator = DecimalSeparator.DOT,
+    val thousandSeparator: ThousandSeparator = ThousandSeparator.COMMA,
+    val currencySymbol: CurrencySymbol = CurrencySymbol.DOLLAR,
     val buttonEnabled: Boolean = true,
 )
 

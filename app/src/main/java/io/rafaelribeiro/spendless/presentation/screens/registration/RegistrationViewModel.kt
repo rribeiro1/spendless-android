@@ -15,7 +15,6 @@ import io.rafaelribeiro.spendless.domain.ExpenseFormatter
 import io.rafaelribeiro.spendless.domain.Result
 import io.rafaelribeiro.spendless.domain.ThousandSeparator
 import io.rafaelribeiro.spendless.domain.UserPreferencesRepository
-import io.rafaelribeiro.spendless.presentation.screens.settings.preferences.PreferencesUiState
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -122,7 +121,7 @@ class RegistrationViewModel @Inject constructor(
 		_uiState.update { state(it) }
 	}
 
-    private fun updatePreferencesState(state: (PreferencesUiState) -> PreferencesUiState) {
+    private fun updatePreferencesState(state: (RegistrationPreferencesUiState) -> RegistrationPreferencesUiState) {
         updateState { it.copy(preferences = state(it.preferences)) }
     }
 

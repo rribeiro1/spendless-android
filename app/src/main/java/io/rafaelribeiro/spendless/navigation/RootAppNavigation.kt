@@ -51,7 +51,7 @@ fun RootAppNavigation(
 ) {
 	NavHost(
 		navController = navigationState.navHostController,
-		startDestination = Screen.LoginScreen.route,
+		startDestination = Screen.RegistrationFlow.route,
 		enterTransition = enterTransition(),
 		exitTransition = exitTransition(),
 		popEnterTransition = popEnterTransition(),

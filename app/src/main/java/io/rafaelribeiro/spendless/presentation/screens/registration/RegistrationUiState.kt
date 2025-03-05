@@ -1,6 +1,5 @@
 package io.rafaelribeiro.spendless.presentation.screens.registration
 
-import io.rafaelribeiro.spendless.presentation.screens.settings.preferences.PreferencesUiState
 import io.rafaelribeiro.spendless.core.presentation.UiText
 import io.rafaelribeiro.spendless.core.presentation.UiText.Companion.Empty
 import io.rafaelribeiro.spendless.domain.CurrencySymbol
@@ -14,12 +13,14 @@ data class RegistrationUiState(
     val pin: String = "",
     val pinConfirmation: String = "",
     val nextButtonEnabled: Boolean = false,
-    val preferences: PreferencesUiState = PreferencesUiState(
-        exampleExpenseFormat = "-$10,382.45",
-        expensesFormat = ExpenseFormat.NEGATIVE,
-        decimalSeparator = DecimalSeparator.DOT,
-        thousandSeparator = ThousandSeparator.COMMA,
-        currencySymbol = CurrencySymbol.DOLLAR,
-    ),
+    val preferences: RegistrationPreferencesUiState = RegistrationPreferencesUiState(),
 )
 
+data class RegistrationPreferencesUiState(
+    val exampleExpenseFormat: String = "-$10,382.45",
+    val expensesFormat: ExpenseFormat = ExpenseFormat.NEGATIVE,
+    val decimalSeparator: DecimalSeparator = DecimalSeparator.DOT,
+    val thousandSeparator: ThousandSeparator = ThousandSeparator.COMMA,
+    val currencySymbol: CurrencySymbol = CurrencySymbol.DOLLAR,
+    val buttonEnabled: Boolean = true,
+)

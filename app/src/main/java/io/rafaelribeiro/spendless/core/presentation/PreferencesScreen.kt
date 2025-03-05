@@ -32,15 +32,19 @@ import io.rafaelribeiro.spendless.presentation.screens.registration.PreferencesU
 import io.rafaelribeiro.spendless.presentation.screens.registration.PreferencesUiEvent.ThousandSeparatorSelected
 import io.rafaelribeiro.spendless.presentation.screens.registration.components.SpendLessDropDown
 import io.rafaelribeiro.spendless.presentation.screens.registration.components.SpendLessSegmentedButton
-import io.rafaelribeiro.spendless.presentation.screens.settings.preferences.PreferencesUiState
 import io.rafaelribeiro.spendless.presentation.theme.SpendLessTheme
 
 
 @Composable
 fun PreferencesScreen(
-    uiState: PreferencesUiState,
     onEvent: (PreferencesUiEvent) -> Unit,
-    buttonText: String = stringResource(R.string.start_tracking),
+    buttonText: String,
+    exampleExpenseFormat: String,
+    expensesFormat: ExpenseFormat,
+    decimalSeparator: DecimalSeparator,
+    thousandSeparator: ThousandSeparator,
+    currencySymbol: CurrencySymbol,
+    buttonEnabled: Boolean = true,
 ) {
     Box(
         modifier = Modifier
@@ -62,7 +66,7 @@ fun PreferencesScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = uiState.exampleExpenseFormat,
+                text = exampleExpenseFormat,
                 style = MaterialTheme.typography.headlineLarge,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
@@ -81,7 +85,7 @@ fun PreferencesScreen(
     SpendLessSegmentedButton(
         title = stringResource(R.string.expenses_format),
         options = ExpenseFormat.entries.map { it.value },
-        selectedIndex = ExpenseFormat.entries.indexOf(uiState.expensesFormat),
+        selectedIndex = ExpenseFormat.entries.indexOf(expensesFormat),
         onOptionSelected = {
             onEvent(ExpensesFormatSelected(ExpenseFormat.entries[it]))
         }
@@ -93,12 +97,12 @@ fun PreferencesScreen(
         getText = { it.title },
         getLeadingIcon = { it.symbol },
         onItemSelected = { onEvent(CurrencySelected(it)) },
-        selectedValue = uiState.currencySymbol,
+        selectedValue = currencySymbol,
     )
     SpendLessSegmentedButton(
         title = stringResource(R.string.decimal_separator),
         options = DecimalSeparator.entries.map { it.value },
-        selectedIndex = DecimalSeparator.entries.indexOf(uiState.decimalSeparator),
+        selectedIndex = DecimalSeparator.entries.indexOf(decimalSeparator),
         onOptionSelected = {
             onEvent(DecimalSeparatorSelected(DecimalSeparator.entries[it]))
         }
@@ -106,7 +110,7 @@ fun PreferencesScreen(
     SpendLessSegmentedButton(
         title = stringResource(R.string.thousands_separator),
         options = ThousandSeparator.entries.map { it.value },
-        selectedIndex = ThousandSeparator.entries.indexOf(uiState.thousandSeparator),
+        selectedIndex = ThousandSeparator.entries.indexOf(thousandSeparator),
         onOptionSelected = {
             onEvent(ThousandSeparatorSelected(ThousandSeparator.entries[it]))
         }
@@ -114,7 +118,7 @@ fun PreferencesScreen(
     SpendLessButton(
         text = buttonText,
         modifier = Modifier.padding(top = 34.dp),
-        enabled = uiState.buttonEnabled,
+        enabled = buttonEnabled,
         onClick = {
             onEvent(ButtonClicked)
         },
@@ -125,16 +129,17 @@ fun PreferencesScreen(
 @Composable
 fun PreferencesScreenPreview() {
     SpendLessTheme {
-        Column (modifier = Modifier.padding(16.dp).fillMaxSize()) {
+        Column (modifier = Modifier
+            .padding(16.dp)
+            .fillMaxSize()) {
             PreferencesScreen(
-                uiState = PreferencesUiState(
-                    exampleExpenseFormat = "-$10,382.45",
-                    expensesFormat = ExpenseFormat.NEGATIVE,
-                    decimalSeparator = DecimalSeparator.DOT,
-                    thousandSeparator = ThousandSeparator.COMMA,
-                    currencySymbol = CurrencySymbol.DOLLAR,
-                ),
-                onEvent = {}
+                onEvent = {},
+                exampleExpenseFormat = "-$10,382.45",
+                expensesFormat = ExpenseFormat.NEGATIVE,
+                decimalSeparator = DecimalSeparator.DOT,
+                thousandSeparator = ThousandSeparator.COMMA,
+                currencySymbol = CurrencySymbol.DOLLAR,
+                buttonText = "Save",
             )
         }
     }

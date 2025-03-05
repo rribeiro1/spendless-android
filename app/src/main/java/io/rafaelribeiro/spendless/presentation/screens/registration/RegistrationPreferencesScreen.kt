@@ -25,11 +25,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.rafaelribeiro.spendless.R
 import io.rafaelribeiro.spendless.core.presentation.PreferencesScreen
-import io.rafaelribeiro.spendless.presentation.screens.settings.preferences.PreferencesUiState
-import io.rafaelribeiro.spendless.domain.CurrencySymbol
-import io.rafaelribeiro.spendless.domain.DecimalSeparator
-import io.rafaelribeiro.spendless.domain.ExpenseFormat
-import io.rafaelribeiro.spendless.domain.ThousandSeparator
 import io.rafaelribeiro.spendless.navigation.NavigationState
 import io.rafaelribeiro.spendless.presentation.theme.SpendLessTheme
 
@@ -76,7 +71,7 @@ fun RegistrationPreferencesRootScreen(
 @Composable
 fun RegistrationPreferencesScreen(
     modifier: Modifier,
-    uiState: PreferencesUiState,
+    uiState: RegistrationPreferencesUiState,
     onEvent: (RegistrationUiEvent) -> Unit,
 ) {
     Column(
@@ -104,7 +99,16 @@ fun RegistrationPreferencesScreen(
                 .fillMaxWidth()
                 .padding(bottom = 24.dp),
         )
-        PreferencesScreen(uiState, onEvent)
+        PreferencesScreen(
+            onEvent = onEvent,
+            buttonText = stringResource(R.string.start_tracking),
+            buttonEnabled = uiState.buttonEnabled,
+            exampleExpenseFormat = uiState.exampleExpenseFormat,
+            expensesFormat = uiState.expensesFormat,
+            decimalSeparator = uiState.decimalSeparator,
+            thousandSeparator = uiState.thousandSeparator,
+            currencySymbol = uiState.currencySymbol,
+        )
     }
 }
 
@@ -114,13 +118,7 @@ fun RegistrationPreferencesRootScreenPreview() {
     SpendLessTheme {
         RegistrationPreferencesScreen(
             modifier = Modifier,
-            uiState = PreferencesUiState(
-                exampleExpenseFormat = "-$1.234,50",
-                expensesFormat = ExpenseFormat.PARENTHESES,
-                decimalSeparator = DecimalSeparator.DOT,
-                thousandSeparator = ThousandSeparator.DOT,
-                currencySymbol = CurrencySymbol.DOLLAR,
-            ),
+            uiState = RegistrationPreferencesUiState(),
             onEvent = {},
         )
     }

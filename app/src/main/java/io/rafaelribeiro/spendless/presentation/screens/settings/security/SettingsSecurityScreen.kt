@@ -24,7 +24,6 @@ import io.rafaelribeiro.spendless.domain.LockoutDuration
 import io.rafaelribeiro.spendless.domain.SessionExpiryDuration
 import io.rafaelribeiro.spendless.navigation.NavigationState
 import io.rafaelribeiro.spendless.presentation.screens.registration.components.SpendLessSegmentedButton
-import io.rafaelribeiro.spendless.presentation.screens.settings.SettingsUiState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,7 +31,7 @@ fun SettingsSecurityScreen(
     modifier: Modifier,
     navigationState: NavigationState,
     onEvent: (SettingsSecurityUiEvent) -> Unit,
-    uiState: SettingsUiState,
+    uiState: SecurityUiState,
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),

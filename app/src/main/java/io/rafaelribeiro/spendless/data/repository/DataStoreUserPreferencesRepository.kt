@@ -8,10 +8,11 @@ import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
-import io.rafaelribeiro.spendless.presentation.screens.settings.preferences.PreferencesUiState
+import io.rafaelribeiro.spendless.presentation.screens.settings.preferences.SettingsPreferencesUiState
 import io.rafaelribeiro.spendless.domain.LockoutDuration
 import io.rafaelribeiro.spendless.domain.SessionExpiryDuration
 import io.rafaelribeiro.spendless.domain.UserPreferencesRepository
+import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationPreferencesUiState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
@@ -108,7 +109,16 @@ data class SecurityPreferences(
 ): UserPreferences()
 
 
-fun PreferencesUiState.toUserPreferences(): UserPreferences {
+fun SettingsPreferencesUiState.toUserPreferences(): UserPreferences {
+    return UserPreferences(
+        expensesFormatName = expensesFormat.name,
+        decimalSeparatorName = decimalSeparator.name,
+        thousandsSeparatorName = thousandSeparator.name,
+        currencyName = currencySymbol.name,
+    )
+}
+
+fun RegistrationPreferencesUiState.toUserPreferences(): UserPreferences {
     return UserPreferences(
         expensesFormatName = expensesFormat.name,
         decimalSeparatorName = decimalSeparator.name,

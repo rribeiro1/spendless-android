@@ -84,7 +84,7 @@ fun SettingsMainScreen(
         ) {
         Column(
             modifier = Modifier.background(
-                color = Color.White,
+                color = MaterialTheme.colorScheme.surfaceContainer,
                 shape = RoundedCornerShape(16.dp)
             )
         ) {

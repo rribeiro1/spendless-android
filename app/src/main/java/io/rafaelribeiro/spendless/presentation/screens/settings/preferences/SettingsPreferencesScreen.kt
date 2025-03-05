@@ -25,7 +25,6 @@ import io.rafaelribeiro.spendless.core.presentation.PreferencesScreen
 import io.rafaelribeiro.spendless.navigation.NavigationState
 import io.rafaelribeiro.spendless.navigation.rememberNavigationState
 import io.rafaelribeiro.spendless.presentation.screens.registration.PreferencesUiEvent
-import io.rafaelribeiro.spendless.presentation.screens.settings.SettingsUiState
 import io.rafaelribeiro.spendless.presentation.theme.SpendLessTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -33,7 +32,7 @@ import io.rafaelribeiro.spendless.presentation.theme.SpendLessTheme
 fun SettingsPreferencesScreen(
     modifier: Modifier,
     navigationState: NavigationState,
-    uiState: SettingsUiState,
+    uiState: SettingsPreferencesUiState,
     onEvent: (PreferencesUiEvent) -> Unit,
 ) {
     Scaffold(
@@ -64,9 +63,14 @@ fun SettingsPreferencesScreen(
                 .fillMaxSize()
         ) {
             PreferencesScreen(
-                uiState = uiState.preferences,
                 onEvent = onEvent,
                 buttonText = stringResource(R.string.save),
+                exampleExpenseFormat = uiState.exampleExpenseFormat,
+                expensesFormat = uiState.expensesFormat,
+                decimalSeparator = uiState.decimalSeparator,
+                thousandSeparator = uiState.thousandSeparator,
+                currencySymbol = uiState.currencySymbol,
+                buttonEnabled = uiState.buttonEnabled
             )
         }
     }
@@ -81,7 +85,7 @@ fun SettingsPreferencesScreenPreview() {
         SettingsPreferencesScreen(
             modifier = Modifier,
             navigationState = rememberNavigationState(),
-            uiState = SettingsUiState(),
+            uiState = SettingsPreferencesUiState(),
             onEvent = {},
         )
     }

@@ -25,7 +25,7 @@ class SettingsViewModel @Inject constructor() : ViewModel() {
         when (event) {
             is SettingsUiEvent.PreferencesClicked -> sendActionEvent(OnPreferencesClicked)
             is SettingsUiEvent.SecurityClicked -> sendActionEvent(OnSecurityClicked)
-            is SettingsUiEvent.LogoutClicked -> sendActionEvent(OnLogoutClicked) // TODO: should we clear UserPreferences?
+            is SettingsUiEvent.LogoutClicked -> sendActionEvent(OnLogoutClicked)
             is SettingsUiEvent.BackClicked -> sendActionEvent(OnBackClicked)
         }
 

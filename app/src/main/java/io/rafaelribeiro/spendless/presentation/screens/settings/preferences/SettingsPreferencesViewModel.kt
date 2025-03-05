@@ -17,7 +17,6 @@ import io.rafaelribeiro.spendless.presentation.screens.registration.PreferencesU
 import io.rafaelribeiro.spendless.presentation.screens.registration.PreferencesUiEvent.DecimalSeparatorSelected
 import io.rafaelribeiro.spendless.presentation.screens.registration.PreferencesUiEvent.ExpensesFormatSelected
 import io.rafaelribeiro.spendless.presentation.screens.registration.PreferencesUiEvent.ThousandSeparatorSelected
-import io.rafaelribeiro.spendless.presentation.screens.settings.SettingsUiState
 import io.rafaelribeiro.spendless.presentation.screens.settings.preferences.SettingsPreferencesActionEvent.OnBackClicked
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -40,15 +39,15 @@ class SettingsPreferencesViewModel @Inject constructor(
         const val WAIT_UNTIL_NO_CONSUMERS_IN_MILLIS = 5000L
     }
 
-    private val _uiState: MutableStateFlow<SettingsUiState> = MutableStateFlow(SettingsUiState())
-    val uiState: StateFlow<SettingsUiState> = _uiState
+    private val _uiState: MutableStateFlow<SettingsPreferencesUiState> = MutableStateFlow(SettingsPreferencesUiState())
+    val uiState: StateFlow<SettingsPreferencesUiState> = _uiState
         .onStart {
             subscribeToUserPreferences()
         }
         .stateIn(
             viewModelScope,
             started = SharingStarted.WhileSubscribed(WAIT_UNTIL_NO_CONSUMERS_IN_MILLIS),
-            initialValue = SettingsUiState()
+            initialValue = SettingsPreferencesUiState()
         )
     private val _actionEvents = Channel<SettingsPreferencesActionEvent>()
     val actionEvents = _actionEvents.receiveAsFlow()
@@ -66,13 +65,8 @@ class SettingsPreferencesViewModel @Inject constructor(
         }
     }
 
-    private fun updateState(state: (SettingsUiState) -> SettingsUiState) {
+    private fun updateState(state: (SettingsPreferencesUiState) -> SettingsPreferencesUiState) {
         _uiState.update { state(it) }
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        _uiState.update { SettingsUiState() }
     }
 
     private fun subscribeToUserPreferences() {
@@ -87,36 +81,34 @@ class SettingsPreferencesViewModel @Inject constructor(
     private fun updateUiState(preferences: UserPreferences) {
         updateState {
             it.copy(
-                preferences = it.preferences.copy(
-                    expensesFormat = ExpenseFormat.fromName(preferences.expensesFormatName),
-                    decimalSeparator = DecimalSeparator.fromName(preferences.decimalSeparatorName),
-                    thousandSeparator = ThousandSeparator.fromName(preferences.thousandsSeparatorName),
-                    currencySymbol = CurrencySymbol.fromName(preferences.currencyName),
-                )
+                expensesFormat = ExpenseFormat.fromName(preferences.expensesFormatName),
+                decimalSeparator = DecimalSeparator.fromName(preferences.decimalSeparatorName),
+                thousandSeparator = ThousandSeparator.fromName(preferences.thousandsSeparatorName),
+                currencySymbol = CurrencySymbol.fromName(preferences.currencyName),
             )
         }
     }
 
     private fun saveSecurityPreferencesToDataStore() {
         viewModelScope.launch {
-            val userPreferences = _uiState.value.preferences.toUserPreferences()
+            val userPreferences = _uiState.value.toUserPreferences()
             userPreferencesRepository.saveUserPreferences(userPreferences)
         }
     }
 
-    private fun updatePreferencesState(state: (PreferencesUiState) -> PreferencesUiState) {
-        updateState { it.copy(preferences = state(it.preferences)) }
-    }
+//    private fun updatePreferencesState(state: (PreferencesUiState) -> PreferencesUiState) {
+//        updateState { state(it) }
+//    }
 
     private fun formatExampleExpense() {
         val amount = -10382.45
         val formatter = ExpenseFormatter(
-            decimalSeparator = _uiState.value.preferences.decimalSeparator,
-            thousandSeparator = _uiState.value.preferences.thousandSeparator,
-            currencySymbol = _uiState.value.preferences.currencySymbol,
-            expensesFormat = _uiState.value.preferences.expensesFormat
+            decimalSeparator = _uiState.value.decimalSeparator,
+            thousandSeparator = _uiState.value.thousandSeparator,
+            currencySymbol = _uiState.value.currencySymbol,
+            expensesFormat = _uiState.value.expensesFormat
         )
-        updatePreferencesState { it.copy(exampleExpenseFormat = formatter.format(amount)) }
+        updateState { it.copy(exampleExpenseFormat = formatter.format(amount)) }
         if (isSameSeparator()) {
             enableSaveButton(enabled = false)
         } else {
@@ -124,29 +116,29 @@ class SettingsPreferencesViewModel @Inject constructor(
         }
     }
 
-    private fun isSameSeparator() = _uiState.value.preferences.thousandSeparator.name == _uiState.value.preferences.decimalSeparator.name
+    private fun isSameSeparator() = _uiState.value.thousandSeparator.name == _uiState.value.decimalSeparator.name
 
     private fun enableSaveButton(enabled: Boolean) {
-        updatePreferencesState { it.copy(buttonEnabled = enabled) }
+        updateState { it.copy(buttonEnabled = enabled) }
     }
 
     fun onEvent(event: PreferencesUiEvent) {
         when (event) {
 
             is ExpensesFormatSelected -> {
-                updatePreferencesState { it.copy(expensesFormat = event.expensesFormat) }
+                updateState { it.copy(expensesFormat = event.expensesFormat) }
                 formatExampleExpense()
             }
             is DecimalSeparatorSelected -> {
-                updatePreferencesState { it.copy(decimalSeparator = event.decimalSeparator) }
+                updateState { it.copy(decimalSeparator = event.decimalSeparator) }
                 formatExampleExpense()
             }
             is ThousandSeparatorSelected -> {
-                updatePreferencesState { it.copy(thousandSeparator = event.thousandSeparator) }
+                updateState { it.copy(thousandSeparator = event.thousandSeparator) }
                 formatExampleExpense()
             }
             is CurrencySelected -> {
-                updatePreferencesState { it.copy(currencySymbol = event.currency) }
+                updateState { it.copy(currencySymbol = event.currency) }
                 formatExampleExpense()
             }
             is ButtonClicked -> {
