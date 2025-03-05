@@ -100,7 +100,6 @@ fun RegistrationPreferencesScreen(
                 .padding(bottom = 24.dp),
         )
         PreferencesScreen(
-            onEvent = onEvent,
             buttonText = stringResource(R.string.start_tracking),
             buttonEnabled = uiState.buttonEnabled,
             exampleExpenseFormat = uiState.exampleExpenseFormat,
@@ -108,6 +107,11 @@ fun RegistrationPreferencesScreen(
             decimalSeparator = uiState.decimalSeparator,
             thousandSeparator = uiState.thousandSeparator,
             currencySymbol = uiState.currencySymbol,
+            onCurrencySelected = { onEvent(RegistrationUiEvent.CurrencySelected(it)) },
+            onDecimalSeparatorSelected = { onEvent(RegistrationUiEvent.DecimalSeparatorSelected(it)) },
+            onThousandSeparatorSelected = { onEvent(RegistrationUiEvent.ThousandSeparatorSelected(it)) },
+            onExpensesFormatSelected = { onEvent(RegistrationUiEvent.ExpensesFormatSelected(it)) },
+            onButtonClicked = { onEvent(RegistrationUiEvent.ButtonClicked) }
         )
     }
 }

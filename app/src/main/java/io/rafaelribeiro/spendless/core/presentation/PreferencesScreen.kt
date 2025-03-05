@@ -24,12 +24,6 @@ import io.rafaelribeiro.spendless.domain.CurrencySymbol
 import io.rafaelribeiro.spendless.domain.DecimalSeparator
 import io.rafaelribeiro.spendless.domain.ExpenseFormat
 import io.rafaelribeiro.spendless.domain.ThousandSeparator
-import io.rafaelribeiro.spendless.presentation.screens.registration.PreferencesUiEvent
-import io.rafaelribeiro.spendless.presentation.screens.registration.PreferencesUiEvent.ButtonClicked
-import io.rafaelribeiro.spendless.presentation.screens.registration.PreferencesUiEvent.CurrencySelected
-import io.rafaelribeiro.spendless.presentation.screens.registration.PreferencesUiEvent.DecimalSeparatorSelected
-import io.rafaelribeiro.spendless.presentation.screens.registration.PreferencesUiEvent.ExpensesFormatSelected
-import io.rafaelribeiro.spendless.presentation.screens.registration.PreferencesUiEvent.ThousandSeparatorSelected
 import io.rafaelribeiro.spendless.presentation.screens.registration.components.SpendLessDropDown
 import io.rafaelribeiro.spendless.presentation.screens.registration.components.SpendLessSegmentedButton
 import io.rafaelribeiro.spendless.presentation.theme.SpendLessTheme
@@ -37,7 +31,6 @@ import io.rafaelribeiro.spendless.presentation.theme.SpendLessTheme
 
 @Composable
 fun PreferencesScreen(
-    onEvent: (PreferencesUiEvent) -> Unit,
     buttonText: String,
     exampleExpenseFormat: String,
     expensesFormat: ExpenseFormat,
@@ -45,6 +38,11 @@ fun PreferencesScreen(
     thousandSeparator: ThousandSeparator,
     currencySymbol: CurrencySymbol,
     buttonEnabled: Boolean = true,
+    onButtonClicked: () -> Unit = {},
+    onExpensesFormatSelected: (ExpenseFormat) -> Unit = {},
+    onDecimalSeparatorSelected: (DecimalSeparator) -> Unit = {},
+    onThousandSeparatorSelected: (ThousandSeparator) -> Unit = {},
+    onCurrencySelected: (CurrencySymbol) -> Unit = {},
 ) {
     Box(
         modifier = Modifier
@@ -87,7 +85,7 @@ fun PreferencesScreen(
         options = ExpenseFormat.entries.map { it.value },
         selectedIndex = ExpenseFormat.entries.indexOf(expensesFormat),
         onOptionSelected = {
-            onEvent(ExpensesFormatSelected(ExpenseFormat.entries[it]))
+            onExpensesFormatSelected(ExpenseFormat.entries[it])
         }
     )
     SpendLessDropDown(
@@ -96,7 +94,7 @@ fun PreferencesScreen(
         itemBackgroundColor = MaterialTheme.colorScheme.onPrimary,
         getText = { it.title },
         getLeadingIcon = { it.symbol },
-        onItemSelected = { onEvent(CurrencySelected(it)) },
+        onItemSelected = { onCurrencySelected(it) },
         selectedValue = currencySymbol,
     )
     SpendLessSegmentedButton(
@@ -104,7 +102,7 @@ fun PreferencesScreen(
         options = DecimalSeparator.entries.map { it.value },
         selectedIndex = DecimalSeparator.entries.indexOf(decimalSeparator),
         onOptionSelected = {
-            onEvent(DecimalSeparatorSelected(DecimalSeparator.entries[it]))
+            onDecimalSeparatorSelected(DecimalSeparator.entries[it])
         }
     )
     SpendLessSegmentedButton(
@@ -112,16 +110,14 @@ fun PreferencesScreen(
         options = ThousandSeparator.entries.map { it.value },
         selectedIndex = ThousandSeparator.entries.indexOf(thousandSeparator),
         onOptionSelected = {
-            onEvent(ThousandSeparatorSelected(ThousandSeparator.entries[it]))
+            onThousandSeparatorSelected(ThousandSeparator.entries[it])
         }
     )
     SpendLessButton(
         text = buttonText,
         modifier = Modifier.padding(top = 34.dp),
         enabled = buttonEnabled,
-        onClick = {
-            onEvent(ButtonClicked)
-        },
+        onClick = onButtonClicked,
     )
 }
 
@@ -133,7 +129,6 @@ fun PreferencesScreenPreview() {
             .padding(16.dp)
             .fillMaxSize()) {
             PreferencesScreen(
-                onEvent = {},
                 exampleExpenseFormat = "-$10,382.45",
                 expensesFormat = ExpenseFormat.NEGATIVE,
                 decimalSeparator = DecimalSeparator.DOT,

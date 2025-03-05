@@ -54,23 +54,23 @@ class RegistrationViewModel @Inject constructor(
 			is RegistrationUiEvent.PinConfirmationDigitTapped -> pinConfirmationChanged(event.digit)
 			is RegistrationUiEvent.PinConfirmationBackspaceTapped -> backspaceConfirmationPinTapped()
 			is RegistrationUiEvent.ResetPinValues -> resetPinValues()
-			is PreferencesUiEvent.ExpensesFormatSelected -> {
-				updatePreferencesState { it.copy(expensesFormat = event.expensesFormat) }
+            is RegistrationUiEvent.ExpensesFormatSelected -> {
+                updatePreferencesState { it.copy(expensesFormat = event.expensesFormat) }
                 formatExampleExpense()
-			}
-			is PreferencesUiEvent.DecimalSeparatorSelected -> {
-				updatePreferencesState { it.copy(decimalSeparator = event.decimalSeparator) }
+            }
+            is RegistrationUiEvent.DecimalSeparatorSelected -> {
+                updatePreferencesState { it.copy(decimalSeparator = event.decimalSeparator) }
                 formatExampleExpense()
-			}
-			is PreferencesUiEvent.ThousandSeparatorSelected -> {
-				updatePreferencesState { it.copy(thousandSeparator = event.thousandSeparator) }
+            }
+            is RegistrationUiEvent.ThousandSeparatorSelected -> {
+                updatePreferencesState { it.copy(thousandSeparator = event.thousandSeparator) }
                 formatExampleExpense()
-			}
-            is PreferencesUiEvent.CurrencySelected -> {
+            }
+            is RegistrationUiEvent.CurrencySelected -> {
                 updatePreferencesState { it.copy(currencySymbol = event.currency) }
                 formatExampleExpense()
             }
-            is PreferencesUiEvent.ButtonClicked -> {
+            is RegistrationUiEvent.ButtonClicked -> {
                 registerUser()
                 saveUserPreferences()
                 sendActionEvent(RegistrationActionEvent.UserPreferencesSaved)
@@ -232,12 +232,11 @@ sealed interface RegistrationUiEvent {
 	data object PinConfirmationBackspaceTapped : RegistrationUiEvent
 	data object ResetPinValues : RegistrationUiEvent
 
+    data object ButtonClicked : RegistrationUiEvent
+    data class ExpensesFormatSelected(val expensesFormat: ExpenseFormat) : RegistrationUiEvent
+    data class DecimalSeparatorSelected(val decimalSeparator: DecimalSeparator) : RegistrationUiEvent
+    data class ThousandSeparatorSelected(val thousandSeparator: ThousandSeparator) : RegistrationUiEvent
+    data class CurrencySelected(val currency: CurrencySymbol) : RegistrationUiEvent
 }
 
-sealed interface PreferencesUiEvent: RegistrationUiEvent {
-    data object ButtonClicked : PreferencesUiEvent
-    data class ExpensesFormatSelected(val expensesFormat: ExpenseFormat) : PreferencesUiEvent
-    data class DecimalSeparatorSelected(val decimalSeparator: DecimalSeparator) : PreferencesUiEvent
-    data class ThousandSeparatorSelected(val thousandSeparator: ThousandSeparator) : PreferencesUiEvent
-    data class CurrencySelected(val currency: CurrencySymbol) : PreferencesUiEvent
-}
+

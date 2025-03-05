@@ -24,7 +24,6 @@ import io.rafaelribeiro.spendless.R
 import io.rafaelribeiro.spendless.core.presentation.PreferencesScreen
 import io.rafaelribeiro.spendless.navigation.NavigationState
 import io.rafaelribeiro.spendless.navigation.rememberNavigationState
-import io.rafaelribeiro.spendless.presentation.screens.registration.PreferencesUiEvent
 import io.rafaelribeiro.spendless.presentation.theme.SpendLessTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -33,7 +32,7 @@ fun SettingsPreferencesScreen(
     modifier: Modifier,
     navigationState: NavigationState,
     uiState: SettingsPreferencesUiState,
-    onEvent: (PreferencesUiEvent) -> Unit,
+    onEvent: (SettingsPreferencesUiEvent) -> Unit,
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -63,7 +62,6 @@ fun SettingsPreferencesScreen(
                 .fillMaxSize()
         ) {
             PreferencesScreen(
-                onEvent = onEvent,
                 buttonText = stringResource(R.string.save),
                 buttonEnabled = uiState.buttonEnabled,
                 exampleExpenseFormat = uiState.exampleExpenseFormat,
@@ -71,6 +69,11 @@ fun SettingsPreferencesScreen(
                 decimalSeparator = uiState.decimalSeparator,
                 thousandSeparator = uiState.thousandSeparator,
                 currencySymbol = uiState.currencySymbol,
+                onCurrencySelected = { onEvent(SettingsPreferencesUiEvent.CurrencySelected(it)) },
+                onDecimalSeparatorSelected = { onEvent(SettingsPreferencesUiEvent.DecimalSeparatorSelected(it)) },
+                onThousandSeparatorSelected = { onEvent(SettingsPreferencesUiEvent.ThousandSeparatorSelected(it)) },
+                onExpensesFormatSelected = { onEvent(SettingsPreferencesUiEvent.ExpensesFormatSelected(it)) },
+                onButtonClicked = { onEvent(SettingsPreferencesUiEvent.ButtonClicked) }
             )
         }
     }

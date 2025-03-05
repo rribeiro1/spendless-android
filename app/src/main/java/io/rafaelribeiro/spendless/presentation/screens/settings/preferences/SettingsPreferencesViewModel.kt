@@ -11,12 +11,11 @@ import io.rafaelribeiro.spendless.domain.ExpenseFormat
 import io.rafaelribeiro.spendless.domain.ExpenseFormatter
 import io.rafaelribeiro.spendless.domain.ThousandSeparator
 import io.rafaelribeiro.spendless.domain.UserPreferencesRepository
-import io.rafaelribeiro.spendless.presentation.screens.registration.PreferencesUiEvent
-import io.rafaelribeiro.spendless.presentation.screens.registration.PreferencesUiEvent.ButtonClicked
-import io.rafaelribeiro.spendless.presentation.screens.registration.PreferencesUiEvent.CurrencySelected
-import io.rafaelribeiro.spendless.presentation.screens.registration.PreferencesUiEvent.DecimalSeparatorSelected
-import io.rafaelribeiro.spendless.presentation.screens.registration.PreferencesUiEvent.ExpensesFormatSelected
-import io.rafaelribeiro.spendless.presentation.screens.registration.PreferencesUiEvent.ThousandSeparatorSelected
+import io.rafaelribeiro.spendless.presentation.screens.settings.preferences.SettingsPreferencesUiEvent.ButtonClicked
+import io.rafaelribeiro.spendless.presentation.screens.settings.preferences.SettingsPreferencesUiEvent.CurrencySelected
+import io.rafaelribeiro.spendless.presentation.screens.settings.preferences.SettingsPreferencesUiEvent.DecimalSeparatorSelected
+import io.rafaelribeiro.spendless.presentation.screens.settings.preferences.SettingsPreferencesUiEvent.ExpensesFormatSelected
+import io.rafaelribeiro.spendless.presentation.screens.settings.preferences.SettingsPreferencesUiEvent.ThousandSeparatorSelected
 import io.rafaelribeiro.spendless.presentation.screens.settings.preferences.SettingsPreferencesActionEvent.OnBackClicked
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -118,7 +117,7 @@ class SettingsPreferencesViewModel @Inject constructor(
         updateState { it.copy(buttonEnabled = enabled) }
     }
 
-    fun onEvent(event: PreferencesUiEvent) {
+    fun onEvent(event: SettingsPreferencesUiEvent) {
         when (event) {
 
             is ExpensesFormatSelected -> {
@@ -150,3 +149,10 @@ sealed interface SettingsPreferencesActionEvent {
     data object OnBackClicked : SettingsPreferencesActionEvent
 }
 
+sealed interface SettingsPreferencesUiEvent {
+    data object ButtonClicked : SettingsPreferencesUiEvent
+    data class ExpensesFormatSelected(val expensesFormat: ExpenseFormat) : SettingsPreferencesUiEvent
+    data class DecimalSeparatorSelected(val decimalSeparator: DecimalSeparator) : SettingsPreferencesUiEvent
+    data class ThousandSeparatorSelected(val thousandSeparator: ThousandSeparator) : SettingsPreferencesUiEvent
+    data class CurrencySelected(val currency: CurrencySymbol) : SettingsPreferencesUiEvent
+}
