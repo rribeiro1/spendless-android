@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -60,9 +61,12 @@ class TransactionsViewModel @Inject constructor(
     }
 
     private fun getTransactionsData(): Flow<TransactionsUiState> {
-        return transactionRepository
-            .getAllTransactions()
-            .map { TransactionsUiState(it.toGroupedTransactions(transactionFormatter, userPreferences.value)) }
+        return combine(
+            userPreferences,
+            transactionRepository.getAllTransactions()
+        ) { userPreferences, transactions ->
+            TransactionsUiState(transactions.toGroupedTransactions(transactionFormatter, userPreferences))
+        }
     }
 
     private fun subscribeToTransactionsData() {

@@ -31,7 +31,7 @@ class OfflineTransactionRepository @Inject constructor(
     }
 
     override fun getBiggestTransaction(): Flow<Transaction?> {
-        return transactionDao.getBiggestTransaction().map { it?.toTransaction() }
+        return transactionDao.getLargestTransaction().map { it?.toTransaction() }
     }
 
     override fun getMostPopularCategory(): Flow<TransactionCategory?> {

@@ -16,8 +16,8 @@ interface TransactionDao {
     @Query("SELECT * FROM transactions ORDER BY createdAt DESC LIMIT 20")
     fun getLatestTransactions(): Flow<List<TransactionEntity>>
 
-    @Query("SELECT * FROM transactions ORDER BY amount DESC LIMIT 1")
-    fun getBiggestTransaction(): Flow<TransactionEntity?>
+    @Query("SELECT * FROM transactions WHERE type = 'EXPENSE' ORDER BY amount ASC LIMIT 1")
+    fun getLargestTransaction(): Flow<TransactionEntity?>
 
     @Query("SELECT category FROM transactions GROUP BY category ORDER BY COUNT(*) DESC LIMIT 1")
     fun getMostPopularCategory(): Flow<TransactionCategory?>
@@ -28,12 +28,7 @@ interface TransactionDao {
     @Query("DELETE FROM transactions")
     suspend fun deleteAllTransactions()
 
-    @Query("""
-        SELECT 
-            (SELECT COALESCE(SUM(amount), 0) FROM transactions WHERE type = 'INCOME') -
-            (SELECT COALESCE(SUM(amount), 0) FROM transactions WHERE type = 'EXPENSE')
-        AS balance
-    """)
+    @Query("SELECT COALESCE(SUM(amount), 0) FROM transactions")
     fun getBalance(): Flow<Double?>
 
     /**
