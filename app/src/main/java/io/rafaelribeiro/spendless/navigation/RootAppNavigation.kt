@@ -17,6 +17,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.navOptions
+import io.rafaelribeiro.spendless.presentation.screens.authentication.AuthPinActionEvent
 import io.rafaelribeiro.spendless.presentation.screens.authentication.AuthPinPromptScreen
 import io.rafaelribeiro.spendless.presentation.screens.authentication.AuthPinPromptViewModel
 import io.rafaelribeiro.spendless.presentation.screens.dashboard.DashboardActionEvent
@@ -31,18 +32,18 @@ import io.rafaelribeiro.spendless.presentation.screens.registration.Registration
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationPreferencesRootScreen
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationUsernameRootScreen
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationViewModel
+import io.rafaelribeiro.spendless.presentation.screens.settings.SettingsActionEvent
+import io.rafaelribeiro.spendless.presentation.screens.settings.SettingsRootScreen
+import io.rafaelribeiro.spendless.presentation.screens.settings.SettingsViewModel
+import io.rafaelribeiro.spendless.presentation.screens.settings.preferences.SettingsPreferencesActionEvent
+import io.rafaelribeiro.spendless.presentation.screens.settings.preferences.SettingsPreferencesScreen
+import io.rafaelribeiro.spendless.presentation.screens.settings.preferences.SettingsPreferencesViewModel
+import io.rafaelribeiro.spendless.presentation.screens.settings.security.SettingsSecurityActionEvent
+import io.rafaelribeiro.spendless.presentation.screens.settings.security.SettingsSecurityScreen
+import io.rafaelribeiro.spendless.presentation.screens.settings.security.SettingsSecurityViewModel
 import io.rafaelribeiro.spendless.presentation.screens.transactions.TransactionsActionEvent
 import io.rafaelribeiro.spendless.presentation.screens.transactions.TransactionsRootScreen
 import io.rafaelribeiro.spendless.presentation.screens.transactions.TransactionsViewModel
-import io.rafaelribeiro.spendless.presentation.screens.settings.SettingsActionEvent
-import io.rafaelribeiro.spendless.presentation.screens.settings.preferences.SettingsPreferencesScreen
-import io.rafaelribeiro.spendless.presentation.screens.settings.SettingsRootScreen
-import io.rafaelribeiro.spendless.presentation.screens.settings.security.SettingsSecurityScreen
-import io.rafaelribeiro.spendless.presentation.screens.settings.SettingsViewModel
-import io.rafaelribeiro.spendless.presentation.screens.settings.preferences.SettingsPreferencesActionEvent
-import io.rafaelribeiro.spendless.presentation.screens.settings.preferences.SettingsPreferencesViewModel
-import io.rafaelribeiro.spendless.presentation.screens.settings.security.SettingsSecurityActionEvent
-import io.rafaelribeiro.spendless.presentation.screens.settings.security.SettingsSecurityViewModel
 import kotlinx.coroutines.flow.Flow
 
 @Composable
@@ -171,9 +172,16 @@ fun RootAppNavigation(
 				onEvent = viewModel::onEvent,
 			)
 		}
-        composable(route = Screen.PinPromptScreen.route) { entry ->
+        composable(route = Screen.PinPromptScreen.route) {
             val viewModel = hiltViewModel<AuthPinPromptViewModel>()
             val uiState by viewModel.authPinUiState.collectAsStateWithLifecycle()
+            ObserveAsEvents(flow = viewModel.actionEvents) { event ->
+                when (event) {
+                    AuthPinActionEvent.CorrectPinEntered -> {
+                        navigationState.navigateAndClearBackStack(Screen.DashboardScreen.route)
+                    }
+                }
+            }
             AuthPinPromptScreen(
                 navigationState = navigationState,
                 uiState = uiState,

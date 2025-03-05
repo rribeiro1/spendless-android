@@ -12,6 +12,7 @@ import io.rafaelribeiro.spendless.domain.AuthRepository
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationViewModel.Companion.ERROR_MESSAGE_DURATION
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationViewModel.Companion.PIN_MAX_SIZE
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,6 +22,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -54,6 +56,9 @@ class AuthPinPromptViewModel @Inject constructor(
             initialValue = initialUiState,
             started = SharingStarted.WhileSubscribed(5000L),
         )
+
+    private val _actionEvents = Channel<AuthPinActionEvent>()
+    val actionEvents = _actionEvents.receiveAsFlow()
 
     private fun subscribeToData() {
         getPinPromptData()
@@ -97,8 +102,7 @@ class AuthPinPromptViewModel @Inject constructor(
                 viewModelScope.launch {
                     resetPinValues(true)
                     if (authRepository.isPinCorrect(currentPin)) {
-                        println("Correct PIN entered!")
-                        //TODO: Then pop back stack and navigate where it came from triggering popBackStack is enough probably?
+                        _actionEvents.send(AuthPinActionEvent.CorrectPinEntered)
                     } else {
                         handleWrongPinUiState()
                     }
@@ -158,4 +162,8 @@ data class AuthPinUiState(
 sealed interface AuthPinUiEvent {
     data class PinDigitTapped(val digit: String) : AuthPinUiEvent
     data object PinBackspaceTapped : AuthPinUiEvent
+}
+
+sealed interface AuthPinActionEvent {
+    data object CorrectPinEntered : AuthPinActionEvent
 }

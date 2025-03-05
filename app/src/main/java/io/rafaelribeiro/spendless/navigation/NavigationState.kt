@@ -30,10 +30,8 @@ class NavigationState(
         navigateTo(
             route = Screen.PinPromptScreen.route,
             navOptions = navOptions {
-                popUpTo(navHostController.graph.startDestinationId) {
-                    inclusive = true
-                }
                 launchSingleTop = true
+                popUpTo(0) { inclusive = true }
             }
         )
     }
