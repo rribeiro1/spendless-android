@@ -1,4 +1,4 @@
-package io.rafaelribeiro.spendless.presentation.screens.login
+package io.rafaelribeiro.spendless.presentation.screens.authentication
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -31,10 +31,10 @@ import io.rafaelribeiro.spendless.presentation.theme.SpendLessTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginPinPromptRootScreen(
+fun AuthPinPromptScreen(
     navigationState: NavigationState,
-    uiState: LoginUiState,
-    onEvent: (LoginUiEvent) -> Unit = {},
+    uiState: AuthPinUiState,
+    onEvent: (AuthPinUiEvent) -> Unit = {},
     modifier: Modifier,
 ) {
     val isPinLocked = uiState.pinLockRemainingSeconds > 0
@@ -82,8 +82,8 @@ fun LoginPinPromptRootScreen(
                 pinLockRemainingSeconds = uiState.pinLockRemainingSeconds,
                 currentPinSize = uiState.pin.length,
                 pinPadEnabled = uiState.pinPadEnabled,
-                onNumberClick = { onEvent(LoginUiEvent.PinDigitTapped(it)) },
-                onBackspaceClick = { onEvent(LoginUiEvent.PinBackspaceTapped) },
+                onNumberClick = { onEvent(AuthPinUiEvent.PinDigitTapped(it)) },
+                onBackspaceClick = { onEvent(AuthPinUiEvent.PinBackspaceTapped) },
             )
         }
         ErrorDialog(
@@ -97,9 +97,9 @@ fun LoginPinPromptRootScreen(
 @Composable
 fun PinPromptScreenPreview() {
     SpendLessTheme {
-        LoginPinPromptRootScreen(
+        AuthPinPromptScreen(
             navigationState = rememberNavigationState(),
-            uiState = LoginUiState(),
+            uiState = AuthPinUiState(),
             modifier = Modifier,
         )
     }
@@ -109,9 +109,9 @@ fun PinPromptScreenPreview() {
 @Composable
 fun PinPromptScreenPreviewLocked() {
     SpendLessTheme {
-        LoginPinPromptRootScreen(
+        AuthPinPromptScreen(
             navigationState = rememberNavigationState(),
-            uiState = LoginUiState(
+            uiState = AuthPinUiState(
                 pinLockRemainingSeconds = 30,
                 pinPadEnabled = false,
             ),

@@ -6,13 +6,12 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.intPreferencesKey
-import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
-import io.rafaelribeiro.spendless.presentation.screens.settings.preferences.SettingsPreferencesUiState
 import io.rafaelribeiro.spendless.domain.LockoutDuration
 import io.rafaelribeiro.spendless.domain.SessionExpiryDuration
 import io.rafaelribeiro.spendless.domain.UserPreferencesRepository
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationPreferencesUiState
+import io.rafaelribeiro.spendless.presentation.screens.settings.preferences.SettingsPreferencesUiState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
@@ -31,7 +30,7 @@ class DataStoreUserPreferencesRepository @Inject constructor(
         private val THOUSANDS_SEPARATOR = stringPreferencesKey("thousands_separator")
         private val CURRENCY = stringPreferencesKey("currency_symbol")
         private val SESSION_EXPIRY_DURATION = intPreferencesKey("session_expiry_duration")
-        private val LOCKED_OUT_DURATION = longPreferencesKey("locked_out_duration")
+        private val LOCKED_OUT_DURATION = intPreferencesKey("locked_out_duration")
     }
 
     override val userPreferences: Flow<UserPreferences> = dataStore.data
@@ -64,8 +63,8 @@ class DataStoreUserPreferencesRepository @Inject constructor(
                 throw exception
             }
         }.map { preferences ->
-            val sessionExpiryDuration = preferences[SESSION_EXPIRY_DURATION]?.toInt() ?: SessionExpiryDuration.MINUTES_5.value
-            val lockedOutDuration = preferences[LOCKED_OUT_DURATION]?.toLong() ?: LockoutDuration.SECONDS_30.value
+            val sessionExpiryDuration = preferences[SESSION_EXPIRY_DURATION] ?: SessionExpiryDuration.MINUTES_5.value
+            val lockedOutDuration = preferences[LOCKED_OUT_DURATION] ?: LockoutDuration.SECONDS_30.value
             SecurityPreferences(
                 sessionExpiryDuration = sessionExpiryDuration,
                 lockedOutDuration = lockedOutDuration
@@ -105,7 +104,7 @@ open class UserPreferences(
 
 data class SecurityPreferences(
     val sessionExpiryDuration: Int = SessionExpiryDuration.MINUTES_5.value,
-    val lockedOutDuration: Long = LockoutDuration.SECONDS_30.value,
+    val lockedOutDuration: Int = LockoutDuration.SECONDS_30.value,
 ): UserPreferences()
 
 
