@@ -17,11 +17,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.navOptions
+import io.rafaelribeiro.spendless.presentation.screens.authentication.AuthPinPromptScreen
+import io.rafaelribeiro.spendless.presentation.screens.authentication.AuthPinPromptViewModel
 import io.rafaelribeiro.spendless.presentation.screens.dashboard.DashboardActionEvent
 import io.rafaelribeiro.spendless.presentation.screens.dashboard.DashboardScreen
 import io.rafaelribeiro.spendless.presentation.screens.dashboard.DashboardViewModel
 import io.rafaelribeiro.spendless.presentation.screens.login.LoginActionEvent
-import io.rafaelribeiro.spendless.presentation.screens.login.LoginPinPromptRootScreen
 import io.rafaelribeiro.spendless.presentation.screens.login.LoginRootScreen
 import io.rafaelribeiro.spendless.presentation.screens.login.LoginViewModel
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationActionEvent
@@ -171,9 +172,9 @@ fun RootAppNavigation(
 			)
 		}
         composable(route = Screen.PinPromptScreen.route) { entry ->
-            val viewModel = entry.sharedViewModel<LoginViewModel>(navigationState.navHostController)
-            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-            LoginPinPromptRootScreen(
+            val viewModel = hiltViewModel<AuthPinPromptViewModel>()
+            val uiState by viewModel.authPinUiState.collectAsStateWithLifecycle()
+            AuthPinPromptScreen(
                 navigationState = navigationState,
                 uiState = uiState,
                 onEvent = viewModel::onEvent,

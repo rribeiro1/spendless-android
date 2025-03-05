@@ -10,7 +10,6 @@ import io.rafaelribeiro.spendless.presentation.screens.registration.Registration
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationViewModel.Companion.PIN_MAX_SIZE
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationViewModel.Companion.USERNAME_MAX_SIZE
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationViewModel.Companion.USERNAME_MIN_SIZE
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,14 +28,6 @@ class LoginViewModel @Inject constructor(
     private val authRepository: AuthRepository,
 ) : ViewModel() {
 
-    companion object {
-        const val PIN_MAX_WRONG_COUNT = 2
-        const val PIN_LOCK_DURATION_SECONDS = 30
-        const val PIN_LOCK_TIMER_INTERVAL = 1000L
-        const val CLEAR_PIN_DIGIT_DELAY = 111L
-    }
-    private var pinLockTimerJob: Job? = null
-
     private val initialUiState = LoginUiState(isLoading = true)
     private val _uiState: MutableStateFlow<LoginUiState> = MutableStateFlow(initialUiState)
     val uiState: StateFlow<LoginUiState> = _uiState
@@ -54,8 +45,6 @@ class LoginViewModel @Inject constructor(
             is LoginUiEvent.UsernameChanged -> usernameChanged(event.username)
             is LoginUiEvent.PinChanged -> passwordPinChanged(event.pin)
             is LoginUiEvent.ActionButtonLoginClicked -> loginClicked()
-            is LoginUiEvent.PinDigitTapped -> pinChanged(event.digit)
-            is LoginUiEvent.PinBackspaceTapped -> backspacePinTapped()
             is LoginUiEvent.UsernameFocusChanged -> updateUiState { it.copy(isUsernameFocused = event.isFocused) }
             is LoginUiEvent.PinFocusChanged -> updateUiState { it.copy(isPinFocused = event.isFocused) }
         }
@@ -77,61 +66,12 @@ class LoginViewModel @Inject constructor(
         setLoginButtonEnabled()
     }
 
-    private fun pinChanged(digit: String) {
-        val currentPin = _uiState.value.pin + digit
-        if (currentPin.length <= PIN_MAX_SIZE) {
-            updateUiState { it.copy(pin = currentPin) }
-            if (currentPin.length == PIN_MAX_SIZE) {
-                viewModelScope.launch {
-                    resetPinValues(true)
-                    if (authRepository.isPinCorrect(currentPin)) {
-                        println("Correct PIN entered!")
-                        //TODO: Then pop back stack and navigate where it came from triggering popBackStack is enough probably?
-                    } else {
-                        handleWrongPinUiState()
-                    }
-                }
-            }
-        }
-    }
-
-    private fun handleWrongPinUiState() {
-        showErrorMessage(UiText.StringResource(R.string.wrong_pin))
-        if (_uiState.value.wrongPinCount < PIN_MAX_WRONG_COUNT) {
-            updateUiState { it.copy(wrongPinCount = it.wrongPinCount + 1) }
-        } else {
-            updateUiState { it.copy(pinPadEnabled = false) } // Disable PinPad
-            startPinLockTimer() // try your PIN again in 00:30
-        }
-    }
-
-    private fun startPinLockTimer() {
-        pinLockTimerJob?.cancel()
-        pinLockTimerJob = viewModelScope.launch {
-            for (seconds in PIN_LOCK_DURATION_SECONDS downTo 0) {
-                updateUiState { it.copy(pinLockRemainingSeconds = seconds) } // Ticking
-                if (seconds == 0) break
-                delay(PIN_LOCK_TIMER_INTERVAL) // Wait for 1 second
-            }
-            updateUiState { it.copy(pinPadEnabled = true, wrongPinCount = 0) } // Re-enable PinPad
-        }
-    }
-
-    private suspend fun resetPinValues(withDelay: Boolean = false) {
-        delay(if (withDelay) CLEAR_PIN_DIGIT_DELAY else 0)
-        updateUiState { it.copy(pin = "") }
-    }
-
     private fun showErrorMessage(text: UiText) {
-        _uiState.update { it.copy(errorMessage = text) }
+        updateUiState { it.copy(errorMessage = text) }
         viewModelScope.launch {
             delay(ERROR_MESSAGE_DURATION)
-            _uiState.update { it.copy(errorMessage = UiText.Empty) }
+            updateUiState { it.copy(errorMessage = UiText.Empty) }
         }
-    }
-
-    private fun backspacePinTapped() {
-        updateUiState { it.copy(pin = it.pin.dropLast(n = 1)) }
     }
 
     private fun setLoginButtonEnabled() {
@@ -154,10 +94,6 @@ class LoginViewModel @Inject constructor(
         viewModelScope.launch { _actionEvents.send(actionEvent) }
     }
 
-    override fun onCleared() {
-        super.onCleared()
-        pinLockTimerJob?.cancel()
-    }
 }
 
 sealed interface LoginActionEvent {
@@ -168,8 +104,6 @@ sealed interface LoginUiEvent {
     data class UsernameChanged(val username: String) : LoginUiEvent
     data class PinChanged(val pin: String) : LoginUiEvent
     data object ActionButtonLoginClicked : LoginUiEvent
-    data class PinDigitTapped(val digit: String) : LoginUiEvent
-    data object PinBackspaceTapped : LoginUiEvent
     data class UsernameFocusChanged(val isFocused: Boolean) : LoginUiEvent
     data class PinFocusChanged(val isFocused: Boolean) : LoginUiEvent
 }
