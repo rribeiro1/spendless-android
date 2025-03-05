@@ -58,7 +58,7 @@ fun SettingsPreferencesScreen(
             modifier = modifier
                 .background(MaterialTheme.colorScheme.background)
                 .padding(innerPadding)
-                .padding(horizontal = 16.dp)
+                .padding(horizontal = 16.dp, vertical = 16.dp)
                 .fillMaxSize()
         ) {
             PreferencesScreen(
