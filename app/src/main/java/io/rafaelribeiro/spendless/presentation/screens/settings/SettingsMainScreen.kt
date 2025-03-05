@@ -35,6 +35,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.rafaelribeiro.spendless.R
+import io.rafaelribeiro.spendless.core.presentation.spendlessShadow
 import io.rafaelribeiro.spendless.presentation.theme.SpendLessTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -79,16 +80,16 @@ fun SettingsMainScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(horizontal = 16.dp, vertical = 12.dp),
 
         ) {
         Column(
-            modifier = Modifier.background(
-                color = MaterialTheme.colorScheme.surfaceContainer,
-                shape = RoundedCornerShape(16.dp)
-            )
+            modifier = Modifier
+                .spendlessShadow()
+                .background(MaterialTheme.colorScheme.surfaceContainer, RoundedCornerShape(16.dp))
+
         ) {
-            SettingItemList(stringResource(R.string.preferences), Icons.Default.Settings) {
+            SettingItemList(stringResource(R.string.preferences), Icons.Filled.Settings) {
                 onEvent(SettingsUiEvent.PreferencesClicked)
             }
             SettingItemList(stringResource(R.string.security), Icons.Default.Lock) {
@@ -98,16 +99,14 @@ fun SettingsMainScreen(
 
         Column(
             modifier = Modifier
-                .padding(top = 16.dp)
-                .background(
-                    color = Color.White,
-                    shape = RoundedCornerShape(16.dp)
-                )
+                .padding(top = 8.dp)
+                .spendlessShadow()
+                .background(MaterialTheme.colorScheme.surfaceContainer, RoundedCornerShape(16.dp))
         ) {
             SettingItemList(
                 title = stringResource(R.string.log_out),
                 icon = Icons.AutoMirrored.Filled.Logout,
-                iconContainerColor = MaterialTheme.colorScheme.errorContainer,
+                iconContainerColor = MaterialTheme.colorScheme.error.copy(alpha = 0.08f),
                 iconTint = MaterialTheme.colorScheme.error,
                 textColor = MaterialTheme.colorScheme.error,
                 onClick = {
@@ -134,8 +133,7 @@ private fun SettingItemList(
             .fillMaxWidth()
             .height(48.dp)
             .padding(horizontal = 4.dp, vertical = 4.dp)
-            .background(color = Color.White)
-            .clip(RoundedCornerShape(16.dp))
+            .background(color = MaterialTheme.colorScheme.surfaceContainer)
             .clickable(onClick = onClick)
     ) {
         Box(

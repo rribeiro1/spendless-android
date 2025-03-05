@@ -1,4 +1,4 @@
-package io.rafaelribeiro.spendless.presentation.screens.registration.components
+package io.rafaelribeiro.spendless.core.presentation
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween

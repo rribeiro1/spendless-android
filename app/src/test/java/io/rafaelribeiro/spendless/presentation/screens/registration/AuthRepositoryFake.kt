@@ -5,13 +5,17 @@ import io.rafaelribeiro.spendless.domain.RegistrationError
 import io.rafaelribeiro.spendless.domain.Result
 import io.rafaelribeiro.spendless.domain.User
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 
 class AuthRepositoryFake : AuthRepository {
+    private val testUsername = "rafael"
+    private val testPin = "12345"
+
     override suspend fun checkUserName(username: String): Result<Unit, RegistrationError> {
-        if (username == "rafael") {
-            return Result.Failure(RegistrationError.USERNAME_ALREADY_EXISTS)
+        return if (username == testUsername) {
+            Result.Failure(RegistrationError.USERNAME_ALREADY_EXISTS)
         } else {
-            return Result.Success(Unit)
+            Result.Success(Unit)
         }
     }
 
@@ -20,15 +24,14 @@ class AuthRepositoryFake : AuthRepository {
     }
 
     override suspend fun isPinCorrect(pin: String): Boolean {
-        TODO("Not yet implemented")
+        return pin == testPin
     }
 
     override suspend fun authenticateCredentials(pin: String, username: String): Boolean {
-        TODO("Not yet implemented")
+        return pin == testPin && username == testUsername
     }
 
-    override val userName: Flow<String>
-        get() = TODO("Not yet implemented")
-    override val pin: Flow<String>
-        get() = TODO("Not yet implemented")
+    override val userName: Flow<String> = flow { emit(testUsername) }
+
+    override val pin: Flow<String> = flow { emit(testPin) }
 }

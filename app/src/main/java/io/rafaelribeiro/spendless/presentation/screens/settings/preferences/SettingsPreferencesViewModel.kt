@@ -119,7 +119,6 @@ class SettingsPreferencesViewModel @Inject constructor(
 
     fun onEvent(event: SettingsPreferencesUiEvent) {
         when (event) {
-
             is ExpensesFormatSelected -> {
                 updateState { it.copy(expensesFormat = event.expensesFormat) }
                 formatExampleExpense()
@@ -140,7 +139,6 @@ class SettingsPreferencesViewModel @Inject constructor(
                 saveSecurityPreferencesToDataStore()
                 sendActionEvent(OnBackClicked)
             }
-
         }
     }
 }
