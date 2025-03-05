@@ -5,7 +5,12 @@ import androidx.datastore.core.IOException
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
+import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import io.rafaelribeiro.spendless.presentation.screens.settings.preferences.SettingsPreferencesUiState
+import io.rafaelribeiro.spendless.domain.LockoutDuration
+import io.rafaelribeiro.spendless.domain.SessionExpiryDuration
 import io.rafaelribeiro.spendless.domain.UserPreferencesRepository
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationPreferencesUiState
 import kotlinx.coroutines.flow.Flow
@@ -25,6 +30,8 @@ class DataStoreUserPreferencesRepository @Inject constructor(
         private val DECIMAL_SEPARATOR = stringPreferencesKey("decimal_separator")
         private val THOUSANDS_SEPARATOR = stringPreferencesKey("thousands_separator")
         private val CURRENCY = stringPreferencesKey("currency_symbol")
+        private val SESSION_EXPIRY_DURATION = intPreferencesKey("session_expiry_duration")
+        private val LOCKED_OUT_DURATION = longPreferencesKey("locked_out_duration")
     }
 
     override val userPreferences: Flow<UserPreferences> = dataStore.data
@@ -49,6 +56,22 @@ class DataStoreUserPreferencesRepository @Inject constructor(
             )
         }
 
+    override val securityPreferences: Flow<SecurityPreferences> = dataStore.data
+        .catch { exception ->
+            if (exception is IOException) {
+                emit(emptyPreferences())
+            } else {
+                throw exception
+            }
+        }.map { preferences ->
+            val sessionExpiryDuration = preferences[SESSION_EXPIRY_DURATION]?.toInt() ?: SessionExpiryDuration.MINUTES_5.value
+            val lockedOutDuration = preferences[LOCKED_OUT_DURATION]?.toLong() ?: LockoutDuration.SECONDS_30.value
+            SecurityPreferences(
+                sessionExpiryDuration = sessionExpiryDuration,
+                lockedOutDuration = lockedOutDuration
+            )
+        }
+
     override suspend fun clearAllPreferences() {
         dataStore.edit { preferences ->
             preferences.clear()
@@ -63,14 +86,37 @@ class DataStoreUserPreferencesRepository @Inject constructor(
             preferences[CURRENCY] = userPreferences.currencyName
         }
     }
+
+    override suspend fun saveSecurityPreferences(securityPreferences: SecurityPreferences) {
+        dataStore.edit { preferences ->
+            preferences[SESSION_EXPIRY_DURATION] = securityPreferences.sessionExpiryDuration
+            preferences[LOCKED_OUT_DURATION] = securityPreferences.lockedOutDuration
+        }
+    }
+
 }
 
-data class UserPreferences(
+open class UserPreferences(
     val expensesFormatName: String = "",
     val decimalSeparatorName: String = "",
     val thousandsSeparatorName: String = "",
     val currencyName: String = "",
 )
+
+data class SecurityPreferences(
+    val sessionExpiryDuration: Int = SessionExpiryDuration.MINUTES_5.value,
+    val lockedOutDuration: Long = LockoutDuration.SECONDS_30.value,
+): UserPreferences()
+
+
+fun SettingsPreferencesUiState.toUserPreferences(): UserPreferences {
+    return UserPreferences(
+        expensesFormatName = expensesFormat.name,
+        decimalSeparatorName = decimalSeparator.name,
+        thousandsSeparatorName = thousandSeparator.name,
+        currencyName = currencySymbol.name,
+    )
+}
 
 fun RegistrationPreferencesUiState.toUserPreferences(): UserPreferences {
     return UserPreferences(

@@ -16,7 +16,15 @@ class AuthRepositoryFake : AuthRepository {
     }
 
     override suspend fun register(username: String, pin: String): Result<User, RegistrationError> {
-        return Result.Success(User(username = username))
+        return Result.Success(User(username = username, pin = pin))
+    }
+
+    override suspend fun isPinCorrect(pin: String): Boolean {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun authenticateCredentials(pin: String, username: String): Boolean {
+        TODO("Not yet implemented")
     }
 
     override val userName: Flow<String>

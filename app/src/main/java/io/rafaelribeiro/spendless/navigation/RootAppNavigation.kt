@@ -21,9 +21,9 @@ import io.rafaelribeiro.spendless.presentation.screens.dashboard.DashboardAction
 import io.rafaelribeiro.spendless.presentation.screens.dashboard.DashboardScreen
 import io.rafaelribeiro.spendless.presentation.screens.dashboard.DashboardViewModel
 import io.rafaelribeiro.spendless.presentation.screens.login.LoginActionEvent
+import io.rafaelribeiro.spendless.presentation.screens.login.LoginPinPromptRootScreen
 import io.rafaelribeiro.spendless.presentation.screens.login.LoginRootScreen
 import io.rafaelribeiro.spendless.presentation.screens.login.LoginViewModel
-import io.rafaelribeiro.spendless.presentation.screens.login.LoginPinPromptRootScreen
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationActionEvent
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationPinConfirmationScreen
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationPinPromptScreen
@@ -33,6 +33,15 @@ import io.rafaelribeiro.spendless.presentation.screens.registration.Registration
 import io.rafaelribeiro.spendless.presentation.screens.transactions.TransactionsActionEvent
 import io.rafaelribeiro.spendless.presentation.screens.transactions.TransactionsRootScreen
 import io.rafaelribeiro.spendless.presentation.screens.transactions.TransactionsViewModel
+import io.rafaelribeiro.spendless.presentation.screens.settings.SettingsActionEvent
+import io.rafaelribeiro.spendless.presentation.screens.settings.preferences.SettingsPreferencesScreen
+import io.rafaelribeiro.spendless.presentation.screens.settings.SettingsRootScreen
+import io.rafaelribeiro.spendless.presentation.screens.settings.security.SettingsSecurityScreen
+import io.rafaelribeiro.spendless.presentation.screens.settings.SettingsViewModel
+import io.rafaelribeiro.spendless.presentation.screens.settings.preferences.SettingsPreferencesActionEvent
+import io.rafaelribeiro.spendless.presentation.screens.settings.preferences.SettingsPreferencesViewModel
+import io.rafaelribeiro.spendless.presentation.screens.settings.security.SettingsSecurityActionEvent
+import io.rafaelribeiro.spendless.presentation.screens.settings.security.SettingsSecurityViewModel
 import kotlinx.coroutines.flow.Flow
 
 @Composable
@@ -182,6 +191,9 @@ fun RootAppNavigation(
                     is DashboardActionEvent.AddTransaction -> {
                         // TODO: Navigate to add transaction screen.
                     }
+                    is DashboardActionEvent.OnSettingsClicked -> {
+                        navigationState.navigateTo(Screen.SettingsFlow.route)
+                    }
                 }
             }
             DashboardScreen(
@@ -206,6 +218,64 @@ fun RootAppNavigation(
                 onEvent = viewModel::onEvent,
                 navigationState = navigationState,
             )
+        }
+
+        navigation(
+            startDestination = Screen.SettingsMainScreen.route,
+            route = Screen.SettingsFlow.route,
+        ) {
+            composable(route = Screen.SettingsMainScreen.route) {
+                val viewModel = hiltViewModel<SettingsViewModel>()
+                ObserveAsEvents(flow = viewModel.actionEvents) { event ->
+                    when (event) {
+                        is SettingsActionEvent.OnBackClicked -> navigationState.popBackStack()
+
+                        is SettingsActionEvent.OnPreferencesClicked -> {
+                            navigationState.navigateTo(Screen.SettingsPreferences.route)
+                        }
+                        is SettingsActionEvent.OnSecurityClicked -> {
+                            navigationState.navigateTo(Screen.SettingsSecurity.route)
+                        }
+                        is SettingsActionEvent.OnLogoutClicked -> {
+                            navigationState.navigateAndClearBackStack(Screen.LoginScreen.route)
+                        }
+                    }
+                }
+                SettingsRootScreen(
+                    modifier = modifier,
+                    onEvent = viewModel::onEvent
+                )
+            }
+            composable(route = Screen.SettingsPreferences.route) {
+                val viewModel = hiltViewModel<SettingsPreferencesViewModel>()
+                val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+                ObserveAsEvents(flow = viewModel.actionEvents) { event ->
+                    when (event) {
+                        is SettingsPreferencesActionEvent.OnBackClicked -> navigationState.popBackStack()
+                    }
+                }
+                SettingsPreferencesScreen(
+                    modifier = modifier,
+                    navigationState = navigationState,
+                    uiState = uiState,
+                    onEvent = viewModel::onEvent,
+                )
+            }
+            composable(route = Screen.SettingsSecurity.route) {
+                val viewModel = hiltViewModel<SettingsSecurityViewModel>()
+                val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+                ObserveAsEvents(flow = viewModel.actionEvents) { event ->
+                    when (event) {
+                        is SettingsSecurityActionEvent.OnBackClicked -> navigationState.popBackStack()
+                    }
+                }
+                SettingsSecurityScreen(
+                    modifier = modifier,
+                    navigationState = navigationState,
+                    onEvent = viewModel::onSecurityEvent,
+                    uiState = uiState,
+                )
+            }
         }
 	}
 }

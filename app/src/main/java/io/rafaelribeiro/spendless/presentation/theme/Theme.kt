@@ -3,9 +3,6 @@ package io.rafaelribeiro.spendless.presentation.theme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.staticCompositionLocalOf
-import androidx.compose.ui.graphics.Color
 
 private val SpendLessColorScheme =
 	lightColorScheme(
@@ -23,15 +20,8 @@ private val SpendLessColorScheme =
         surfaceVariant = Yellow, // Secondary Fixed in Figma.
         inversePrimary = PastelPurple,
         surfaceDim = VibrantYellowGreen, // Secondary Fixed Dim in Figma.
-        onSurfaceVariant = Charcoal,
-	/* Other default colors to override
-	background = Color(0xFFFFFBFE),
-	surface = Color(0xFFFFFBFE),
-	onSecondary = Color.White,
-	onTertiary = Color.White,
-	onBackground = Color(0xFF1C1B1F),
-	onSurface = Color(0xFF1C1B1F),
-	 */
+        surfaceContainerLow = GrayLight,
+        onSurfaceVariant = GrayDark,
 	)
 
 @Composable

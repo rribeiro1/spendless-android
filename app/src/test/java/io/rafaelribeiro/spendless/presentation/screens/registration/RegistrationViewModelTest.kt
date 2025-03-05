@@ -109,32 +109,32 @@ class RegistrationViewModelTest {
         fun `updates the example currency text to match the current preferences selected`() {
             assertThat(state.preferences.exampleExpenseFormat).isEqualTo("-$10,382.45")
 
-            registrationViewModel.onEvent(RegistrationUiEvent.ExpensesFormatSelected(ExpenseFormat.PARENTHESES))
+            registrationViewModel.onEvent(PreferencesUiEvent.ExpensesFormatSelected(ExpenseFormat.PARENTHESES))
             assertThat(state.preferences.exampleExpenseFormat).isEqualTo("($10,382.45)")
 
-            registrationViewModel.onEvent(RegistrationUiEvent.DecimalSeparatorSelected(DecimalSeparator.COMMA))
+            registrationViewModel.onEvent(PreferencesUiEvent.DecimalSeparatorSelected(DecimalSeparator.COMMA))
             assertThat(state.preferences.exampleExpenseFormat).isEqualTo("($10,382,45)")
 
-            registrationViewModel.onEvent(RegistrationUiEvent.ThousandSeparatorSelected(ThousandSeparator.SPACE))
+            registrationViewModel.onEvent(PreferencesUiEvent.ThousandSeparatorSelected(ThousandSeparator.SPACE))
             assertThat(state.preferences.exampleExpenseFormat).isEqualTo("($10 382,45)")
 
-            registrationViewModel.onEvent(RegistrationUiEvent.CurrencySelected(CurrencySymbol.EURO))
+            registrationViewModel.onEvent(PreferencesUiEvent.CurrencySelected(CurrencySymbol.EURO))
             assertThat(state.preferences.exampleExpenseFormat).isEqualTo("(€10 382,45)")
         }
 
         @Test
         fun `disables button when user has the same separator selected for both the thousands and decimal separator`() {
-            assertThat(state.preferences.startTrackingButtonEnabled).isTrue()
+            assertThat(state.preferences.buttonEnabled).isTrue()
 
-            registrationViewModel.onEvent(RegistrationUiEvent.DecimalSeparatorSelected(DecimalSeparator.COMMA))
-            registrationViewModel.onEvent(RegistrationUiEvent.ThousandSeparatorSelected(ThousandSeparator.COMMA))
-            assertThat(state.preferences.startTrackingButtonEnabled).isFalse()
+            registrationViewModel.onEvent(PreferencesUiEvent.DecimalSeparatorSelected(DecimalSeparator.COMMA))
+            registrationViewModel.onEvent(PreferencesUiEvent.ThousandSeparatorSelected(ThousandSeparator.COMMA))
+            assertThat(state.preferences.buttonEnabled).isFalse()
 
-            registrationViewModel.onEvent(RegistrationUiEvent.ThousandSeparatorSelected(ThousandSeparator.DOT))
-            assertThat(state.preferences.startTrackingButtonEnabled).isTrue()
+            registrationViewModel.onEvent(PreferencesUiEvent.ThousandSeparatorSelected(ThousandSeparator.DOT))
+            assertThat(state.preferences.buttonEnabled).isTrue()
 
-            registrationViewModel.onEvent(RegistrationUiEvent.DecimalSeparatorSelected(DecimalSeparator.DOT))
-            assertThat(state.preferences.startTrackingButtonEnabled).isFalse()
+            registrationViewModel.onEvent(PreferencesUiEvent.DecimalSeparatorSelected(DecimalSeparator.DOT))
+            assertThat(state.preferences.buttonEnabled).isFalse()
         }
     }
 }
