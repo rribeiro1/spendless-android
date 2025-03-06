@@ -5,6 +5,7 @@ import io.rafaelribeiro.spendless.domain.AuthRepository
 import io.rafaelribeiro.spendless.domain.RegistrationError
 import io.rafaelribeiro.spendless.domain.Result
 import io.rafaelribeiro.spendless.domain.User
+import io.rafaelribeiro.spendless.domain.UserSessionState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -17,6 +18,9 @@ class OfflineAuthRepository @Inject constructor(
     override val pin: Flow<String> = dataStore.data.map { it.pin }
 
     override val userName: Flow<String> = dataStore.data.map { it.username }
+
+    override val sessionState: Flow<UserSessionState>
+        get() = dataStore.data.map { it.sessionState }
 
 	override suspend fun checkUserName(username: String): Result<Unit, RegistrationError> =
 		if (!username.all { it.isLetterOrDigit() }) {
@@ -44,5 +48,11 @@ class OfflineAuthRepository @Inject constructor(
 
     override suspend fun authenticateCredentials(pin: String, username: String): Boolean {
         return this.pin.first() == pin && this.userName.first() == username
+    }
+
+    override suspend fun updateSessionState(state: UserSessionState) {
+        dataStore.updateData {
+            it.copy(sessionState = state)
+        }
     }
 }
