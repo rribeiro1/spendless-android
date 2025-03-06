@@ -30,14 +30,12 @@ class MainViewModel @Inject constructor(
             started = WhileSubscribed(5_000),
             initialValue = UserSessionState.Idle,
         )
-    private val securityPreferences: StateFlow<SecurityPreferences> = userPreferencesRepository.securityPreferences
+    val securityPreferences: StateFlow<SecurityPreferences> = userPreferencesRepository.securityPreferences
         .stateIn(
             scope = viewModelScope,
             initialValue = SecurityPreferences(),
             started = WhileSubscribed(5_000),
         )
-
-    fun sessionExpiryDuration() = securityPreferences.value.sessionExpiryDuration
 
     private fun sendActionEvent(actionEvent: MainActionEvent) {
         viewModelScope.launch { _actionEvents.send(actionEvent) }

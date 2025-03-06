@@ -60,6 +60,7 @@ fun RootAppNavigation(
     val context = LocalContext.current
     val mainViewModel = hiltViewModel<MainViewModel>()
     val sessionState by mainViewModel.sessionState.collectAsState()
+    val securityPreferences by mainViewModel.securityPreferences.collectAsState()
     val startScreen = when (sessionState) {
         UserSessionState.Idle -> Screen.RegistrationFlow.route
         UserSessionState.Active -> Screen.DashboardScreen.route
@@ -72,7 +73,7 @@ fun RootAppNavigation(
         when (event) {
             MainActionEvent.SessionExpired -> navigationState.triggerPinPromptScreen()
             MainActionEvent.CancelUserSession -> UserSessionWorker.cancel(context)
-            MainActionEvent.StartUserSession -> UserSessionWorker.enqueue(context, mainViewModel.sessionExpiryDuration())
+            MainActionEvent.StartUserSession -> UserSessionWorker.enqueue(context, securityPreferences.sessionExpiryDuration)
         }
     }
 
