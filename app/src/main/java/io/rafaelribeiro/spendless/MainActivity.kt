@@ -19,6 +19,12 @@ class MainActivity : ComponentActivity() {
 
     private val mainViewModel: MainViewModel by viewModels()
 
+    // Todo: another way to observe WorkManager. It can be integrated this way too!
+//    val workInfoLiveData = WorkManager.getInstance(this)
+//        .getWorkInfoByIdLiveData(mainViewModel.userSessionWorkerRequest.id)
+//    val workManager = WorkManager.getInstance(this).getWorkInfosByTagFlow("asd")
+
+
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		installSplashScreen().apply {
@@ -26,6 +32,11 @@ class MainActivity : ComponentActivity() {
 				!isAppReady
 			}
 		}
+        (applicationContext as SpendLessApplication).sessionTimeout.observe(this) { timedOut ->
+            if (timedOut)
+                mainViewModel.expireSession()
+        }
+
 		enableEdgeToEdge()
 		setContent {
 			SpendLessTheme {
