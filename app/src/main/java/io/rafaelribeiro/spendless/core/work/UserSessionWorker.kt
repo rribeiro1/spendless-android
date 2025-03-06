@@ -21,7 +21,7 @@ class UserSessionWorker(
     companion object {
         private const val WORK_NAME = "user_session_worker"
 
-        fun enqueue(context: Context) {
+        fun enqueue(context: Context, sessionExpiryDuration: Int) {
             val workManager = WorkManager.getInstance(context)
             val workInfo = workManager.getWorkInfosForUniqueWork(WORK_NAME).get() // Check existing work
 
@@ -37,7 +37,7 @@ class UserSessionWorker(
                     .build()
 
                 val workRequest = OneTimeWorkRequestBuilder<UserSessionWorker>()
-                    .setInitialDelay(10, TimeUnit.SECONDS)
+                    .setInitialDelay(sessionExpiryDuration.toLong(), TimeUnit.MINUTES)
                     .setConstraints(constraints)
                     .build()
 

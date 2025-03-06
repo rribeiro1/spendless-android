@@ -3,6 +3,8 @@ package io.rafaelribeiro.spendless
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.rafaelribeiro.spendless.data.repository.DataStoreUserPreferencesRepository
+import io.rafaelribeiro.spendless.data.repository.SecurityPreferences
 import io.rafaelribeiro.spendless.domain.AuthRepository
 import io.rafaelribeiro.spendless.domain.UserSessionState
 import kotlinx.coroutines.channels.Channel
@@ -16,6 +18,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val authRepository: AuthRepository,
+    private val userPreferencesRepository: DataStoreUserPreferencesRepository
 ) : ViewModel() {
 
     private val _actionEvents = Channel<MainActionEvent>()
@@ -27,6 +30,14 @@ class MainViewModel @Inject constructor(
             started = WhileSubscribed(5_000),
             initialValue = UserSessionState.Idle,
         )
+    private val securityPreferences: StateFlow<SecurityPreferences> = userPreferencesRepository.securityPreferences
+        .stateIn(
+            scope = viewModelScope,
+            initialValue = SecurityPreferences(),
+            started = WhileSubscribed(5_000),
+        )
+
+    fun sessionExpiryDuration() = securityPreferences.value.sessionExpiryDuration
 
     private fun sendActionEvent(actionEvent: MainActionEvent) {
         viewModelScope.launch { _actionEvents.send(actionEvent) }

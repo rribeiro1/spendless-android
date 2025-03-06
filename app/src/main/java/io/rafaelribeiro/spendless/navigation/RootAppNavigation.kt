@@ -72,7 +72,7 @@ fun RootAppNavigation(
         when (event) {
             MainActionEvent.SessionExpired -> navigationState.triggerPinPromptScreen()
             MainActionEvent.CancelUserSession -> UserSessionWorker.cancel(context)
-            MainActionEvent.StartUserSession -> UserSessionWorker.enqueue(context)
+            MainActionEvent.StartUserSession -> UserSessionWorker.enqueue(context, mainViewModel.sessionExpiryDuration())
         }
     }
 
