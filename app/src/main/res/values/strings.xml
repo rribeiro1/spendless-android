@@ -49,4 +49,7 @@
     <string name="session_expiry_duration">Session Expiry Duration</string>
     <string name="lockout_duration">Locked out duration</string>
     <string name="save">Save</string>
+    <string name="create_transaction">Create Transaction</string>
+    <string name="create">Create</string>
+    <string name="receiver">Receiver</string>
 </resources>

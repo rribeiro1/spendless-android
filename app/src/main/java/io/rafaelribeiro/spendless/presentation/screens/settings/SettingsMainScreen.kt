@@ -68,7 +68,6 @@ fun SettingsRootScreen(
             onEvent = onEvent,
         )
     }
-
 }
 
 @Composable

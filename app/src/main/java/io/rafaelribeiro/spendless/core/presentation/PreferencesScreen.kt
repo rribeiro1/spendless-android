@@ -68,7 +68,8 @@ fun PreferencesScreen(
 
     SpendLessSegmentedButton(
         title = stringResource(R.string.expenses_format),
-        options = ExpenseFormat.entries.map { it.value },
+        options = ExpenseFormat.entries,
+        getText = { it.display },
         selectedIndex = ExpenseFormat.entries.indexOf(expensesFormat),
         onOptionSelected = {
             onExpensesFormatSelected(ExpenseFormat.entries[it])
@@ -85,7 +86,8 @@ fun PreferencesScreen(
     )
     SpendLessSegmentedButton(
         title = stringResource(R.string.decimal_separator),
-        options = DecimalSeparator.entries.map { it.value },
+        options = DecimalSeparator.entries,
+        getText = { it.display },
         selectedIndex = DecimalSeparator.entries.indexOf(decimalSeparator),
         onOptionSelected = {
             onDecimalSeparatorSelected(DecimalSeparator.entries[it])
@@ -93,7 +95,8 @@ fun PreferencesScreen(
     )
     SpendLessSegmentedButton(
         title = stringResource(R.string.thousands_separator),
-        options = ThousandSeparator.entries.map { it.value },
+        options = ThousandSeparator.entries,
+        getText = { it.display },
         selectedIndex = ThousandSeparator.entries.indexOf(thousandSeparator),
         onOptionSelected = {
             onThousandSeparatorSelected(ThousandSeparator.entries[it])

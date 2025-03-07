@@ -59,7 +59,8 @@ fun <T>SpendLessDropDown(
     getText: (T) -> String,
     selectedValue: T? = null,
     selectedPosition: Int? = null,
-    onItemSelected: (T) -> Unit = {}
+    onItemSelected: (T) -> Unit = {},
+    modifier: Modifier = Modifier
 ) {
     val isDropDownExpanded = remember { mutableStateOf(false) }
     val boxWidth = remember { mutableIntStateOf(0) }
@@ -87,7 +88,8 @@ fun <T>SpendLessDropDown(
     }
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Center,
+        modifier = modifier
     ) {
         Box(
             modifier = Modifier

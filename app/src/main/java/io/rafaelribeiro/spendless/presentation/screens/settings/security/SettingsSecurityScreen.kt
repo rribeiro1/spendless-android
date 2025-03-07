@@ -74,7 +74,8 @@ fun SecurityScreen(
         ) {
             SpendLessSegmentedButton(
                 title = stringResource(R.string.session_expiry_duration),
-                options = SessionExpiryDuration.entries.map { it.title },
+                options = SessionExpiryDuration.entries,
+                getText = { it.display },
                 selectedIndex = SessionExpiryDuration.entries.indexOf(uiState.sessionExpiryDuration),
                 onOptionSelected = {
                     onEvent(
@@ -86,7 +87,8 @@ fun SecurityScreen(
             )
             SpendLessSegmentedButton(
                 title = stringResource(R.string.lockout_duration),
-                options = LockoutDuration.entries.map { it.title },
+                options = LockoutDuration.entries,
+                getText = { it.display },
                 selectedIndex = LockoutDuration.entries.indexOf(uiState.lockoutDuration),
                 onOptionSelected = {
                     onEvent(SettingsSecurityUiEvent.LockedOutDurationSelected(LockoutDuration.entries[it]))

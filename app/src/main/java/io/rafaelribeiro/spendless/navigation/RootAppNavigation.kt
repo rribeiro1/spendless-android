@@ -15,6 +15,7 @@ import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.dialog
 import androidx.navigation.compose.navigation
 import androidx.navigation.navOptions
 import io.rafaelribeiro.spendless.MainActionEvent
@@ -46,6 +47,8 @@ import io.rafaelribeiro.spendless.presentation.screens.settings.security.Setting
 import io.rafaelribeiro.spendless.presentation.screens.transactions.TransactionsActionEvent
 import io.rafaelribeiro.spendless.presentation.screens.transactions.TransactionsRootScreen
 import io.rafaelribeiro.spendless.presentation.screens.transactions.TransactionsViewModel
+import io.rafaelribeiro.spendless.presentation.screens.transactions.create.CreateTransactionRootScreen
+import io.rafaelribeiro.spendless.presentation.screens.transactions.create.CreateTransactionViewModel
 import kotlinx.coroutines.flow.Flow
 
 @Composable
@@ -58,10 +61,9 @@ fun RootAppNavigation(
         if (event == MainActionEvent.SessionExpired)
             navigationState.triggerPinPromptScreen()
     }
-
 	NavHost(
 		navController = navigationState.navHostController,
-		startDestination = Screen.RegistrationFlow.route,
+		startDestination = Screen.DashboardScreen.route,
 		enterTransition = enterTransition(),
 		exitTransition = exitTransition(),
 		popEnterTransition = popEnterTransition(),
@@ -206,7 +208,7 @@ fun RootAppNavigation(
                         navigationState.navigateTo(Screen.TransactionsScreen.route)
                     }
                     is DashboardActionEvent.AddTransaction -> {
-                        // TODO: Navigate to add transaction screen.
+                        navigationState.navigateTo(Screen.CreateTransactionScreen.route)
                     }
                     is DashboardActionEvent.OnSettingsClicked -> {
                         navigationState.navigateTo(Screen.SettingsFlow.route)
@@ -225,7 +227,7 @@ fun RootAppNavigation(
             ObserveAsEvents(flow = viewModel.actionEvents) { event ->
                 when (event) {
                     is TransactionsActionEvent.NavigateToAddTransaction -> {
-                        // TODO: Navigate to add transaction screen.
+                        navigationState.navigateTo(Screen.CreateTransactionScreen.route)
                     }
                 }
             }
@@ -236,7 +238,15 @@ fun RootAppNavigation(
                 navigationState = navigationState,
             )
         }
-
+        dialog(route = Screen.CreateTransactionScreen.route) {
+            val viewModel = hiltViewModel<CreateTransactionViewModel>()
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            CreateTransactionRootScreen(
+                modifier = modifier,
+                uiState = uiState,
+                onEvent = viewModel::onEvent,
+            )
+        }
         navigation(
             startDestination = Screen.SettingsMainScreen.route,
             route = Screen.SettingsFlow.route,
