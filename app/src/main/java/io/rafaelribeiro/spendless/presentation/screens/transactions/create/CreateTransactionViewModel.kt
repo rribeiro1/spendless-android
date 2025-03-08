@@ -121,16 +121,16 @@ class CreateTransactionViewModel @Inject constructor(
     private fun updateTransactionDescription(transactionDescription: String) {
         val newDescription = transactionDescription.take(DESCRIPTION_MAX_SIZE)
         updateState { it.copy(transaction = it.transaction.copy(description = newDescription)) }
-        enableCreateButton()
+        setCreateButtonStatus()
     }
 
     private fun updateAmount(amount: String) {
         val convertedAmount = amount
             .take(AMOUNT_DIGITS_MAX_SIZE)
             .toAmount()
-
         if (convertedAmount <= 0.0) {
             updateState { it.copy(transaction = it.transaction.copy(amountDisplay = "")) }
+            setCreateButtonStatus()
             return
         }
         val formattedAmount = transactionFormatter.formatAmount(
@@ -144,21 +144,17 @@ class CreateTransactionViewModel @Inject constructor(
             excludeExpenseFormat = true
         )
         updateState { it.copy(transaction = it.transaction.copy(amountDisplay = formattedAmount)) }
-        enableCreateButton()
+        setCreateButtonStatus()
     }
 
     private fun updatePreferencesState(state: (TransactionPreferencesUiState) -> TransactionPreferencesUiState) {
         updateState { it.copy(preferences = state(it.preferences)) }
     }
 
-    private fun enableCreateButton() {
-        if (uiState.value.transaction.amountDisplay.isNotEmpty() &&
-            uiState.value.transaction.description.length >= 3 &&
-            uiState.value.transaction.description.length <= 14) {
-            updateState { it.copy(transaction = it.transaction.copy(createdButtonEnabled = true)) }
-        } else {
-            updateState { it.copy(transaction = it.transaction.copy(createdButtonEnabled = false)) }
-        }
+    private fun setCreateButtonStatus() {
+        val transaction = uiState.value.transaction
+        val shouldEnable = transaction.amountDisplay.isNotEmpty() && transaction.description.length in 3..14
+        updateState { it.copy(transaction = it.transaction.copy(createdButtonEnabled = shouldEnable)) }
     }
 
     private fun sendActionEvent(actionEvent: CreateTransactionActionEvent) {
