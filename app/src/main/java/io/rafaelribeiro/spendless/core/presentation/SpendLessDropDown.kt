@@ -47,7 +47,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupPositionProvider
-import io.rafaelribeiro.spendless.domain.TransactionCategory
+import io.rafaelribeiro.spendless.domain.transaction.TransactionCategory
 import io.rafaelribeiro.spendless.presentation.theme.SpendLessTheme
 
 @Composable

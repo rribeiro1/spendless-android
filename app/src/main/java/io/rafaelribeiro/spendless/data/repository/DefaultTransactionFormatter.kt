@@ -1,11 +1,11 @@
 package io.rafaelribeiro.spendless.data.repository
 
-import io.rafaelribeiro.spendless.domain.CurrencySymbol
-import io.rafaelribeiro.spendless.domain.DecimalSeparator
-import io.rafaelribeiro.spendless.domain.ExpenseFormat
-import io.rafaelribeiro.spendless.domain.ExpenseFormatter
-import io.rafaelribeiro.spendless.domain.TransactionFormatter
-import io.rafaelribeiro.spendless.domain.ThousandSeparator
+import io.rafaelribeiro.spendless.domain.preferences.CurrencySymbol
+import io.rafaelribeiro.spendless.domain.preferences.DecimalSeparator
+import io.rafaelribeiro.spendless.domain.preferences.ExpenseFormat
+import io.rafaelribeiro.spendless.domain.transaction.ExpenseFormatter
+import io.rafaelribeiro.spendless.domain.transaction.TransactionFormatter
+import io.rafaelribeiro.spendless.domain.preferences.ThousandSeparator
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId.systemDefault

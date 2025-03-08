@@ -1,4 +1,4 @@
-package io.rafaelribeiro.spendless.domain
+package io.rafaelribeiro.spendless.domain.preferences
 
 enum class ExpenseFormat(val display: String) {
     NEGATIVE("-$10"),

@@ -9,13 +9,10 @@ import io.rafaelribeiro.spendless.core.presentation.UiText
 import io.rafaelribeiro.spendless.data.repository.DefaultTransactionFormatter
 import io.rafaelribeiro.spendless.data.repository.OfflineTransactionRepository
 import io.rafaelribeiro.spendless.data.repository.UserPreferences
-import io.rafaelribeiro.spendless.domain.CurrencySymbol
-import io.rafaelribeiro.spendless.domain.DecimalSeparator
-import io.rafaelribeiro.spendless.domain.ExpenseFormat
-import io.rafaelribeiro.spendless.domain.Transaction
-import io.rafaelribeiro.spendless.domain.TransactionCategory
-import io.rafaelribeiro.spendless.domain.TransactionType
-import io.rafaelribeiro.spendless.domain.UserPreferencesRepository
+import io.rafaelribeiro.spendless.domain.transaction.Transaction
+import io.rafaelribeiro.spendless.domain.transaction.TransactionCategory
+import io.rafaelribeiro.spendless.domain.transaction.TransactionType
+import io.rafaelribeiro.spendless.domain.user.UserPreferencesRepository
 import io.rafaelribeiro.spendless.presentation.screens.transactions.TransactionsViewModel.Companion.WAIT_UNTIL_NO_CONSUMERS_IN_MILLIS
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
@@ -39,7 +36,7 @@ class CreateTransactionViewModel @Inject constructor(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(CreateTransactionUiState())
     val uiState: StateFlow<CreateTransactionUiState> = _uiState
-        .onStart { subscribeToPreferencesData() }
+        .onStart { subscribeToUserPreferences() }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(WAIT_UNTIL_NO_CONSUMERS_IN_MILLIS),
@@ -49,19 +46,11 @@ class CreateTransactionViewModel @Inject constructor(
     private val _actionEvents = Channel<CreateTransactionActionEvent>()
     val actionEvents = _actionEvents.receiveAsFlow()
 
-    private fun subscribeToPreferencesData() {
+    private fun subscribeToUserPreferences() {
         viewModelScope.launch {
             userPreferencesRepository
                 .userPreferences
-                .onEach { preferences ->
-                    updateState { it.copy(
-                        preferences = TransactionPreferences(
-                            transactionCurrency = CurrencySymbol.fromName(preferences.currencyName),
-                            transactionFormat = ExpenseFormat.fromName(preferences.expensesFormatName),
-                            transactionDecimalSeparator = DecimalSeparator.fromName(preferences.decimalSeparatorName))
-                        )
-                    }
-                }
+                .onEach { preferences -> updatePreferencesState { it.fromUserPreferences(preferences) } }
                 .launchIn(viewModelScope)
         }
     }
@@ -79,29 +68,41 @@ class CreateTransactionViewModel @Inject constructor(
     }
 
     private fun saveTransaction() {
-        try {
-            val transaction = Transaction(
-                type = uiState.value.transaction.transactionType,
-                amount = convertAmountToDouble(uiState.value.transaction.amountDisplay),
-                description = uiState.value.transaction.description,
-                note = uiState.value.transaction.note,
-                category = uiState.value.transaction.category,
-                createdAt = System.currentTimeMillis()
-            )
-            viewModelScope.launch {
+        viewModelScope.launch {
+            try {
+                val transaction = createTransaction()
                 transactionRepository.saveTransaction(transaction)
+                sendActionEvent(CreateTransactionActionEvent.TransactionCreated)
+            } catch (e: Exception) {
+                Log.e(LOG_TAG, "Error saving transaction", e)
+                showErrorMessage(UiText.StringResource(R.string.created_transaction_failed))
             }
-            sendActionEvent(CreateTransactionActionEvent.TransactionCreated)
-        } catch (e: Exception) {
-            Log.e(LOG_TAG, "Error saving transaction", e)
-            showErrorMessage(UiText.StringResource(R.string.created_transaction_failed))
         }
     }
 
-    private fun convertAmountToDouble(amountDisplay: String): Double {
-        val amount = amountDisplay.replace(Regex("\\D"), "")
-        if (amount.isEmpty()) return 0.0
-        return amount.toDouble() / 100
+    private fun createTransaction(): Transaction {
+        val transactionState = uiState.value.transaction
+        val amount = transactionState.amountDisplay.toSignedAmount(uiState.value.transaction.transactionType)
+        return Transaction(
+            type = transactionState.transactionType,
+            amount = amount,
+            description = transactionState.description,
+            note = transactionState.note,
+            category = transactionState.category,
+            createdAt = System.currentTimeMillis()
+        )
+    }
+
+    private fun String.toAmount(): Double {
+        return this
+            .replace(Regex("\\D"), "")
+            .ifEmpty { "0" }
+            .toDouble() / 100
+    }
+
+    private fun String.toSignedAmount(transactionType: TransactionType): Double {
+        val amount = this.toAmount()
+        return if (transactionType == TransactionType.EXPENSE) -amount else amount
     }
 
     private fun updateTransactionType(transactionType: TransactionType) {
@@ -124,7 +125,10 @@ class CreateTransactionViewModel @Inject constructor(
     }
 
     private fun updateAmount(amount: String) {
-        val convertedAmount = convertAmountToDouble(amount.take(AMOUNT_DIGITS_MAX_SIZE))
+        val convertedAmount = amount
+            .take(AMOUNT_DIGITS_MAX_SIZE)
+            .toAmount()
+
         if (convertedAmount <= 0.0) {
             updateState { it.copy(transaction = it.transaction.copy(amountDisplay = "")) }
             return
@@ -132,14 +136,19 @@ class CreateTransactionViewModel @Inject constructor(
         val formattedAmount = transactionFormatter.formatAmount(
             convertedAmount,
             UserPreferences(
-                currencyName = uiState.value.preferences.transactionCurrency.name,
-                expensesFormatName = uiState.value.preferences.transactionFormat.name,
-                decimalSeparatorName = uiState.value.preferences.transactionDecimalSeparator.name
+                currencyName = uiState.value.preferences.currencySymbol.name,
+                expensesFormatName = uiState.value.preferences.expensesFormat.name,
+                decimalSeparatorName = uiState.value.preferences.decimalSeparator.name,
+                thousandsSeparatorName = uiState.value.preferences.thousandSeparator.name
             ),
             excludeExpenseFormat = true
         )
         updateState { it.copy(transaction = it.transaction.copy(amountDisplay = formattedAmount)) }
         enableCreateButton()
+    }
+
+    private fun updatePreferencesState(state: (TransactionPreferencesUiState) -> TransactionPreferencesUiState) {
+        updateState { it.copy(preferences = state(it.preferences)) }
     }
 
     private fun enableCreateButton() {

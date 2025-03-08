@@ -26,7 +26,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.rafaelribeiro.spendless.core.data.TransactionCreator
-import io.rafaelribeiro.spendless.domain.TransactionCategory
+import io.rafaelribeiro.spendless.domain.transaction.TransactionCategory
 import io.rafaelribeiro.spendless.presentation.screens.dashboard.components.DashboardBalance
 import io.rafaelribeiro.spendless.presentation.screens.dashboard.components.DashboardEmptyTransactions
 import io.rafaelribeiro.spendless.presentation.screens.dashboard.components.DashboardLargestTransaction

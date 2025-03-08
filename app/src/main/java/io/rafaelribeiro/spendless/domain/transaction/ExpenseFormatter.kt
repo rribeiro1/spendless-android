@@ -1,5 +1,9 @@
-package io.rafaelribeiro.spendless.domain
+package io.rafaelribeiro.spendless.domain.transaction
 
+import io.rafaelribeiro.spendless.domain.preferences.CurrencySymbol
+import io.rafaelribeiro.spendless.domain.preferences.DecimalSeparator
+import io.rafaelribeiro.spendless.domain.preferences.ExpenseFormat
+import io.rafaelribeiro.spendless.domain.preferences.ThousandSeparator
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 

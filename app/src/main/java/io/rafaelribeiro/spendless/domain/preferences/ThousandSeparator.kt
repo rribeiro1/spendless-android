@@ -1,4 +1,4 @@
-package io.rafaelribeiro.spendless.domain
+package io.rafaelribeiro.spendless.domain.preferences
 
 enum class ThousandSeparator(val display: String, val symbol: String) {
     DOT("1.000", "."),

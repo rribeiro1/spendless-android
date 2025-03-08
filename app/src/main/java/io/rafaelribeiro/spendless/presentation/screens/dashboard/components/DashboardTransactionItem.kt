@@ -32,8 +32,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.rafaelribeiro.spendless.core.data.TransactionCreator
-import io.rafaelribeiro.spendless.domain.TransactionType.EXPENSE
-import io.rafaelribeiro.spendless.domain.TransactionType.INCOME
+import io.rafaelribeiro.spendless.domain.transaction.TransactionType.EXPENSE
+import io.rafaelribeiro.spendless.domain.transaction.TransactionType.INCOME
 import io.rafaelribeiro.spendless.presentation.screens.dashboard.TransactionUiModel
 import io.rafaelribeiro.spendless.presentation.theme.LightOlive
 import io.rafaelribeiro.spendless.presentation.theme.SpendLessTheme

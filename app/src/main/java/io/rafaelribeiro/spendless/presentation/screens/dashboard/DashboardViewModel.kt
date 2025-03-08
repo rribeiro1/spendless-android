@@ -8,10 +8,10 @@ import io.rafaelribeiro.spendless.core.presentation.combine
 import io.rafaelribeiro.spendless.data.repository.DefaultTransactionFormatter
 import io.rafaelribeiro.spendless.data.repository.UserPreferences
 import io.rafaelribeiro.spendless.domain.AuthRepository
-import io.rafaelribeiro.spendless.domain.TransactionRepository
-import io.rafaelribeiro.spendless.domain.UserPreferencesRepository
-import io.rafaelribeiro.spendless.domain.toGroupedTransactions
-import io.rafaelribeiro.spendless.domain.toUIModel
+import io.rafaelribeiro.spendless.domain.transaction.TransactionRepository
+import io.rafaelribeiro.spendless.domain.user.UserPreferencesRepository
+import io.rafaelribeiro.spendless.domain.transaction.toGroupedTransactions
+import io.rafaelribeiro.spendless.domain.transaction.toUIModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow

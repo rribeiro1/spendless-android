@@ -63,7 +63,7 @@ fun RootAppNavigation(
         if (event == MainActionEvent.SessionExpired)
             navigationState.triggerPinPromptScreen()
     }
-	NavHost(
+    NavHost(
 		navController = navigationState.navHostController,
 		startDestination = Screen.DashboardScreen.route,
 		enterTransition = enterTransition(),

@@ -1,3 +1,3 @@
-package io.rafaelribeiro.spendless.domain
+package io.rafaelribeiro.spendless.domain.error
 
 interface Error

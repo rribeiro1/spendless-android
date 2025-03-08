@@ -6,8 +6,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.rafaelribeiro.spendless.data.repository.DefaultTransactionFormatter
 import io.rafaelribeiro.spendless.data.repository.OfflineTransactionRepository
 import io.rafaelribeiro.spendless.data.repository.UserPreferences
-import io.rafaelribeiro.spendless.domain.UserPreferencesRepository
-import io.rafaelribeiro.spendless.domain.toGroupedTransactions
+import io.rafaelribeiro.spendless.domain.user.UserPreferencesRepository
+import io.rafaelribeiro.spendless.domain.transaction.toGroupedTransactions
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow

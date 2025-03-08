@@ -1,16 +1,16 @@
 package io.rafaelribeiro.spendless.core.data
 
 import io.rafaelribeiro.spendless.data.repository.UserPreferences
-import io.rafaelribeiro.spendless.domain.CurrencySymbol
-import io.rafaelribeiro.spendless.domain.DecimalSeparator
-import io.rafaelribeiro.spendless.domain.ExpenseFormat
-import io.rafaelribeiro.spendless.domain.ExpenseFormatter
-import io.rafaelribeiro.spendless.domain.ThousandSeparator
-import io.rafaelribeiro.spendless.domain.Transaction
-import io.rafaelribeiro.spendless.domain.TransactionCategory
-import io.rafaelribeiro.spendless.domain.TransactionFormatter
-import io.rafaelribeiro.spendless.domain.TransactionType
-import io.rafaelribeiro.spendless.domain.toUIModel
+import io.rafaelribeiro.spendless.domain.preferences.CurrencySymbol
+import io.rafaelribeiro.spendless.domain.preferences.DecimalSeparator
+import io.rafaelribeiro.spendless.domain.preferences.ExpenseFormat
+import io.rafaelribeiro.spendless.domain.transaction.ExpenseFormatter
+import io.rafaelribeiro.spendless.domain.preferences.ThousandSeparator
+import io.rafaelribeiro.spendless.domain.transaction.Transaction
+import io.rafaelribeiro.spendless.domain.transaction.TransactionCategory
+import io.rafaelribeiro.spendless.domain.transaction.TransactionFormatter
+import io.rafaelribeiro.spendless.domain.transaction.TransactionType
+import io.rafaelribeiro.spendless.domain.transaction.toUIModel
 import io.rafaelribeiro.spendless.presentation.screens.dashboard.TransactionUiModel
 import java.time.Instant
 import java.time.LocalDateTime

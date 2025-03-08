@@ -5,7 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import io.rafaelribeiro.spendless.data.entity.TransactionEntity
-import io.rafaelribeiro.spendless.domain.TransactionCategory
+import io.rafaelribeiro.spendless.domain.transaction.TransactionCategory
 import kotlinx.coroutines.flow.Flow
 
 @Dao
