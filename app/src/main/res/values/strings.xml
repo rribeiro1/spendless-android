@@ -52,4 +52,5 @@
     <string name="create_transaction">Create Transaction</string>
     <string name="create">Create</string>
     <string name="receiver">Receiver</string>
+    <string name="created_transaction_failed">We could not created your transaction, please try it again!</string>
 </resources>

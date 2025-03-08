@@ -47,6 +47,8 @@ import io.rafaelribeiro.spendless.presentation.screens.settings.security.Setting
 import io.rafaelribeiro.spendless.presentation.screens.transactions.TransactionsActionEvent
 import io.rafaelribeiro.spendless.presentation.screens.transactions.TransactionsRootScreen
 import io.rafaelribeiro.spendless.presentation.screens.transactions.TransactionsViewModel
+import io.rafaelribeiro.spendless.presentation.screens.transactions.create.CreateTransactionActionEvent.TransactionCreated
+import io.rafaelribeiro.spendless.presentation.screens.transactions.create.CreateTransactionActionEvent.CancelTransactionCreation
 import io.rafaelribeiro.spendless.presentation.screens.transactions.create.CreateTransactionRootScreen
 import io.rafaelribeiro.spendless.presentation.screens.transactions.create.CreateTransactionViewModel
 import kotlinx.coroutines.flow.Flow
@@ -241,6 +243,13 @@ fun RootAppNavigation(
         dialog(route = Screen.CreateTransactionScreen.route) {
             val viewModel = hiltViewModel<CreateTransactionViewModel>()
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            ObserveAsEvents(viewModel.actionEvents) {
+                when (it) {
+                    is CancelTransactionCreation, TransactionCreated -> {
+                        navigationState.popBackStack()
+                    }
+                }
+            }
             CreateTransactionRootScreen(
                 modifier = modifier,
                 uiState = uiState,

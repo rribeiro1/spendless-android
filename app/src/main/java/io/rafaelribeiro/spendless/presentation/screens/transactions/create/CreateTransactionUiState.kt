@@ -9,6 +9,11 @@ import io.rafaelribeiro.spendless.domain.TransactionCategory
 import io.rafaelribeiro.spendless.domain.TransactionType
 
 data class CreateTransactionUiState(
+    val transaction: TransactionState = TransactionState(),
+    val preferences: TransactionPreferences = TransactionPreferences(),
+)
+
+data class TransactionState(
     val transactionType: TransactionType = TransactionType.EXPENSE,
     val category: TransactionCategory = TransactionCategory.HOME,
     val amountDisplay: String = "",
@@ -16,6 +21,9 @@ data class CreateTransactionUiState(
     val note: String = "",
     val createdButtonEnabled: Boolean = false,
     val errorMessage: UiText = Empty,
+)
+
+data class TransactionPreferences(
     val transactionCurrency: CurrencySymbol = CurrencySymbol.DOLLAR,
     val transactionFormat: ExpenseFormat = ExpenseFormat.NEGATIVE,
     val transactionDecimalSeparator: DecimalSeparator = DecimalSeparator.DOT,

@@ -26,7 +26,7 @@ import kotlin.random.Random
 class TransactionCreator {
     companion object {
         private val testTransactionFormatter: TransactionFormatter = object : TransactionFormatter {
-            override fun formatAmount(amount: Double, preferences: UserPreferences): String {
+            override fun formatAmount(amount: Double, preferences: UserPreferences, amountOnly: Boolean): String {
                 val formatter = ExpenseFormatter(
                     thousandSeparator = ThousandSeparator.DOT,
                     decimalSeparator = DecimalSeparator.COMMA,

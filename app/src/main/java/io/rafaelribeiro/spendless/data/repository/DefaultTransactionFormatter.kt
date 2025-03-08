@@ -14,7 +14,7 @@ import java.util.Locale
 import javax.inject.Inject
 
 class DefaultTransactionFormatter @Inject constructor() : TransactionFormatter {
-    override fun formatAmount(amount: Double, preferences: UserPreferences): String {
+    override fun formatAmount(amount: Double, preferences: UserPreferences, excludeExpenseFormat: Boolean): String {
         val thousandSeparator = getEnumValue(ThousandSeparator::class.java, preferences.thousandsSeparatorName)
         val decimalSeparator = getEnumValue(DecimalSeparator::class.java, preferences.decimalSeparatorName)
         val expenseFormat = getEnumValue(ExpenseFormat::class.java, preferences.expensesFormatName)
@@ -25,7 +25,7 @@ class DefaultTransactionFormatter @Inject constructor() : TransactionFormatter {
             expensesFormat = expenseFormat,
             currencySymbol = currencySymbol,
         )
-        return formatter.format(amount)
+        return formatter.format(amount, excludeExpenseFormat)
     }
 
     override fun formatDateTime(timestamp: Long): String {

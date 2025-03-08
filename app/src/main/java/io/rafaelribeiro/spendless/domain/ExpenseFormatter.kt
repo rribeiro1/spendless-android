@@ -9,10 +9,10 @@ class ExpenseFormatter(
     private val currencySymbol: CurrencySymbol,
     private val expensesFormat: ExpenseFormat
 ) {
-    fun format(amount: Double): String {
+    fun format(amount: Double, excludeExpenseFormat : Boolean = false): String {
         val formatter = createFormatter()
         val formattedValue = formatter.format(kotlin.math.abs(amount))
-        return formatOutput(amount, formattedValue)
+        return if (excludeExpenseFormat) formattedValue else applyExpenseFormat(amount, formattedValue)
     }
 
     private fun createFormatter(): DecimalFormat {
@@ -23,7 +23,7 @@ class ExpenseFormatter(
         return DecimalFormat("#,##0.00", symbols)
     }
 
-    private fun formatOutput(amount: Double, formattedValue: String): String {
+    private fun applyExpenseFormat(amount: Double, formattedValue: String): String {
         val prefix = currencySymbol.symbol
         return when {
             amount < 0 && expensesFormat == ExpenseFormat.PARENTHESES -> "($prefix$formattedValue)"
