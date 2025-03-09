@@ -9,9 +9,9 @@ import io.rafaelribeiro.spendless.data.repository.DefaultTransactionFormatter
 import io.rafaelribeiro.spendless.data.repository.UserPreferences
 import io.rafaelribeiro.spendless.domain.AuthRepository
 import io.rafaelribeiro.spendless.domain.transaction.TransactionRepository
-import io.rafaelribeiro.spendless.domain.user.UserPreferencesRepository
 import io.rafaelribeiro.spendless.domain.transaction.toGroupedTransactions
 import io.rafaelribeiro.spendless.domain.transaction.toUIModel
+import io.rafaelribeiro.spendless.domain.user.UserPreferencesRepository
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,7 +24,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
 
 @HiltViewModel
 class DashboardViewModel @Inject constructor(

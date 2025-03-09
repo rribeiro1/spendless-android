@@ -70,6 +70,9 @@ dependencies {
     implementation(libs.room.runtime)
     implementation(libs.room.core)
     ksp(libs.room.compiler)
+    // -- Glance (Widgets)
+    implementation(libs.androidx.glance.appwidget)
+    implementation(libs.androidx.glance.material3)
     // -- Tests
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

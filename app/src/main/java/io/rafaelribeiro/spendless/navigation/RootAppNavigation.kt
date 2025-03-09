@@ -3,6 +3,7 @@ package io.rafaelribeiro.spendless.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -56,6 +57,7 @@ import kotlinx.coroutines.flow.Flow
 @Composable
 fun RootAppNavigation(
 	navigationState: NavigationState,
+    launchedFromWidget: Boolean = false,
 	modifier: Modifier = Modifier,
 ) {
     val mainViewModel = hiltViewModel<MainViewModel>()
@@ -65,7 +67,7 @@ fun RootAppNavigation(
     }
     NavHost(
 		navController = navigationState.navHostController,
-		startDestination = Screen.RegistrationFlow.route,
+		startDestination = if (launchedFromWidget) Screen.DashboardScreen.route else Screen.RegistrationFlow.route,
 		enterTransition = enterTransition(),
 		exitTransition = exitTransition(),
 		popEnterTransition = popEnterTransition(),
@@ -221,6 +223,7 @@ fun RootAppNavigation(
                 modifier = modifier,
                 uiState = uiState,
                 onEvent = viewModel::onEvent,
+                launchedFromWidget = launchedFromWidget
             )
         }
         composable(route = Screen.TransactionsScreen.route) {

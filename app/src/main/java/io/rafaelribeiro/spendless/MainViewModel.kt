@@ -44,7 +44,6 @@ class MainViewModel @Inject constructor(
             }
         }
     }
-
 }
 
 sealed interface MainActionEvent {
