@@ -1,6 +1,6 @@
-package io.rafaelribeiro.spendless.domain
+package io.rafaelribeiro.spendless.domain.preferences
 
-enum class LockoutDuration(val title: String, val value: Int) {
+enum class LockoutDuration(val display: String, val value: Int) {
     SECONDS_15("15s", 15),
     SECONDS_30("30s", 30),
     SECONDS_60("1 min", 60),

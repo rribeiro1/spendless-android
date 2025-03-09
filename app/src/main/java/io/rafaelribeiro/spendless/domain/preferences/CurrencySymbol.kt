@@ -1,4 +1,4 @@
-package io.rafaelribeiro.spendless.domain
+package io.rafaelribeiro.spendless.domain.preferences
 
 
 enum class CurrencySymbol(val symbol: String, val title: String) {

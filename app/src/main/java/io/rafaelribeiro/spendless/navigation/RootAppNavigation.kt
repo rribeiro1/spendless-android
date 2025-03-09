@@ -3,6 +3,7 @@ package io.rafaelribeiro.spendless.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -15,6 +16,7 @@ import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.dialog
 import androidx.navigation.compose.navigation
 import androidx.navigation.navOptions
 import io.rafaelribeiro.spendless.MainActionEvent
@@ -46,11 +48,16 @@ import io.rafaelribeiro.spendless.presentation.screens.settings.security.Setting
 import io.rafaelribeiro.spendless.presentation.screens.transactions.TransactionsActionEvent
 import io.rafaelribeiro.spendless.presentation.screens.transactions.TransactionsRootScreen
 import io.rafaelribeiro.spendless.presentation.screens.transactions.TransactionsViewModel
+import io.rafaelribeiro.spendless.presentation.screens.transactions.create.CreateTransactionActionEvent.TransactionCreated
+import io.rafaelribeiro.spendless.presentation.screens.transactions.create.CreateTransactionActionEvent.CancelTransactionCreation
+import io.rafaelribeiro.spendless.presentation.screens.transactions.create.CreateTransactionRootScreen
+import io.rafaelribeiro.spendless.presentation.screens.transactions.create.CreateTransactionViewModel
 import kotlinx.coroutines.flow.Flow
 
 @Composable
 fun RootAppNavigation(
 	navigationState: NavigationState,
+    launchedFromWidget: Boolean = false,
 	modifier: Modifier = Modifier,
 ) {
     val mainViewModel = hiltViewModel<MainViewModel>()
@@ -58,10 +65,9 @@ fun RootAppNavigation(
         if (event == MainActionEvent.SessionExpired)
             navigationState.triggerPinPromptScreen()
     }
-
-	NavHost(
+    NavHost(
 		navController = navigationState.navHostController,
-		startDestination = Screen.RegistrationFlow.route,
+		startDestination = if (launchedFromWidget) Screen.DashboardScreen.route else Screen.RegistrationFlow.route,
 		enterTransition = enterTransition(),
 		exitTransition = exitTransition(),
 		popEnterTransition = popEnterTransition(),
@@ -206,7 +212,7 @@ fun RootAppNavigation(
                         navigationState.navigateTo(Screen.TransactionsScreen.route)
                     }
                     is DashboardActionEvent.AddTransaction -> {
-                        // TODO: Navigate to add transaction screen.
+                        navigationState.navigateTo(Screen.CreateTransactionScreen.route)
                     }
                     is DashboardActionEvent.OnSettingsClicked -> {
                         navigationState.navigateTo(Screen.SettingsFlow.route)
@@ -217,6 +223,7 @@ fun RootAppNavigation(
                 modifier = modifier,
                 uiState = uiState,
                 onEvent = viewModel::onEvent,
+                launchedFromWidget = launchedFromWidget
             )
         }
         composable(route = Screen.TransactionsScreen.route) {
@@ -225,7 +232,7 @@ fun RootAppNavigation(
             ObserveAsEvents(flow = viewModel.actionEvents) { event ->
                 when (event) {
                     is TransactionsActionEvent.NavigateToAddTransaction -> {
-                        // TODO: Navigate to add transaction screen.
+                        navigationState.navigateTo(Screen.CreateTransactionScreen.route)
                     }
                 }
             }
@@ -236,7 +243,22 @@ fun RootAppNavigation(
                 navigationState = navigationState,
             )
         }
-
+        dialog(route = Screen.CreateTransactionScreen.route) {
+            val viewModel = hiltViewModel<CreateTransactionViewModel>()
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            ObserveAsEvents(viewModel.actionEvents) {
+                when (it) {
+                    is CancelTransactionCreation, TransactionCreated -> {
+                        navigationState.popBackStack()
+                    }
+                }
+            }
+            CreateTransactionRootScreen(
+                modifier = modifier,
+                uiState = uiState,
+                onEvent = viewModel::onEvent,
+            )
+        }
         navigation(
             startDestination = Screen.SettingsMainScreen.route,
             route = Screen.SettingsFlow.route,

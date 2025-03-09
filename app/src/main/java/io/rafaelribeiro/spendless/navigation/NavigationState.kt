@@ -13,6 +13,7 @@ class NavigationState(
 	fun navigateTo(route: String, navOptions: NavOptions? = null) {
 		navHostController.navigate(route, navOptions)
 	}
+
 	fun popBackStack() = navHostController.popBackStack()
 
     fun navigateAndClearBackStack(route: String) {

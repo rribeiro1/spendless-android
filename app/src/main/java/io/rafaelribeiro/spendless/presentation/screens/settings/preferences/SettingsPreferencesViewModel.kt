@@ -5,12 +5,12 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.rafaelribeiro.spendless.data.repository.UserPreferences
 import io.rafaelribeiro.spendless.data.repository.toUserPreferences
-import io.rafaelribeiro.spendless.domain.CurrencySymbol
-import io.rafaelribeiro.spendless.domain.DecimalSeparator
-import io.rafaelribeiro.spendless.domain.ExpenseFormat
-import io.rafaelribeiro.spendless.domain.ExpenseFormatter
-import io.rafaelribeiro.spendless.domain.ThousandSeparator
-import io.rafaelribeiro.spendless.domain.UserPreferencesRepository
+import io.rafaelribeiro.spendless.domain.preferences.CurrencySymbol
+import io.rafaelribeiro.spendless.domain.preferences.DecimalSeparator
+import io.rafaelribeiro.spendless.domain.preferences.ExpenseFormat
+import io.rafaelribeiro.spendless.domain.transaction.ExpenseFormatter
+import io.rafaelribeiro.spendless.domain.preferences.ThousandSeparator
+import io.rafaelribeiro.spendless.domain.user.UserPreferencesRepository
 import io.rafaelribeiro.spendless.presentation.screens.settings.preferences.SettingsPreferencesUiEvent.ButtonClicked
 import io.rafaelribeiro.spendless.presentation.screens.settings.preferences.SettingsPreferencesUiEvent.CurrencySelected
 import io.rafaelribeiro.spendless.presentation.screens.settings.preferences.SettingsPreferencesUiEvent.DecimalSeparatorSelected
@@ -119,7 +119,6 @@ class SettingsPreferencesViewModel @Inject constructor(
 
     fun onEvent(event: SettingsPreferencesUiEvent) {
         when (event) {
-
             is ExpensesFormatSelected -> {
                 updateState { it.copy(expensesFormat = event.expensesFormat) }
                 formatExampleExpense()
@@ -140,7 +139,6 @@ class SettingsPreferencesViewModel @Inject constructor(
                 saveSecurityPreferencesToDataStore()
                 sendActionEvent(OnBackClicked)
             }
-
         }
     }
 }

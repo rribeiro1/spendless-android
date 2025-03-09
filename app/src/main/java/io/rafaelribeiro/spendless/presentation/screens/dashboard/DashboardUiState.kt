@@ -1,7 +1,7 @@
 package io.rafaelribeiro.spendless.presentation.screens.dashboard
 
-import io.rafaelribeiro.spendless.domain.TransactionCategory
-import io.rafaelribeiro.spendless.domain.TransactionType
+import io.rafaelribeiro.spendless.domain.transaction.TransactionCategory
+import io.rafaelribeiro.spendless.domain.transaction.TransactionType
 
 data class DashboardUiState(
     val username: String = "",

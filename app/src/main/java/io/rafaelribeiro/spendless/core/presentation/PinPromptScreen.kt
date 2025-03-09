@@ -35,8 +35,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.rafaelribeiro.spendless.R
-import io.rafaelribeiro.spendless.domain.FormattedText
-import io.rafaelribeiro.spendless.domain.formatSecondsToMMSS
 import io.rafaelribeiro.spendless.presentation.theme.SpendLessTheme
 
 @Composable
@@ -69,7 +67,7 @@ fun PinPromptScreen(
 			textAlign = TextAlign.Center,
 			modifier = Modifier.padding(bottom = 8.dp),
 		)
-        FormattedText(
+		FormattedText(
             allText = description,
             textToBeFormattedAsBold = if (pinLockRemainingSeconds == 0) null else pinLockRemainingSeconds.formatSecondsToMMSS(),
             color = MaterialTheme.colorScheme.onSurface,

@@ -1,7 +1,7 @@
 package io.rafaelribeiro.spendless.data.converter
 
 import androidx.room.TypeConverter
-import io.rafaelribeiro.spendless.domain.TransactionCategory
+import io.rafaelribeiro.spendless.domain.transaction.TransactionCategory
 
 class TransactionCategoryConverter {
     @TypeConverter

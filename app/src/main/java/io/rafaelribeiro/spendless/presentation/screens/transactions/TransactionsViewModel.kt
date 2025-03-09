@@ -6,15 +6,15 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.rafaelribeiro.spendless.data.repository.DefaultTransactionFormatter
 import io.rafaelribeiro.spendless.data.repository.OfflineTransactionRepository
 import io.rafaelribeiro.spendless.data.repository.UserPreferences
-import io.rafaelribeiro.spendless.domain.UserPreferencesRepository
-import io.rafaelribeiro.spendless.domain.toGroupedTransactions
+import io.rafaelribeiro.spendless.domain.user.UserPreferencesRepository
+import io.rafaelribeiro.spendless.domain.transaction.toGroupedTransactions
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -60,9 +60,12 @@ class TransactionsViewModel @Inject constructor(
     }
 
     private fun getTransactionsData(): Flow<TransactionsUiState> {
-        return transactionRepository
-            .getAllTransactions()
-            .map { TransactionsUiState(it.toGroupedTransactions(transactionFormatter, userPreferences.value)) }
+        return combine(
+            userPreferences,
+            transactionRepository.getAllTransactions()
+        ) { userPreferences, transactions ->
+            TransactionsUiState(transactions.toGroupedTransactions(transactionFormatter, userPreferences))
+        }
     }
 
     private fun subscribeToTransactionsData() {

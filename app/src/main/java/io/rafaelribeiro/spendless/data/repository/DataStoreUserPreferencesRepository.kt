@@ -7,9 +7,9 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
-import io.rafaelribeiro.spendless.domain.LockoutDuration
-import io.rafaelribeiro.spendless.domain.SessionExpiryDuration
-import io.rafaelribeiro.spendless.domain.UserPreferencesRepository
+import io.rafaelribeiro.spendless.domain.preferences.LockoutDuration
+import io.rafaelribeiro.spendless.domain.preferences.SessionExpiryDuration
+import io.rafaelribeiro.spendless.domain.user.UserPreferencesRepository
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationPreferencesUiState
 import io.rafaelribeiro.spendless.presentation.screens.settings.preferences.SettingsPreferencesUiState
 import kotlinx.coroutines.flow.Flow

@@ -1,4 +1,4 @@
-package io.rafaelribeiro.spendless.domain
+package io.rafaelribeiro.spendless.core.presentation
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
