@@ -1,4 +1,4 @@
-package io.rafaelribeiro.spendless.domain
+package io.rafaelribeiro.spendless.domain.error
 
 enum class RegistrationError : Error {
 	USERNAME_ALREADY_EXISTS,

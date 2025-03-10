@@ -1,7 +1,7 @@
 package io.rafaelribeiro.spendless.data.mapper
 
 import io.rafaelribeiro.spendless.data.entity.TransactionEntity
-import io.rafaelribeiro.spendless.domain.Transaction
+import io.rafaelribeiro.spendless.domain.transaction.Transaction
 
 fun Transaction.toTransactionEntity(): TransactionEntity = TransactionEntity(
     id = id,

@@ -1,7 +1,7 @@
-package io.rafaelribeiro.spendless.domain
+package io.rafaelribeiro.spendless.domain.preferences
 
 
-enum class SessionExpiryDuration(val title: String, val value: Int) {
+enum class SessionExpiryDuration(val display: String, val value: Int) {
     MINUTES_5("5 min", 5),
     MINUTES_15("15 min", 15),
     MINUTES_30("30 min", 30),

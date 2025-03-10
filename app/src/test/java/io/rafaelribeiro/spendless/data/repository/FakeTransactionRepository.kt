@@ -1,9 +1,9 @@
 package io.rafaelribeiro.spendless.data.repository
 
 import io.rafaelribeiro.spendless.core.data.TransactionCreator
-import io.rafaelribeiro.spendless.domain.Transaction
-import io.rafaelribeiro.spendless.domain.TransactionCategory
-import io.rafaelribeiro.spendless.domain.TransactionRepository
+import io.rafaelribeiro.spendless.domain.transaction.Transaction
+import io.rafaelribeiro.spendless.domain.transaction.TransactionCategory
+import io.rafaelribeiro.spendless.domain.transaction.TransactionRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject

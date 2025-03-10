@@ -18,6 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.rafaelribeiro.spendless.R
+import io.rafaelribeiro.spendless.core.presentation.AutoResizingText
 import io.rafaelribeiro.spendless.presentation.theme.SpendLessTheme
 
 @Composable
@@ -37,22 +38,24 @@ fun DashboardPreviousWeek(
             )
             .padding(horizontal = 12.dp)
     ) {
-        Text(
+        AutoResizingText(
             text = amountPreviousWeekDisplay,
             style = MaterialTheme.typography.titleLarge.copy(
                 fontSize = 18.sp
             ),
             color = MaterialTheme.colorScheme.onSurface,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
+            maxFontSize = 18.sp,
+            minFontSize = 14.sp
         )
-        Text(
+        AutoResizingText(
             text = stringResource(R.string.previous_week),
             style = MaterialTheme.typography.bodySmall.copy(
                 fontSize = 12.sp,
                 lineHeight = 16.sp
             ),
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+            maxFontSize = 12.sp,
+            minFontSize = 8.sp,
             modifier = Modifier.padding(top = 4.dp)
         )
     }

@@ -3,15 +3,15 @@ package io.rafaelribeiro.spendless.presentation.screens.dashboard
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.rafaelribeiro.spendless.core.data.TransactionCreator
 import io.rafaelribeiro.spendless.core.presentation.combine
 import io.rafaelribeiro.spendless.data.repository.DefaultTransactionFormatter
-import io.rafaelribeiro.spendless.core.data.TransactionCreator
 import io.rafaelribeiro.spendless.data.repository.UserPreferences
 import io.rafaelribeiro.spendless.domain.AuthRepository
-import io.rafaelribeiro.spendless.domain.TransactionRepository
-import io.rafaelribeiro.spendless.domain.UserPreferencesRepository
-import io.rafaelribeiro.spendless.domain.toGroupedTransactions
-import io.rafaelribeiro.spendless.domain.toUIModel
+import io.rafaelribeiro.spendless.domain.transaction.TransactionRepository
+import io.rafaelribeiro.spendless.domain.transaction.toGroupedTransactions
+import io.rafaelribeiro.spendless.domain.transaction.toUIModel
+import io.rafaelribeiro.spendless.domain.user.UserPreferencesRepository
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,7 +24,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
 
 @HiltViewModel
 class DashboardViewModel @Inject constructor(
@@ -60,10 +59,19 @@ class DashboardViewModel @Inject constructor(
     fun onEvent(event: DashboardUiEvent) {
         when (event) {
             is DashboardUiEvent.AddTransactionClicked -> sendActionEvent(DashboardActionEvent.AddTransaction)
-            is DashboardUiEvent.DownloadTransactionsClicked -> addTransaction() // TODO: Replace with download screen.
+            is DashboardUiEvent.DownloadTransactionsClicked -> clearData()
             is DashboardUiEvent.SettingsClicked -> sendActionEvent(DashboardActionEvent.OnSettingsClicked)
             is DashboardUiEvent.TransactionNoteClicked -> showTransactionNote(event.transactionId)
             is DashboardUiEvent.ShowAllTransactionsClicked -> sendActionEvent(DashboardActionEvent.ShowAllTransactions)
+        }
+    }
+
+    fun clearData() {
+        viewModelScope.launch {
+            transactionRepository.deleteAllTransactions()
+            TransactionCreator.createTransactions(3).forEach {
+                transactionRepository.saveTransaction(it)
+            }
         }
     }
 
@@ -91,22 +99,6 @@ class DashboardViewModel @Inject constructor(
                 largestTransaction = largestTransaction?.toUIModel(transactionFormatter, preferences),
                 mostPopularCategory = mostPopularCategory
             )
-        }
-    }
-
-    // TODO: Temporary method to add a transaction. This will be replaced with add transaction screen on RIB-29.
-    private fun addTransaction() {
-        viewModelScope.launch {
-            transactionRepository.saveTransaction(
-                TransactionCreator.createTransaction()
-            )
-        }
-    }
-
-    // TODO: Temporary method to delete all transactions.
-    private fun deleteAllTransactions() {
-        viewModelScope.launch {
-            transactionRepository.deleteAllTransactions()
         }
     }
 

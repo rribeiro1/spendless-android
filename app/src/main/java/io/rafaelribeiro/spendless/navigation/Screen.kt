@@ -10,6 +10,7 @@ sealed class Screen(val route: String) {
     data object PinPromptScreen : Screen(PIN_PROMPT_SCREEN)
     data object DashboardScreen : Screen(DASHBOARD_SCREEN)
     data object TransactionsScreen : Screen(TRANSACTIONS_SCREEN)
+    data object CreateTransactionScreen : Screen(CREATE_TRANSACTION_SCREEN)
     data object SettingsFlow : Screen(SETTINGS_FLOW)
     data object SettingsMainScreen : Screen(SETTINGS_MAIN_SCREEN)
     data object SettingsPreferences: Screen(SETTINGS_PREFERENCES)
@@ -25,6 +26,7 @@ sealed class Screen(val route: String) {
         private const val PIN_PROMPT_SCREEN = "pin_prompt_screen"
         private const val DASHBOARD_SCREEN = "dashboard_screen"
         private const val TRANSACTIONS_SCREEN = "transactions_screen"
+        private const val CREATE_TRANSACTION_SCREEN = "create_transaction_screen"
 		private const val SETTINGS_FLOW = "settings_flow"
         private const val SETTINGS_MAIN_SCREEN = "settings_main_screen"
         private const val SETTINGS_PREFERENCES = "settings_preferences"

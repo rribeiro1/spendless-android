@@ -1,7 +1,7 @@
 package io.rafaelribeiro.spendless.presentation.screens.settings.security
 
-import io.rafaelribeiro.spendless.domain.LockoutDuration
-import io.rafaelribeiro.spendless.domain.SessionExpiryDuration
+import io.rafaelribeiro.spendless.domain.preferences.LockoutDuration
+import io.rafaelribeiro.spendless.domain.preferences.SessionExpiryDuration
 
 data class SecurityUiState(
     val sessionExpiryDuration: SessionExpiryDuration = SessionExpiryDuration.MINUTES_5,

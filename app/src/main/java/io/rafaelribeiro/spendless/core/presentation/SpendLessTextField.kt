@@ -19,11 +19,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.graphics.DefaultShadowColor
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -44,56 +42,53 @@ fun SpendLessTextField(
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     modifier: Modifier = Modifier
 ) {
-    Box(
-        modifier = modifier
-            .height(48.dp)
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-            .focused(isFocused)
-            .shadow(
-                elevation = 32.dp,
-                shape = RoundedCornerShape(16.dp),
-                spotColor = DefaultShadowColor.copy(
-                    red = 24 / 255f,
-                    green = 0 / 255f,
-                    blue = 64 / 255f,
-                    alpha = 0.2f
-                ),
-            )
-            .background(MaterialTheme.colorScheme.onPrimary)
-            .onFocusChanged { onFocusChange(it.isFocused) }
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+        modifier = Modifier.fillMaxWidth()
     ) {
-        BasicTextField(
-            value = text,
-            onValueChange = onValueChange,
-            textStyle = MaterialTheme.typography.bodyMedium.copy(
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            ),
-            modifier = Modifier
+        Box(
+            modifier = modifier
+                .height(48.dp)
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp)
-                .focusRequester(focusRequester),
-            singleLine = true,
-            cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-            visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
-            keyboardOptions = keyboardOptions,
-            keyboardActions = keyboardActions,
-            decorationBox = { innerTextField ->
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.CenterStart
-                ) {
-                    if (text.isEmpty()) {
-                        Text(
-                            text = textPlaceholder,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                            style = MaterialTheme.typography.bodyMedium
-                        )
+                .padding(horizontal = 16.dp)
+                .focused(isFocused)
+                .spendlessShadow()
+                .background(MaterialTheme.colorScheme.onPrimary)
+                .onFocusChanged { onFocusChange(it.isFocused) }
+        ) {
+            BasicTextField(
+                value = text,
+                onValueChange = onValueChange,
+                textStyle = MaterialTheme.typography.bodyMedium.copy(
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 12.dp)
+                    .focusRequester(focusRequester),
+                singleLine = true,
+                cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
+                keyboardOptions = keyboardOptions,
+                keyboardActions = keyboardActions,
+                decorationBox = { innerTextField ->
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.CenterStart
+                    ) {
+                        if (text.isEmpty()) {
+                            Text(
+                                text = textPlaceholder,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
+                        innerTextField()
                     }
-                    innerTextField()
                 }
-            }
-        )
+            )
+        }
     }
 }
 
@@ -114,20 +109,14 @@ fun Modifier.focused(isFocused: Boolean): Modifier {
 @Composable
 fun PreviewSpendLessTextField() {
     SpendLessTheme {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
+        SpendLessTextField(
+            text = "",
+            textPlaceholder = "Username",
+            onValueChange = {},
+            isFocused = false,
+            onFocusChange = {},
             modifier = Modifier.fillMaxWidth()
-        ) {
-            SpendLessTextField(
-                text = "",
-                textPlaceholder = "Username",
-                onValueChange = {},
-                isFocused = false,
-                onFocusChange = {},
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
+        )
     }
 }
 

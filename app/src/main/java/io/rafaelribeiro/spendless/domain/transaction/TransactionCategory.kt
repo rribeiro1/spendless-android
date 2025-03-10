@@ -1,4 +1,4 @@
-package io.rafaelribeiro.spendless.domain
+package io.rafaelribeiro.spendless.domain.transaction
 
 enum class TransactionCategory(val emoji: String, val displayName: String) {
     HOME("🏠", "Home"),

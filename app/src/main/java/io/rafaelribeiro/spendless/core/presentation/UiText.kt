@@ -5,7 +5,7 @@ import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import io.rafaelribeiro.spendless.R
-import io.rafaelribeiro.spendless.domain.RegistrationError
+import io.rafaelribeiro.spendless.domain.error.RegistrationError
 import io.rafaelribeiro.spendless.domain.Result
 
 sealed class UiText {
