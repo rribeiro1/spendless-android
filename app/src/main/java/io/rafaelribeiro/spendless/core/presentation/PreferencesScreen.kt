@@ -7,25 +7,20 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.DefaultShadowColor
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.rafaelribeiro.spendless.R
-import io.rafaelribeiro.spendless.domain.CurrencySymbol
-import io.rafaelribeiro.spendless.domain.DecimalSeparator
-import io.rafaelribeiro.spendless.domain.ExpenseFormat
-import io.rafaelribeiro.spendless.domain.ThousandSeparator
-import io.rafaelribeiro.spendless.presentation.screens.registration.components.SpendLessDropDown
-import io.rafaelribeiro.spendless.presentation.screens.registration.components.SpendLessSegmentedButton
+import io.rafaelribeiro.spendless.domain.preferences.CurrencySymbol
+import io.rafaelribeiro.spendless.domain.preferences.DecimalSeparator
+import io.rafaelribeiro.spendless.domain.preferences.ExpenseFormat
+import io.rafaelribeiro.spendless.domain.preferences.ThousandSeparator
 import io.rafaelribeiro.spendless.presentation.theme.SpendLessTheme
 
 
@@ -47,16 +42,7 @@ fun PreferencesScreen(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .shadow(
-                elevation = 32.dp,
-                shape = RoundedCornerShape(16.dp),
-                spotColor = DefaultShadowColor.copy(
-                    red = 24 / 255f,
-                    green = 0 / 255f,
-                    blue = 64 / 255f,
-                    alpha = 0.4f
-                ),
-            )
+            .spendlessShadow()
             .background(MaterialTheme.colorScheme.onPrimary)
     ) {
         Column(
@@ -82,7 +68,8 @@ fun PreferencesScreen(
 
     SpendLessSegmentedButton(
         title = stringResource(R.string.expenses_format),
-        options = ExpenseFormat.entries.map { it.value },
+        options = ExpenseFormat.entries,
+        getText = { it.display },
         selectedIndex = ExpenseFormat.entries.indexOf(expensesFormat),
         onOptionSelected = {
             onExpensesFormatSelected(ExpenseFormat.entries[it])
@@ -99,7 +86,8 @@ fun PreferencesScreen(
     )
     SpendLessSegmentedButton(
         title = stringResource(R.string.decimal_separator),
-        options = DecimalSeparator.entries.map { it.value },
+        options = DecimalSeparator.entries,
+        getText = { it.display },
         selectedIndex = DecimalSeparator.entries.indexOf(decimalSeparator),
         onOptionSelected = {
             onDecimalSeparatorSelected(DecimalSeparator.entries[it])
@@ -107,7 +95,8 @@ fun PreferencesScreen(
     )
     SpendLessSegmentedButton(
         title = stringResource(R.string.thousands_separator),
-        options = ThousandSeparator.entries.map { it.value },
+        options = ThousandSeparator.entries,
+        getText = { it.display },
         selectedIndex = ThousandSeparator.entries.indexOf(thousandSeparator),
         onOptionSelected = {
             onThousandSeparatorSelected(ThousandSeparator.entries[it])
@@ -121,7 +110,7 @@ fun PreferencesScreen(
     )
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 fun PreferencesScreenPreview() {
     SpendLessTheme {

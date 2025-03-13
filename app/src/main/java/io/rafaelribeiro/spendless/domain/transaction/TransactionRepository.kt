@@ -1,4 +1,4 @@
-package io.rafaelribeiro.spendless.domain
+package io.rafaelribeiro.spendless.domain.transaction
 
 import kotlinx.coroutines.flow.Flow
 

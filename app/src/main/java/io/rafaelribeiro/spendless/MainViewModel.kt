@@ -6,7 +6,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.rafaelribeiro.spendless.data.repository.DataStoreUserPreferencesRepository
 import io.rafaelribeiro.spendless.data.repository.SecurityPreferences
 import io.rafaelribeiro.spendless.domain.AuthRepository
-import io.rafaelribeiro.spendless.domain.UserSessionState
+import io.rafaelribeiro.spendless.domain.user.UserSessionState
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.StateFlow

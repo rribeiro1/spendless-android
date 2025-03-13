@@ -11,7 +11,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import io.rafaelribeiro.spendless.data.crypto.UserSerializer
-import io.rafaelribeiro.spendless.domain.User
+import io.rafaelribeiro.spendless.domain.user.User
 import javax.inject.Singleton
 
 @Module

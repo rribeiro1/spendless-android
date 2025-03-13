@@ -1,4 +1,4 @@
-package io.rafaelribeiro.spendless.domain
+package io.rafaelribeiro.spendless.domain.transaction
 
 import io.rafaelribeiro.spendless.core.presentation.timestampToLocalDate
 import io.rafaelribeiro.spendless.data.repository.UserPreferences
@@ -8,14 +8,18 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 data class Transaction(
-    val id: Long,
+    val id: Long = INITIAL_TRANSACTION_ID,
     val amount: Double,
     val description: String,
     val note: String? = null,
     val category: TransactionCategory,
     val type: TransactionType,
     val createdAt: Long,
-)
+) {
+    companion object {
+        const val INITIAL_TRANSACTION_ID = 0L
+    }
+}
 
 fun Transaction.toUIModel(
     formatter: TransactionFormatter,

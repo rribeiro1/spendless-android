@@ -1,7 +1,7 @@
 package io.rafaelribeiro.spendless.data.crypto
 
 import androidx.datastore.core.Serializer
-import io.rafaelribeiro.spendless.domain.User
+import io.rafaelribeiro.spendless.domain.user.User
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json

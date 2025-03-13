@@ -1,6 +1,6 @@
-package io.rafaelribeiro.spendless.domain
+package io.rafaelribeiro.spendless.domain.preferences
 
-enum class ExpenseFormat(val value: String) {
+enum class ExpenseFormat(val display: String) {
     NEGATIVE("-$10"),
     PARENTHESES("($10)");
 

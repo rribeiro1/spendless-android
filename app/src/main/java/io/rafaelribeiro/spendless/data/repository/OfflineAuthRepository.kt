@@ -2,10 +2,10 @@ package io.rafaelribeiro.spendless.data.repository
 
 import androidx.datastore.core.DataStore
 import io.rafaelribeiro.spendless.domain.AuthRepository
-import io.rafaelribeiro.spendless.domain.RegistrationError
+import io.rafaelribeiro.spendless.domain.error.RegistrationError
 import io.rafaelribeiro.spendless.domain.Result
-import io.rafaelribeiro.spendless.domain.User
-import io.rafaelribeiro.spendless.domain.UserSessionState
+import io.rafaelribeiro.spendless.domain.user.User
+import io.rafaelribeiro.spendless.domain.user.UserSessionState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map

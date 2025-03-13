@@ -7,9 +7,9 @@ import dagger.hilt.components.SingletonComponent
 import io.rafaelribeiro.spendless.data.repository.OfflineAuthRepository
 import io.rafaelribeiro.spendless.data.repository.OfflineTransactionRepository
 import io.rafaelribeiro.spendless.domain.AuthRepository
-import io.rafaelribeiro.spendless.domain.TransactionRepository
+import io.rafaelribeiro.spendless.domain.transaction.TransactionRepository
 import io.rafaelribeiro.spendless.data.repository.DataStoreUserPreferencesRepository
-import io.rafaelribeiro.spendless.domain.UserPreferencesRepository
+import io.rafaelribeiro.spendless.domain.user.UserPreferencesRepository
 
 @Module
 @InstallIn(SingletonComponent::class)

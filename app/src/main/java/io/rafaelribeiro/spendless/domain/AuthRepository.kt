@@ -1,5 +1,8 @@
 package io.rafaelribeiro.spendless.domain
 
+import io.rafaelribeiro.spendless.domain.error.RegistrationError
+import io.rafaelribeiro.spendless.domain.user.User
+import io.rafaelribeiro.spendless.domain.user.UserSessionState
 import kotlinx.coroutines.flow.Flow
 
 interface AuthRepository {
