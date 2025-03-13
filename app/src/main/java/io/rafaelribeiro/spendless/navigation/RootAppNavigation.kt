@@ -2,10 +2,12 @@ package io.rafaelribeiro.spendless.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModel
@@ -21,6 +23,8 @@ import androidx.navigation.compose.navigation
 import androidx.navigation.navOptions
 import io.rafaelribeiro.spendless.MainActionEvent
 import io.rafaelribeiro.spendless.MainViewModel
+import io.rafaelribeiro.spendless.core.work.UserSessionWorker
+import io.rafaelribeiro.spendless.domain.user.UserSessionState
 import io.rafaelribeiro.spendless.presentation.screens.authentication.AuthPinActionEvent
 import io.rafaelribeiro.spendless.presentation.screens.authentication.AuthPinPromptScreen
 import io.rafaelribeiro.spendless.presentation.screens.authentication.AuthPinPromptViewModel
@@ -60,14 +64,28 @@ fun RootAppNavigation(
     launchedFromWidget: Boolean = false,
 	modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
     val mainViewModel = hiltViewModel<MainViewModel>()
+    val sessionState by mainViewModel.sessionState.collectAsState()
+    val securityPreferences by mainViewModel.securityPreferences.collectAsState()
+    val startScreen = when (sessionState) {
+        UserSessionState.Idle -> Screen.RegistrationFlow.route
+        UserSessionState.Active -> Screen.DashboardScreen.route
+        UserSessionState.Inactive -> Screen.LoginScreen.route
+        UserSessionState.Expired -> Screen.PinPromptScreen.route
+    }
+    println("asd sessionState: $sessionState")
+    println("asd startScreen: $startScreen")
     ObserveAsEvents(flow = mainViewModel.actionEvents) { event ->
-        if (event == MainActionEvent.SessionExpired)
-            navigationState.triggerPinPromptScreen()
+        when (event) {
+            MainActionEvent.SessionExpired -> navigationState.triggerPinPromptScreen()
+            MainActionEvent.CancelUserSession -> UserSessionWorker.cancel(context)
+            MainActionEvent.StartUserSession -> UserSessionWorker.enqueue(context, securityPreferences.sessionExpiryDuration)
+        }
     }
     NavHost(
 		navController = navigationState.navHostController,
-		startDestination = if (launchedFromWidget) Screen.DashboardScreen.route else Screen.RegistrationFlow.route,
+		startDestination = startScreen,
 		enterTransition = enterTransition(),
 		exitTransition = exitTransition(),
 		popEnterTransition = popEnterTransition(),
@@ -197,10 +215,13 @@ fun RootAppNavigation(
                 }
             }
             AuthPinPromptScreen(
-                navigationState = navigationState,
                 uiState = uiState,
                 onEvent = viewModel::onEvent,
                 modifier = modifier,
+                onLogoutClicked = {
+                    mainViewModel.terminateSession()
+                    navigationState.navigateAndClearBackStack(Screen.LoginScreen.route)
+                }
             )
         }
         composable(route = Screen.DashboardScreen.route) {
@@ -225,6 +246,9 @@ fun RootAppNavigation(
                 onEvent = viewModel::onEvent,
                 launchedFromWidget = launchedFromWidget
             )
+            LaunchedEffect(key1 = Unit) {
+                mainViewModel.startSession()
+            }
         }
         composable(route = Screen.TransactionsScreen.route) {
             val viewModel = hiltViewModel<TransactionsViewModel>()
@@ -276,6 +300,7 @@ fun RootAppNavigation(
                             navigationState.navigateTo(Screen.SettingsSecurity.route)
                         }
                         is SettingsActionEvent.OnLogoutClicked -> {
+                            mainViewModel.terminateSession()
                             navigationState.navigateAndClearBackStack(Screen.LoginScreen.route)
                         }
                     }
