@@ -17,13 +17,15 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.rafaelribeiro.spendless.R
 import io.rafaelribeiro.spendless.core.presentation.SpendLessButton
-import io.rafaelribeiro.spendless.domain.LockoutDuration
-import io.rafaelribeiro.spendless.domain.SessionExpiryDuration
+import io.rafaelribeiro.spendless.domain.preferences.LockoutDuration
+import io.rafaelribeiro.spendless.domain.preferences.SessionExpiryDuration
 import io.rafaelribeiro.spendless.navigation.NavigationState
-import io.rafaelribeiro.spendless.presentation.screens.registration.components.SpendLessSegmentedButton
+import io.rafaelribeiro.spendless.core.presentation.SpendLessSegmentedButton
+import io.rafaelribeiro.spendless.presentation.theme.SpendLessTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -52,42 +54,65 @@ fun SettingsSecurityScreen(
             )
         },
     ) { innerPadding ->
+        SecurityScreen(
+            modifier = Modifier.padding(innerPadding),
+            onEvent = onEvent,
+            uiState = uiState
+        )
+    }
+}
 
-        Box(modifier = Modifier.padding(innerPadding)){
-            Column(
-                modifier = Modifier.padding(horizontal = 16.dp)
-            ) {
-                SpendLessSegmentedButton(
-                    title = stringResource(R.string.session_expiry_duration),
-                    options = SessionExpiryDuration.entries.map { it.title },
-                    selectedIndex = SessionExpiryDuration.entries.indexOf(uiState.sessionExpiryDuration),
-                    onOptionSelected = {
-                        onEvent(
-                            SettingsSecurityUiEvent.SessionExpiryDurationSelected(
-                                SessionExpiryDuration.entries[it]
-                            )
+@Composable
+fun SecurityScreen(
+    modifier: Modifier,
+    onEvent: (SettingsSecurityUiEvent) -> Unit,
+    uiState: SecurityUiState,
+) {
+    Box(modifier = modifier) {
+        Column(
+            modifier = Modifier.padding(horizontal = 16.dp)
+        ) {
+            SpendLessSegmentedButton(
+                title = stringResource(R.string.session_expiry_duration),
+                options = SessionExpiryDuration.entries,
+                getText = { it.display },
+                selectedIndex = SessionExpiryDuration.entries.indexOf(uiState.sessionExpiryDuration),
+                onOptionSelected = {
+                    onEvent(
+                        SettingsSecurityUiEvent.SessionExpiryDurationSelected(
+                            SessionExpiryDuration.entries[it]
                         )
-                    }
-                )
-                SpendLessSegmentedButton(
-                    title = stringResource(R.string.lockout_duration),
-                    options = LockoutDuration.entries.map { it.title },
-                    selectedIndex = LockoutDuration.entries.indexOf(uiState.lockoutDuration),
-                    onOptionSelected = {
-                        onEvent(SettingsSecurityUiEvent.LockedOutDurationSelected(LockoutDuration.entries[it]))
-                    }
-                )
-
-                SpendLessButton(
-                    modifier = Modifier.padding(vertical = 24.dp),
-                    text = stringResource(R.string.save),
-                    onClick = {
-                        onEvent(SettingsSecurityUiEvent.SaveClicked)
-                    }
-                )
-
-            }
+                    )
+                }
+            )
+            SpendLessSegmentedButton(
+                title = stringResource(R.string.lockout_duration),
+                options = LockoutDuration.entries,
+                getText = { it.display },
+                selectedIndex = LockoutDuration.entries.indexOf(uiState.lockoutDuration),
+                onOptionSelected = {
+                    onEvent(SettingsSecurityUiEvent.LockedOutDurationSelected(LockoutDuration.entries[it]))
+                }
+            )
+            SpendLessButton(
+                modifier = Modifier.padding(vertical = 24.dp),
+                text = stringResource(R.string.save),
+                onClick = {
+                    onEvent(SettingsSecurityUiEvent.SaveClicked)
+                }
+            )
         }
     }
+}
 
+@Preview(showBackground = true)
+@Composable
+fun SettingsSecurityScreenPreview() {
+    SpendLessTheme {
+        SecurityScreen(
+            modifier = Modifier,
+            onEvent = {},
+            uiState = SecurityUiState()
+        )
+    }
 }

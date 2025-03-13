@@ -4,9 +4,9 @@ import io.rafaelribeiro.spendless.data.database.TransactionDao
 import io.rafaelribeiro.spendless.data.mapper.toTransaction
 import io.rafaelribeiro.spendless.data.mapper.toTransactionEntity
 import io.rafaelribeiro.spendless.data.mapper.toTransactions
-import io.rafaelribeiro.spendless.domain.Transaction
-import io.rafaelribeiro.spendless.domain.TransactionCategory
-import io.rafaelribeiro.spendless.domain.TransactionRepository
+import io.rafaelribeiro.spendless.domain.transaction.Transaction
+import io.rafaelribeiro.spendless.domain.transaction.TransactionCategory
+import io.rafaelribeiro.spendless.domain.transaction.TransactionRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -31,7 +31,7 @@ class OfflineTransactionRepository @Inject constructor(
     }
 
     override fun getBiggestTransaction(): Flow<Transaction?> {
-        return transactionDao.getBiggestTransaction().map { it?.toTransaction() }
+        return transactionDao.getLargestTransaction().map { it?.toTransaction() }
     }
 
     override fun getMostPopularCategory(): Flow<TransactionCategory?> {

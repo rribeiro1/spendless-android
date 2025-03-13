@@ -18,6 +18,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -26,7 +27,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.rafaelribeiro.spendless.core.data.TransactionCreator
-import io.rafaelribeiro.spendless.domain.TransactionCategory
+import io.rafaelribeiro.spendless.core.presentation.DevicePreviews
+import io.rafaelribeiro.spendless.domain.transaction.TransactionCategory
 import io.rafaelribeiro.spendless.presentation.screens.dashboard.components.DashboardBalance
 import io.rafaelribeiro.spendless.presentation.screens.dashboard.components.DashboardEmptyTransactions
 import io.rafaelribeiro.spendless.presentation.screens.dashboard.components.DashboardLargestTransaction
@@ -40,8 +42,14 @@ import io.rafaelribeiro.spendless.presentation.theme.SpendLessTheme
 fun DashboardScreen(
     uiState: DashboardUiState,
     modifier: Modifier,
-    onEvent: (DashboardUiEvent) -> Unit
+    onEvent: (DashboardUiEvent) -> Unit,
+    launchedFromWidget: Boolean = false
 ) {
+    LaunchedEffect(launchedFromWidget) {
+        if (launchedFromWidget) {
+            onEvent(DashboardUiEvent.AddTransactionClicked)
+        }
+    }
     Scaffold(
         containerColor = Color.Transparent,
         modifier = modifier
@@ -176,7 +184,7 @@ fun DashboardEmptyScreenPreview() {
     }
 }
 
-@Preview
+@DevicePreviews
 @Composable
 fun DashboardScreenPreview() {
     SpendLessTheme {

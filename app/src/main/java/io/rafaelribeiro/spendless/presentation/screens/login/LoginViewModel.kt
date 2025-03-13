@@ -55,8 +55,8 @@ class LoginViewModel @Inject constructor(
     }
 
     private fun usernameChanged(username: String) {
-        val trimmedUsername = username.take(USERNAME_MAX_SIZE)
-        updateUiState { it.copy(username = trimmedUsername) }
+        val newUsername = username.take(USERNAME_MAX_SIZE)
+        updateUiState { it.copy(username = newUsername) }
         setLoginButtonEnabled()
     }
 

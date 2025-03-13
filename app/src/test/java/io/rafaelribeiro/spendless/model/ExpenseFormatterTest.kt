@@ -2,13 +2,12 @@ package io.rafaelribeiro.spendless.model
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
-import io.rafaelribeiro.spendless.domain.CurrencySymbol
-import io.rafaelribeiro.spendless.domain.DecimalSeparator
-import io.rafaelribeiro.spendless.domain.ExpenseFormat
-import io.rafaelribeiro.spendless.domain.ExpenseFormatter
-import io.rafaelribeiro.spendless.domain.ThousandSeparator
+import io.rafaelribeiro.spendless.domain.preferences.CurrencySymbol
+import io.rafaelribeiro.spendless.domain.preferences.DecimalSeparator
+import io.rafaelribeiro.spendless.domain.preferences.ExpenseFormat
+import io.rafaelribeiro.spendless.domain.transaction.ExpenseFormatter
+import io.rafaelribeiro.spendless.domain.preferences.ThousandSeparator
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 
 class ExpenseFormatterTest {
 

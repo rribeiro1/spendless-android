@@ -1,16 +1,16 @@
 package io.rafaelribeiro.spendless.core.data
 
 import io.rafaelribeiro.spendless.data.repository.UserPreferences
-import io.rafaelribeiro.spendless.domain.CurrencySymbol
-import io.rafaelribeiro.spendless.domain.DecimalSeparator
-import io.rafaelribeiro.spendless.domain.ExpenseFormat
-import io.rafaelribeiro.spendless.domain.ExpenseFormatter
-import io.rafaelribeiro.spendless.domain.ThousandSeparator
-import io.rafaelribeiro.spendless.domain.Transaction
-import io.rafaelribeiro.spendless.domain.TransactionCategory
-import io.rafaelribeiro.spendless.domain.TransactionFormatter
-import io.rafaelribeiro.spendless.domain.TransactionType
-import io.rafaelribeiro.spendless.domain.toUIModel
+import io.rafaelribeiro.spendless.domain.preferences.CurrencySymbol
+import io.rafaelribeiro.spendless.domain.preferences.DecimalSeparator
+import io.rafaelribeiro.spendless.domain.preferences.ExpenseFormat
+import io.rafaelribeiro.spendless.domain.transaction.ExpenseFormatter
+import io.rafaelribeiro.spendless.domain.preferences.ThousandSeparator
+import io.rafaelribeiro.spendless.domain.transaction.Transaction
+import io.rafaelribeiro.spendless.domain.transaction.TransactionCategory
+import io.rafaelribeiro.spendless.domain.transaction.TransactionFormatter
+import io.rafaelribeiro.spendless.domain.transaction.TransactionType
+import io.rafaelribeiro.spendless.domain.transaction.toUIModel
 import io.rafaelribeiro.spendless.presentation.screens.dashboard.TransactionUiModel
 import java.time.Instant
 import java.time.LocalDateTime
@@ -26,7 +26,7 @@ import kotlin.random.Random
 class TransactionCreator {
     companion object {
         private val testTransactionFormatter: TransactionFormatter = object : TransactionFormatter {
-            override fun formatAmount(amount: Double, preferences: UserPreferences): String {
+            override fun formatAmount(amount: Double, preferences: UserPreferences, amountOnly: Boolean): String {
                 val formatter = ExpenseFormatter(
                     thousandSeparator = ThousandSeparator.DOT,
                     decimalSeparator = DecimalSeparator.COMMA,
@@ -84,7 +84,7 @@ class TransactionCreator {
                     description = "Amazon",
                     category = TransactionCategory.HOME,
                     type = TransactionType.EXPENSE,
-                    amount = 100.00,
+                    amount = -100.00,
                     amountDisplay = "-$100.00",
                     createdAt = randomTimestamp()
                 ),
@@ -92,7 +92,7 @@ class TransactionCreator {
                     description = "McDonald's",
                     category = TransactionCategory.FOOD,
                     type = TransactionType.EXPENSE,
-                    amount = 1450.00,
+                    amount = -1450.00,
                     amountDisplay = "-$1450.00",
                     createdAt = randomTimestamp(),
                     note = "I was hungry today so I bought quite everything from the menu, I should stop doing this"
@@ -101,7 +101,7 @@ class TransactionCreator {
                     description = "Netflix Monthly Subscription from Brazil",
                     category = TransactionCategory.ENTERTAINMENT,
                     type = TransactionType.EXPENSE,
-                    amount = 10.00,
+                    amount = -10.00,
                     amountDisplay = "-$10.00",
                     createdAt = randomTimestamp()
                 ),
@@ -109,7 +109,7 @@ class TransactionCreator {
                     description = "Zara",
                     category = TransactionCategory.CLOTHING,
                     type = TransactionType.EXPENSE,
-                    amount = 12492.50,
+                    amount = -12492.50,
                     amountDisplay = "-$12,492.50",
                     createdAt = randomTimestamp()
                 ),
@@ -117,7 +117,7 @@ class TransactionCreator {
                     description = "Gym - Monthly Membership John Reed",
                     category = TransactionCategory.HEALTH,
                     type = TransactionType.EXPENSE,
-                    amount = 100.00,
+                    amount = -100.00,
                     amountDisplay = "-$100.00",
                     createdAt = randomTimestamp(),
                     note = "I am trying to get back in shape, let's see how it goes. But I am more like an gym investor because I just pay and don't go."
@@ -126,7 +126,7 @@ class TransactionCreator {
                     description = "Haircut",
                     category = TransactionCategory.PERSONAL_CARE,
                     type = TransactionType.EXPENSE,
-                    amount = 50.00,
+                    amount = -50.00,
                     amountDisplay = "-$50.00",
                     createdAt = randomTimestamp(),
                     note = "I was looking like a caveman, so I decided to cut my hair."
@@ -135,7 +135,7 @@ class TransactionCreator {
                     description = "Uber",
                     category = TransactionCategory.TRANSPORTATION,
                     type = TransactionType.EXPENSE,
-                    amount = 10.00,
+                    amount = -10.00,
                     amountDisplay = "-$10.00",
                     createdAt = randomTimestamp(),
                     note = "I was late for a meeting, so I had to take an Uber."
@@ -144,7 +144,7 @@ class TransactionCreator {
                     description = "Udemy",
                     category = TransactionCategory.EDUCATION,
                     type = TransactionType.EXPENSE,
-                    amount = 140.50,
+                    amount = -140.50,
                     amountDisplay = "-$140.50",
                     createdAt = randomTimestamp(),
                     note = "I am learning this android thing, let's see if I can get a job with this."

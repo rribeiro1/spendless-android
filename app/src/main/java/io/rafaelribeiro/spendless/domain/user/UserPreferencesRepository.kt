@@ -1,4 +1,4 @@
-package io.rafaelribeiro.spendless.domain
+package io.rafaelribeiro.spendless.domain.user
 
 import io.rafaelribeiro.spendless.data.repository.SecurityPreferences
 import kotlinx.coroutines.flow.Flow

@@ -22,7 +22,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.rafaelribeiro.spendless.R
-import io.rafaelribeiro.spendless.domain.TransactionCategory
+import io.rafaelribeiro.spendless.domain.transaction.TransactionCategory
 import io.rafaelribeiro.spendless.presentation.theme.SpendLessTheme
 
 @Composable

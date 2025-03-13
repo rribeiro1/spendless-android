@@ -4,8 +4,6 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
     alias(libs.plugins.jetbrains.kotlin.serialization)
-    // -- Spotless
-    id("com.diffplug.spotless") version "7.0.2"
     // -- Hilt
     id("kotlin-kapt")
     alias(libs.plugins.hilt)
@@ -72,6 +70,9 @@ dependencies {
     implementation(libs.room.runtime)
     implementation(libs.room.core)
     ksp(libs.room.compiler)
+    // -- Glance (Widgets)
+    implementation(libs.androidx.glance.appwidget)
+    implementation(libs.androidx.glance.material3)
     // -- Tests
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -90,22 +91,4 @@ dependencies {
 // Allow references to generated code
 kapt {
     correctErrorTypes = true
-}
-
-spotless {
-    format("misc") {
-        target(".gitignore", "*.md", "*.yml", "*.properties")
-
-        trimTrailingWhitespace()
-        leadingSpacesToTabs()
-        endWithNewline()
-    }
-
-    kotlin {
-        target("**/*.kt")
-        ktlint("1.5.0")
-        trimTrailingWhitespace()
-        leadingSpacesToTabs()
-        endWithNewline()
-    }
 }

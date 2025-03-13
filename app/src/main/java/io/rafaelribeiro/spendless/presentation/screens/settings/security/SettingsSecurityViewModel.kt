@@ -4,9 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.rafaelribeiro.spendless.data.repository.SecurityPreferences
-import io.rafaelribeiro.spendless.domain.LockoutDuration
-import io.rafaelribeiro.spendless.domain.SessionExpiryDuration
-import io.rafaelribeiro.spendless.domain.UserPreferencesRepository
+import io.rafaelribeiro.spendless.domain.preferences.LockoutDuration
+import io.rafaelribeiro.spendless.domain.preferences.SessionExpiryDuration
+import io.rafaelribeiro.spendless.domain.user.UserPreferencesRepository
 import io.rafaelribeiro.spendless.presentation.screens.settings.security.SettingsSecurityActionEvent.OnBackClicked
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
