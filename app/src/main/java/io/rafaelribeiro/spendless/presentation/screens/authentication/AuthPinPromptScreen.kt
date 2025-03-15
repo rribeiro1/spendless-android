@@ -78,8 +78,10 @@ fun AuthPinPromptScreen(
                 pinLockRemainingSeconds = uiState.pinLockRemainingSeconds,
                 currentPinSize = uiState.pin.length,
                 pinPadEnabled = uiState.pinPadEnabled,
+                biometricsEnabled = uiState.biometricsEnabled,
                 onNumberClick = { onEvent(AuthPinUiEvent.PinDigitTapped(it)) },
                 onBackspaceClick = { onEvent(AuthPinUiEvent.PinBackspaceTapped) },
+                onBiometricsClick = { onEvent(AuthPinUiEvent.BiometricsTapped) },
             )
         }
         ErrorDialog(

@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Backspace
+import androidx.compose.material.icons.filled.Fingerprint
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -45,8 +46,10 @@ fun PinPromptScreen(
     pinLockRemainingSeconds: Int = 0,
 	currentPinSize: Int = 0,
     pinPadEnabled: Boolean = true,
+	biometricsEnabled: Boolean = false,
 	onNumberClick: (String) -> Unit = {},
 	onBackspaceClick: () -> Unit = {},
+	onBiometricsClick: () -> Unit = {},
 ) {
 	Column(
 		horizontalAlignment = Alignment.CenterHorizontally,
@@ -84,7 +87,9 @@ fun PinPromptScreen(
 		PinPad(
 			onNumberClick = { onNumberClick(it) },
 			onBackspaceClick = { onBackspaceClick() },
+			onBiometricsClick = { onBiometricsClick() },
             pinPadEnabled = pinPadEnabled,
+			biometricsEnabled = biometricsEnabled,
 		)
 		Spacer(modifier = Modifier.height(62.dp))
 	}
@@ -132,7 +137,9 @@ private fun PinCircle(
 fun PinPad(
 	onNumberClick: (String) -> Unit,
 	onBackspaceClick: () -> Unit,
+	onBiometricsClick: () -> Unit,
     pinPadEnabled: Boolean = true,
+	biometricsEnabled: Boolean = false,
 ) {
 	Column(
 		modifier = Modifier.fillMaxWidth(),
@@ -157,7 +164,16 @@ fun PinPad(
 			horizontalArrangement = Arrangement
 				.spacedBy(4.dp, Alignment.CenterHorizontally),
 		) {
-			Spacer(modifier = Modifier.size(108.dp))
+			if (biometricsEnabled) {
+				PinPadButton(
+					icon = Icons.Filled.Fingerprint,
+					color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.3f),
+					disabledContainerColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f),
+					onClick = { onBiometricsClick() },
+				)
+			} else {
+				Spacer(modifier = Modifier.size(108.dp))
+			}
 			PinPadButton(
 				text = "0",
                 enabled = pinPadEnabled,

@@ -75,6 +75,7 @@ class AuthPinPromptViewModel @Inject constructor(
                 isLoading = false,
                 username = username,
                 totalPinLockDuration = securityPreferences.lockedOutDuration,
+                biometricsEnabled = securityPreferences.isBiometricEnabled,
             )
         }
     }
@@ -83,7 +84,12 @@ class AuthPinPromptViewModel @Inject constructor(
         when (event) {
             is AuthPinUiEvent.PinDigitTapped -> pinChanged(event.digit)
             is AuthPinUiEvent.PinBackspaceTapped -> backspacePinTapped()
+            is AuthPinUiEvent.BiometricsTapped -> biometricsTapped()
         }
+    }
+
+    private fun biometricsTapped() {
+        // TODO("Not yet implemented")
     }
 
     private fun backspacePinTapped() {
@@ -157,11 +163,13 @@ data class AuthPinUiState(
     val pinPadEnabled: Boolean = true,
     val pinLockRemainingSeconds: Int = 0,
     val totalPinLockDuration: Int = 0,
+    val biometricsEnabled: Boolean = false,
 )
 
 sealed interface AuthPinUiEvent {
     data class PinDigitTapped(val digit: String) : AuthPinUiEvent
     data object PinBackspaceTapped : AuthPinUiEvent
+    data object BiometricsTapped : AuthPinUiEvent
 }
 
 sealed interface AuthPinActionEvent {
