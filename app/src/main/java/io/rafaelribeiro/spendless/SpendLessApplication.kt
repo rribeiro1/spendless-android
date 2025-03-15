@@ -17,7 +17,6 @@ class SpendLessApplication : Application(), Configuration.Provider {
             .setMinimumLoggingLevel(android.util.Log.DEBUG)
             .build()
 
-
     fun sessionTimeout() {
         _sessionTimeout.value = true
     }

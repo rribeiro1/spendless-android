@@ -1,12 +1,16 @@
 package io.rafaelribeiro.spendless
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.rafaelribeiro.spendless.data.repository.DataStoreUserPreferencesRepository
 import io.rafaelribeiro.spendless.data.repository.SecurityPreferences
 import io.rafaelribeiro.spendless.domain.AuthRepository
+import io.rafaelribeiro.spendless.domain.UserSessionRepository
+import io.rafaelribeiro.spendless.domain.user.UserPreferencesRepository
 import io.rafaelribeiro.spendless.domain.user.UserSessionState
+import io.rafaelribeiro.spendless.workers.UserSessionWorker.Companion.WORKER_TAG
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.StateFlow
@@ -17,24 +21,30 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val authRepository: AuthRepository,
-    private val userPreferencesRepository: DataStoreUserPreferencesRepository
+    private val userSessionRepository: UserSessionRepository,
+    userPreferencesRepository: UserPreferencesRepository,
 ) : ViewModel() {
+    companion object {
+        const val WAIT_UNTIL_NO_CONSUMERS_IN_MILLIS = 5_000L
+    }
 
     private val _actionEvents = Channel<MainActionEvent>()
     val actionEvents = _actionEvents.receiveAsFlow()
 
-    val sessionState: StateFlow<UserSessionState> = authRepository.sessionState
+    val sessionState: StateFlow<UserSessionState> = userSessionRepository
+        .sessionState
         .stateIn(
             scope = viewModelScope,
-            started = WhileSubscribed(5_000),
+            started = WhileSubscribed(WAIT_UNTIL_NO_CONSUMERS_IN_MILLIS),
             initialValue = UserSessionState.Idle,
         )
-    val securityPreferences: StateFlow<SecurityPreferences> = userPreferencesRepository.securityPreferences
+
+    val securityPreferences: StateFlow<SecurityPreferences> = userPreferencesRepository
+        .securityPreferences
         .stateIn(
             scope = viewModelScope,
             initialValue = SecurityPreferences(),
-            started = WhileSubscribed(5_000),
+            started = WhileSubscribed(WAIT_UNTIL_NO_CONSUMERS_IN_MILLIS),
         )
 
     private fun sendActionEvent(actionEvent: MainActionEvent) {
@@ -43,22 +53,22 @@ class MainViewModel @Inject constructor(
 
     fun startSession() {
         viewModelScope.launch {
-            authRepository.updateSessionState(UserSessionState.Active)
+            userSessionRepository.updateSessionState(UserSessionState.Active)
             sendActionEvent(MainActionEvent.StartUserSession)
         }
     }
 
     fun terminateSession() {
         viewModelScope.launch {
-            authRepository.updateSessionState(UserSessionState.Inactive)
+            userSessionRepository.updateSessionState(UserSessionState.Inactive)
             sendActionEvent(MainActionEvent.CancelUserSession)
         }
     }
 
     fun expireSession() {
         viewModelScope.launch {
-            authRepository.updateSessionState(UserSessionState.Expired)
-            println("Session timed out!")
+            userSessionRepository.updateSessionState(UserSessionState.Expired)
+            Log.i(WORKER_TAG, "Session Expired!")
             sendActionEvent(MainActionEvent.SessionExpired)
         }
     }

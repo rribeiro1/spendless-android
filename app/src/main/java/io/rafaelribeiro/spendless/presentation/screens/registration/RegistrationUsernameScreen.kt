@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import io.rafaelribeiro.spendless.R
 import io.rafaelribeiro.spendless.core.presentation.ErrorDialog
 import io.rafaelribeiro.spendless.core.presentation.SpendLessButton
+import io.rafaelribeiro.spendless.navigation.NavigationState
 import io.rafaelribeiro.spendless.presentation.theme.SpendLessTheme
 
 @OptIn(ExperimentalMaterial3Api::class)

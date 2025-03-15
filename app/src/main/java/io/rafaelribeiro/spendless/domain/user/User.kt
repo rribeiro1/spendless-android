@@ -9,9 +9,3 @@ data class User(
     val sessionState: UserSessionState = UserSessionState.Idle,
 )
 
-enum class UserSessionState {
-    Idle,           // show RegistrationScreen
-    Active,         // show DashboardScreen
-    Inactive,       // show LoginScreen
-    Expired,        // show pinPromptScreen
-}

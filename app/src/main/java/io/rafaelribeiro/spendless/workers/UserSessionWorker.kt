@@ -1,6 +1,7 @@
-package io.rafaelribeiro.spendless.core.work
+package io.rafaelribeiro.spendless.workers
 
 import android.content.Context
+import android.util.Log
 import androidx.work.Constraints
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingWorkPolicy
@@ -19,6 +20,7 @@ class UserSessionWorker(
 ) : CoroutineWorker(appContext, workerParams) {
 
     companion object {
+        const val WORKER_TAG = "UserSessionWorker"
         private const val WORK_NAME = "user_session_worker"
 
         fun enqueue(context: Context, sessionExpiryDuration: Int) {
@@ -30,8 +32,8 @@ class UserSessionWorker(
                     it.state == WorkInfo.State.SUCCEEDED || it.state == WorkInfo.State.FAILED || it.state == WorkInfo.State.CANCELLED
                 }
             ) {
-                // Only enqueue if no work exists or existing work is finished
-                println("enqueueing worker STARTED")
+                // Only enqueue if no work exists or existing work is finished.
+                Log.i(WORKER_TAG, "Enqueueing Worker Started...")
                 val constraints = Constraints.Builder()
                     .setRequiresBatteryNotLow(false)
                     .build()
@@ -47,7 +49,7 @@ class UserSessionWorker(
                     workRequest
                 )
             } else {
-                println("asd Worker is already running or enqueued")
+                Log.i(WORKER_TAG, "Worker is already running or enqueued...")
             }
         }
 
@@ -57,13 +59,11 @@ class UserSessionWorker(
     }
 
     override suspend fun doWork(): Result {
-        println("asd enqueueing worker doWork** STARTED")
+        Log.i(WORKER_TAG, "Do Work Started...")
         withContext(Dispatchers.Main) {
-            // Trigger ViewModel's sessionTimeout function
             (applicationContext as SpendLessApplication).sessionTimeout()
         }
-        println("asd enqueueing worker FINISHED")
+        Log.i(WORKER_TAG, "Do Work Finished...")
         return Result.success()
     }
-
 }
