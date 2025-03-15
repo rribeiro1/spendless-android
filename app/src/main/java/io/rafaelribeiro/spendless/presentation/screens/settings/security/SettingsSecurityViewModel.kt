@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.rafaelribeiro.spendless.data.repository.SecurityPreferences
+import io.rafaelribeiro.spendless.domain.preferences.Biometrics
 import io.rafaelribeiro.spendless.domain.preferences.LockoutDuration
 import io.rafaelribeiro.spendless.domain.preferences.SessionExpiryDuration
 import io.rafaelribeiro.spendless.domain.user.UserPreferencesRepository
@@ -74,7 +75,8 @@ class SettingsSecurityViewModel @Inject constructor(
         updateState {
             it.copy(
                 sessionExpiryDuration = SessionExpiryDuration.fromValue(preferences.sessionExpiryDuration),
-                lockoutDuration = LockoutDuration.fromValue(preferences.lockedOutDuration)
+                lockoutDuration = LockoutDuration.fromValue(preferences.lockedOutDuration),
+                biometricsEnabled = preferences.isBiometricEnabled,
             )
         }
     }
@@ -83,7 +85,8 @@ class SettingsSecurityViewModel @Inject constructor(
         viewModelScope.launch {
             val securityPreferences = SecurityPreferences(
                 sessionExpiryDuration = _uiState.value.sessionExpiryDuration.value,
-                lockedOutDuration = _uiState.value.lockoutDuration.value
+                lockedOutDuration = _uiState.value.lockoutDuration.value,
+                isBiometricEnabled = _uiState.value.biometricsEnabled,
             )
             userPreferencesRepository.saveSecurityPreferences(securityPreferences)
         }
@@ -96,6 +99,9 @@ class SettingsSecurityViewModel @Inject constructor(
             }
             is SettingsSecurityUiEvent.LockedOutDurationSelected -> {
                 updateState { it.copy(lockoutDuration = event.duration) }
+            }
+            is SettingsSecurityUiEvent.BiometricsSelected -> {
+                updateState { it.copy(biometricsEnabled = event.biometrics.value) }
             }
             is SettingsSecurityUiEvent.SaveClicked -> {
                 saveSecurityPreferencesToDataStore()
@@ -114,4 +120,5 @@ sealed interface SettingsSecurityUiEvent {
     data object SaveClicked : SettingsSecurityUiEvent
     data class SessionExpiryDurationSelected(val duration: SessionExpiryDuration) : SettingsSecurityUiEvent
     data class LockedOutDurationSelected(val duration: LockoutDuration) : SettingsSecurityUiEvent
+    data class BiometricsSelected(val biometrics: Biometrics) : SettingsSecurityUiEvent
 }
