@@ -1,13 +1,24 @@
 package io.rafaelribeiro.spendless.navigation
 
+import android.content.Context
+import android.content.Intent
+import android.os.Build
+import android.provider.Settings
+import androidx.activity.compose.LocalActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
+import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG
+import androidx.biometric.BiometricManager.Authenticators.DEVICE_CREDENTIAL
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.fragment.app.FragmentActivity.RESULT_CANCELED
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModel
@@ -22,12 +33,16 @@ import androidx.navigation.compose.dialog
 import androidx.navigation.compose.navigation
 import androidx.navigation.navOptions
 import io.rafaelribeiro.spendless.MainActionEvent
+import io.rafaelribeiro.spendless.MainActivity
 import io.rafaelribeiro.spendless.MainViewModel
+import io.rafaelribeiro.spendless.R
+import io.rafaelribeiro.spendless.core.data.BiometricPromptManager
 import io.rafaelribeiro.spendless.core.work.UserSessionWorker
 import io.rafaelribeiro.spendless.domain.user.UserSessionState
 import io.rafaelribeiro.spendless.presentation.screens.authentication.AuthPinActionEvent
 import io.rafaelribeiro.spendless.presentation.screens.authentication.AuthPinPromptScreen
 import io.rafaelribeiro.spendless.presentation.screens.authentication.AuthPinPromptViewModel
+import io.rafaelribeiro.spendless.presentation.screens.authentication.AuthPinUiEvent
 import io.rafaelribeiro.spendless.presentation.screens.dashboard.DashboardActionEvent
 import io.rafaelribeiro.spendless.presentation.screens.dashboard.DashboardScreen
 import io.rafaelribeiro.spendless.presentation.screens.dashboard.DashboardViewModel
@@ -52,22 +67,24 @@ import io.rafaelribeiro.spendless.presentation.screens.settings.security.Setting
 import io.rafaelribeiro.spendless.presentation.screens.transactions.TransactionsActionEvent
 import io.rafaelribeiro.spendless.presentation.screens.transactions.TransactionsRootScreen
 import io.rafaelribeiro.spendless.presentation.screens.transactions.TransactionsViewModel
-import io.rafaelribeiro.spendless.presentation.screens.transactions.create.CreateTransactionActionEvent.TransactionCreated
 import io.rafaelribeiro.spendless.presentation.screens.transactions.create.CreateTransactionActionEvent.CancelTransactionCreation
+import io.rafaelribeiro.spendless.presentation.screens.transactions.create.CreateTransactionActionEvent.TransactionCreated
 import io.rafaelribeiro.spendless.presentation.screens.transactions.create.CreateTransactionRootScreen
 import io.rafaelribeiro.spendless.presentation.screens.transactions.create.CreateTransactionViewModel
 import kotlinx.coroutines.flow.Flow
 
 @Composable
 fun RootAppNavigation(
-	navigationState: NavigationState,
+    modifier: Modifier = Modifier,
+    navigationState: NavigationState,
     launchedFromWidget: Boolean = false,
-	modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
+    val activity = LocalActivity.current as MainActivity
     val mainViewModel = hiltViewModel<MainViewModel>()
     val sessionState by mainViewModel.sessionState.collectAsState()
     val securityPreferences by mainViewModel.securityPreferences.collectAsState()
+
     val startScreen = when (sessionState) {
         UserSessionState.Idle -> Screen.RegistrationFlow.route
         UserSessionState.Active -> Screen.DashboardScreen.route
@@ -207,11 +224,38 @@ fun RootAppNavigation(
         composable(route = Screen.PinPromptScreen.route) {
             val viewModel = hiltViewModel<AuthPinPromptViewModel>()
             val uiState by viewModel.authPinUiState.collectAsStateWithLifecycle()
+            val enrollLauncher = rememberLauncherForActivityResult(
+                contract = ActivityResultContracts.StartActivityForResult(),
+                onResult = {
+                    println("Activity result: $it")
+                    when (it.resultCode) {
+                        RESULT_CANCELED -> {}
+                        else -> {
+                            showBiometricPrompt(viewModel, activity, context)
+                        }
+                    }
+                }
+            )
             ObserveAsEvents(flow = viewModel.actionEvents) { event ->
                 when (event) {
                     AuthPinActionEvent.CorrectPinEntered -> {
                         navigationState.navigateAndClearBackStack(Screen.DashboardScreen.route)
                     }
+                    AuthPinActionEvent.BiometricsTriggered -> {
+                        showBiometricPrompt(viewModel, activity, context)
+                    }
+                }
+            }
+            ObserveAsEvents(flow = viewModel.biometricEvents) { result ->
+                when (result) {
+                    BiometricPromptManager.BiometricResult.AuthenticationSuccess -> {
+                        viewModel.onEvent(AuthPinUiEvent.CorrectBiometricsEntered)
+                    }
+                    BiometricPromptManager.BiometricResult.AuthenticationNotSet -> {
+                        if (Build.VERSION.SDK_INT >= 30)
+                            launchIntent(enrollLauncher)
+                    }
+                    else -> {}
                 }
             }
             AuthPinPromptScreen(
@@ -365,3 +409,25 @@ private fun <T> ObserveAsEvents(flow: Flow<T>, onEvent: (T) -> Unit) {
 	}
 }
 
+@RequiresApi(Build.VERSION_CODES.R)
+private fun launchIntent(enrollLauncher: ActivityResultLauncher<Intent>) {
+    val enrollIntent = Intent(Settings.ACTION_BIOMETRIC_ENROLL).apply {
+        putExtra(
+            Settings.EXTRA_BIOMETRIC_AUTHENTICATORS_ALLOWED,
+            BIOMETRIC_STRONG or DEVICE_CREDENTIAL
+        )
+    }
+    enrollLauncher.launch(enrollIntent)
+}
+
+private fun showBiometricPrompt(
+    viewModel: AuthPinPromptViewModel,
+    activity: MainActivity,
+    context: Context
+) {
+    viewModel.biometricManager.showBiometricPrompt(
+        activity,
+        title = context.getString(R.string.biometric_title),
+        description = context.getString(R.string.biometric_description),
+    )
+}

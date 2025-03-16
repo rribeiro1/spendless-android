@@ -75,6 +75,8 @@ dependencies {
     // -- Glance (Widgets)
     implementation(libs.androidx.glance.appwidget)
     implementation(libs.androidx.glance.material3)
+    // Biometrics
+    implementation(libs.androidx.biometric)
     // -- Tests
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

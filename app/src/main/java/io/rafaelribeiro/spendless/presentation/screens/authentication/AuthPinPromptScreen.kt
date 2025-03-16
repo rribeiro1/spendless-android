@@ -24,9 +24,6 @@ import androidx.compose.ui.unit.dp
 import io.rafaelribeiro.spendless.R
 import io.rafaelribeiro.spendless.core.presentation.ErrorDialog
 import io.rafaelribeiro.spendless.core.presentation.PinPromptScreen
-import io.rafaelribeiro.spendless.navigation.NavigationState
-import io.rafaelribeiro.spendless.navigation.Screen
-import io.rafaelribeiro.spendless.navigation.rememberNavigationState
 import io.rafaelribeiro.spendless.presentation.theme.SpendLessTheme
 
 @OptIn(ExperimentalMaterial3Api::class)

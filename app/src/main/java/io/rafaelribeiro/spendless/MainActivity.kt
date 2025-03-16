@@ -1,11 +1,11 @@
 package io.rafaelribeiro.spendless
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.fragment.app.FragmentActivity
 import dagger.hilt.android.AndroidEntryPoint
 import io.rafaelribeiro.spendless.navigation.RootAppNavigation
 import io.rafaelribeiro.spendless.navigation.rememberNavigationState
@@ -16,7 +16,7 @@ import io.rafaelribeiro.spendless.presentation.widget.CreateTransactionWidget.WI
 private var isAppReady: Boolean = true
 
 @AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+class MainActivity : FragmentActivity() {
     private val mainViewModel: MainViewModel by viewModels()
 
     // Todo: another way to observe WorkManager. It can be integrated this way too!
@@ -42,7 +42,7 @@ class MainActivity : ComponentActivity() {
 			SpendLessTheme {
                 RootAppNavigation(
 					navigationState = rememberNavigationState(),
-					launchedFromWidget = launchedFromWidget
+					launchedFromWidget = launchedFromWidget,
 				)
 			}
 		}

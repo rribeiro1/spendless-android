@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.rafaelribeiro.spendless.R
+import io.rafaelribeiro.spendless.core.data.BiometricPromptManager
 import io.rafaelribeiro.spendless.core.presentation.UiText
 import io.rafaelribeiro.spendless.core.presentation.UiText.Companion.Empty
 import io.rafaelribeiro.spendless.data.repository.DataStoreUserPreferencesRepository
@@ -32,6 +33,7 @@ import javax.inject.Inject
 class AuthPinPromptViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     dataStoreUserPreferencesRepository: DataStoreUserPreferencesRepository,
+    internal val biometricManager: BiometricPromptManager,
 ) : ViewModel() {
     companion object {
         const val PIN_MAX_WRONG_COUNT = 2
@@ -60,6 +62,9 @@ class AuthPinPromptViewModel @Inject constructor(
     private val _actionEvents = Channel<AuthPinActionEvent>()
     val actionEvents = _actionEvents.receiveAsFlow()
 
+    var biometricEvents = biometricManager.promptResults
+        private set
+
     private fun subscribeToData() {
         getPinPromptData()
             .onEach { _authPinUiState.value = it  }
@@ -85,11 +90,20 @@ class AuthPinPromptViewModel @Inject constructor(
             is AuthPinUiEvent.PinDigitTapped -> pinChanged(event.digit)
             is AuthPinUiEvent.PinBackspaceTapped -> backspacePinTapped()
             is AuthPinUiEvent.BiometricsTapped -> biometricsTapped()
+            is AuthPinUiEvent.CorrectBiometricsEntered -> correctPinEntered()
+        }
+    }
+
+    private fun correctPinEntered() {
+        viewModelScope.launch {
+            _actionEvents.send(AuthPinActionEvent.CorrectPinEntered)
         }
     }
 
     private fun biometricsTapped() {
-        // TODO("Not yet implemented")
+        viewModelScope.launch {
+            _actionEvents.send(AuthPinActionEvent.BiometricsTriggered)
+        }
     }
 
     private fun backspacePinTapped() {
@@ -108,7 +122,7 @@ class AuthPinPromptViewModel @Inject constructor(
                 viewModelScope.launch {
                     resetPinValues(true)
                     if (authRepository.isPinCorrect(currentPin)) {
-                        _actionEvents.send(AuthPinActionEvent.CorrectPinEntered)
+                        correctPinEntered()
                     } else {
                         handleWrongPinUiState()
                     }
@@ -170,8 +184,10 @@ sealed interface AuthPinUiEvent {
     data class PinDigitTapped(val digit: String) : AuthPinUiEvent
     data object PinBackspaceTapped : AuthPinUiEvent
     data object BiometricsTapped : AuthPinUiEvent
+    data object CorrectBiometricsEntered : AuthPinUiEvent
 }
 
 sealed interface AuthPinActionEvent {
     data object CorrectPinEntered : AuthPinActionEvent
+    data object BiometricsTriggered : AuthPinActionEvent
 }

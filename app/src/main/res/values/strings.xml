@@ -56,4 +56,6 @@
     <string name="biometrics_for_pin_prompt">Biometrics for PIN prompt</string>
     <string name="enable">Enable</string>
     <string name="disable">Disable</string>
+    <string name="biometric_description">Would you like to use biometric authentication to log in?</string>
+    <string name="biometric_title">Use biometric authentication</string>
 </resources>

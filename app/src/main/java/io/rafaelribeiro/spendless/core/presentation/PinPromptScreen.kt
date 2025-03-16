@@ -34,6 +34,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import io.rafaelribeiro.spendless.R
 import io.rafaelribeiro.spendless.presentation.theme.SpendLessTheme
@@ -167,6 +168,7 @@ fun PinPad(
 			if (biometricsEnabled) {
 				PinPadButton(
 					icon = Icons.Filled.Fingerprint,
+					iconSize = 40.dp,
 					color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.3f),
 					disabledContainerColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f),
 					onClick = { onBiometricsClick() },
@@ -194,6 +196,7 @@ fun PinPad(
 fun PinPadButton(
 	text: String = "",
 	icon: ImageVector? = null,
+	iconSize: Dp? = null,
 	iconDescription: String = "",
 	color: Color = MaterialTheme.colorScheme.secondary,
     disabledContainerColor: Color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.3f),
@@ -214,6 +217,7 @@ fun PinPadButton(
 	) {
 		if (icon != null) {
 			Icon(
+				modifier = iconSize?.let { Modifier.size(iconSize) } ?: Modifier,
 				imageVector = icon,
 				contentDescription = iconDescription,
 				tint = if (enabled) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.tertiary.copy(alpha = 0.3f),
