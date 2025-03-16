@@ -1,5 +1,6 @@
 package io.rafaelribeiro.spendless.navigation
 
+import android.util.Log
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -37,7 +38,7 @@ import io.rafaelribeiro.spendless.MainActivity
 import io.rafaelribeiro.spendless.MainViewModel
 import io.rafaelribeiro.spendless.R
 import io.rafaelribeiro.spendless.core.data.BiometricPromptManager
-import io.rafaelribeiro.spendless.core.work.UserSessionWorker
+import io.rafaelribeiro.spendless.workers.UserSessionWorker
 import io.rafaelribeiro.spendless.domain.user.UserSessionState
 import io.rafaelribeiro.spendless.presentation.screens.authentication.AuthPinActionEvent
 import io.rafaelribeiro.spendless.presentation.screens.authentication.AuthPinPromptScreen
@@ -71,6 +72,7 @@ import io.rafaelribeiro.spendless.presentation.screens.transactions.create.Creat
 import io.rafaelribeiro.spendless.presentation.screens.transactions.create.CreateTransactionActionEvent.TransactionCreated
 import io.rafaelribeiro.spendless.presentation.screens.transactions.create.CreateTransactionRootScreen
 import io.rafaelribeiro.spendless.presentation.screens.transactions.create.CreateTransactionViewModel
+import io.rafaelribeiro.spendless.workers.UserSessionWorker.Companion.WORKER_TAG
 import kotlinx.coroutines.flow.Flow
 
 @Composable
@@ -91,8 +93,8 @@ fun RootAppNavigation(
         UserSessionState.Inactive -> Screen.LoginScreen.route
         UserSessionState.Expired -> Screen.PinPromptScreen.route
     }
-    println("asd sessionState: $sessionState")
-    println("asd startScreen: $startScreen")
+    Log.i(WORKER_TAG, "Session State: $sessionState")
+    Log.i(WORKER_TAG, "Start Screen: $startScreen")
     ObserveAsEvents(flow = mainViewModel.actionEvents) { event ->
         when (event) {
             MainActionEvent.SessionExpired -> navigationState.triggerPinPromptScreen()
