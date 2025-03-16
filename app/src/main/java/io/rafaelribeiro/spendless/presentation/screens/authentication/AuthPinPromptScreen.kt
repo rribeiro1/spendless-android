@@ -31,7 +31,6 @@ import io.rafaelribeiro.spendless.presentation.theme.SpendLessTheme
 fun AuthPinPromptScreen(
     uiState: AuthPinUiState,
     onEvent: (AuthPinUiEvent) -> Unit = {},
-    onLogoutClicked: () -> Unit = {},
     modifier: Modifier,
 ) {
     val isPinLocked = uiState.pinLockRemainingSeconds > 0
@@ -51,7 +50,7 @@ fun AuthPinPromptScreen(
                                 disabledContentColor = MaterialTheme.colorScheme.error.copy(alpha = 0.3f),
                             ),
                             shape = RoundedCornerShape(16.dp),
-                            onClick = onLogoutClicked,
+                            onClick = { onEvent(AuthPinUiEvent.LogoutTapped) },
                         ) {
                             Icon(
                                 tint = MaterialTheme.colorScheme.error,

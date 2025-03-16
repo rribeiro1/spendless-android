@@ -91,6 +91,13 @@ class AuthPinPromptViewModel @Inject constructor(
             is AuthPinUiEvent.PinBackspaceTapped -> backspacePinTapped()
             is AuthPinUiEvent.BiometricsTapped -> biometricsTapped()
             is AuthPinUiEvent.CorrectBiometricsEntered -> correctPinEntered()
+            is AuthPinUiEvent.LogoutTapped -> logoutTapped()
+        }
+    }
+
+    private fun logoutTapped() {
+        viewModelScope.launch {
+            _actionEvents.send(AuthPinActionEvent.LogoutClicked)
         }
     }
 
@@ -185,9 +192,11 @@ sealed interface AuthPinUiEvent {
     data object PinBackspaceTapped : AuthPinUiEvent
     data object BiometricsTapped : AuthPinUiEvent
     data object CorrectBiometricsEntered : AuthPinUiEvent
+    data object LogoutTapped : AuthPinUiEvent
 }
 
 sealed interface AuthPinActionEvent {
     data object CorrectPinEntered : AuthPinActionEvent
     data object BiometricsTriggered : AuthPinActionEvent
+    data object LogoutClicked : AuthPinActionEvent
 }

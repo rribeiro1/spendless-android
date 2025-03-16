@@ -244,6 +244,10 @@ fun RootAppNavigation(
                     AuthPinActionEvent.BiometricsTriggered -> {
                         showBiometricPrompt(viewModel, activity, context)
                     }
+                    AuthPinActionEvent.LogoutClicked -> {
+                        mainViewModel.terminateSession()
+                        navigationState.navigateAndClearBackStack(Screen.LoginScreen.route)
+                    }
                 }
             }
             ObserveAsEvents(flow = viewModel.biometricEvents) { result ->
@@ -262,10 +266,6 @@ fun RootAppNavigation(
                 uiState = uiState,
                 onEvent = viewModel::onEvent,
                 modifier = modifier,
-                onLogoutClicked = {
-                    mainViewModel.terminateSession()
-                    navigationState.navigateAndClearBackStack(Screen.LoginScreen.route)
-                }
             )
         }
         composable(route = Screen.DashboardScreen.route) {
