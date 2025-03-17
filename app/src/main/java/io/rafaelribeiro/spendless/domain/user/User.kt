@@ -6,4 +6,6 @@ import kotlinx.serialization.Serializable
 data class User(
 	val username: String,
     val pin: String,
+    val sessionState: UserSessionState = UserSessionState.Idle,
 )
+

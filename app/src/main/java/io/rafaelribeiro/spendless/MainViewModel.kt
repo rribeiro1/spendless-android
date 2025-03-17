@@ -1,51 +1,81 @@
 package io.rafaelribeiro.spendless
 
-import androidx.lifecycle.SavedStateHandle
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
+import io.rafaelribeiro.spendless.data.repository.DataStoreUserPreferencesRepository
+import io.rafaelribeiro.spendless.data.repository.SecurityPreferences
+import io.rafaelribeiro.spendless.domain.AuthRepository
+import io.rafaelribeiro.spendless.domain.UserSessionRepository
+import io.rafaelribeiro.spendless.domain.user.UserPreferencesRepository
+import io.rafaelribeiro.spendless.domain.user.UserSessionState
+import io.rafaelribeiro.spendless.workers.UserSessionWorker.Companion.WORKER_TAG
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val savedStateHandle: SavedStateHandle,
+    private val userSessionRepository: UserSessionRepository,
+    userPreferencesRepository: UserPreferencesRepository,
 ) : ViewModel() {
-
-    // TODO: This ViewModel is just for Test Purposes, we need to replace everything here with WorkManager..
-
     companion object {
-        private const val SESSION_TICKER_KEY = "session_ticker"
-        private const val SESSION_TIMER_INTERVAL = 1000L
+        const val WAIT_UNTIL_NO_CONSUMERS_IN_MILLIS = 5_000L
     }
-    private var sessionExpiryJob: Job? = null
+
     private val _actionEvents = Channel<MainActionEvent>()
     val actionEvents = _actionEvents.receiveAsFlow()
-    init {
-        startUserSession(600) // 10 mins
+
+    val sessionState: StateFlow<UserSessionState> = userSessionRepository
+        .sessionState
+        .stateIn(
+            scope = viewModelScope,
+            started = WhileSubscribed(WAIT_UNTIL_NO_CONSUMERS_IN_MILLIS),
+            initialValue = UserSessionState.Idle,
+        )
+
+    val securityPreferences: StateFlow<SecurityPreferences> = userPreferencesRepository
+        .securityPreferences
+        .stateIn(
+            scope = viewModelScope,
+            initialValue = SecurityPreferences(),
+            started = WhileSubscribed(WAIT_UNTIL_NO_CONSUMERS_IN_MILLIS),
+        )
+
+    private fun sendActionEvent(actionEvent: MainActionEvent) {
+        viewModelScope.launch { _actionEvents.send(actionEvent) }
     }
-    private fun startUserSession(sessionExpiryDurationInSeconds: Int) {
-        sessionExpiryJob?.cancel()
-        sessionExpiryJob = viewModelScope.launch(Dispatchers.IO) {
-            val totalSeconds = savedStateHandle.get<Int>(SESSION_TICKER_KEY) ?: sessionExpiryDurationInSeconds
-            for (seconds in totalSeconds downTo 0) {
-              savedStateHandle[SESSION_TICKER_KEY] = seconds
-                if (seconds == 0) {
-                    _actionEvents.send(MainActionEvent.SessionExpired)
-                    break
-                }
-                delay(SESSION_TIMER_INTERVAL)
-                println("seconds: $seconds")
-            }
+
+    fun startSession() {
+        viewModelScope.launch {
+            userSessionRepository.updateSessionState(UserSessionState.Active)
+            sendActionEvent(MainActionEvent.StartUserSession)
+        }
+    }
+
+    fun terminateSession() {
+        viewModelScope.launch {
+            userSessionRepository.updateSessionState(UserSessionState.Inactive)
+            sendActionEvent(MainActionEvent.CancelUserSession)
+        }
+    }
+
+    fun expireSession() {
+        viewModelScope.launch {
+            userSessionRepository.updateSessionState(UserSessionState.Expired)
+            Log.i(WORKER_TAG, "Session Expired!")
+            sendActionEvent(MainActionEvent.SessionExpired)
         }
     }
 }
 
 sealed interface MainActionEvent {
     data object SessionExpired : MainActionEvent
+    data object StartUserSession : MainActionEvent
+    data object CancelUserSession : MainActionEvent
 }

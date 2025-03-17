@@ -9,6 +9,8 @@ import io.rafaelribeiro.spendless.data.repository.OfflineTransactionRepository
 import io.rafaelribeiro.spendless.domain.AuthRepository
 import io.rafaelribeiro.spendless.domain.transaction.TransactionRepository
 import io.rafaelribeiro.spendless.data.repository.DataStoreUserPreferencesRepository
+import io.rafaelribeiro.spendless.data.repository.OfflineUserSessionRepository
+import io.rafaelribeiro.spendless.domain.UserSessionRepository
 import io.rafaelribeiro.spendless.domain.user.UserPreferencesRepository
 
 @Module
@@ -22,4 +24,7 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun bindUserPreferencesRepository(impl: DataStoreUserPreferencesRepository): UserPreferencesRepository
+
+    @Binds
+    abstract fun bindUserSessionRepository(impl: OfflineUserSessionRepository): UserSessionRepository
 }

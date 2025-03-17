@@ -2,6 +2,7 @@ package io.rafaelribeiro.spendless.domain.preferences
 
 
 enum class SessionExpiryDuration(val display: String, val value: Int) {
+    MINUTES_1("1 min", 1),
     MINUTES_5("5 min", 5),
     MINUTES_15("15 min", 15),
     MINUTES_30("30 min", 30),

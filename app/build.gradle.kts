@@ -70,6 +70,8 @@ dependencies {
     implementation(libs.room.runtime)
     implementation(libs.room.core)
     ksp(libs.room.compiler)
+    // Work Manager
+    implementation(libs.work.runtime.ktx)
     // -- Glance (Widgets)
     implementation(libs.androidx.glance.appwidget)
     implementation(libs.androidx.glance.material3)
@@ -79,6 +81,7 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
+    androidTestImplementation(libs.work.testing)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     testImplementation(libs.junit.jupiter.api)

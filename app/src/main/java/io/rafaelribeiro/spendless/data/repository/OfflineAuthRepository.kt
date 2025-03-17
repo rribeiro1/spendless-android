@@ -13,7 +13,6 @@ import javax.inject.Inject
 class OfflineAuthRepository @Inject constructor(
     private val dataStore: DataStore<User>,
 ) : AuthRepository {
-
     override val pin: Flow<String> = dataStore.data.map { it.pin }
 
     override val userName: Flow<String> = dataStore.data.map { it.username }
@@ -27,14 +26,8 @@ class OfflineAuthRepository @Inject constructor(
 			Result.Success(Unit)
 		}
 
-	override suspend fun register(
-		username: String,
-		pin: String,
-	): Result<User, RegistrationError> {
-
-        dataStore.updateData {
-            User(username, pin)
-        }
+	override suspend fun register(username: String, pin: String): Result<User, RegistrationError> {
+        dataStore.updateData { User(username, pin) }
         return Result.Success(User(username, pin))
     }
 
