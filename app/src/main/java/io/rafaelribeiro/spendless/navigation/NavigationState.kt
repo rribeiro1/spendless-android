@@ -13,17 +13,13 @@ class NavigationState(
 	val navHostController: NavHostController,
 ) {
 	fun navigateTo(route: String, navOptions: NavOptions? = null) {
-        if (navHostController.debounceClick() == null)
-            return
-        navHostController.navigate(route, navOptions)
-	}
+        navHostController.debounceClick()?.navigate(route, navOptions)
+    }
 
 	fun popBackStack() = navHostController.popBackStack()
 
     fun navigateAndClearBackStack(route: String) {
-        if (navHostController.debounceClick() == null)
-            return
-        navHostController.navigate(route) {
+        navHostController.debounceClick()?.navigate(route) {
             launchSingleTop = true
             popUpTo(0) { inclusive = true }
         }
