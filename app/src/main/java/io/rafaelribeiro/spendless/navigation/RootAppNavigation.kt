@@ -184,6 +184,7 @@ fun RootAppNavigation(
                 val uiState by viewModel.uiState.collectAsStateWithLifecycle()
                 ObserveAsEvents(flow = viewModel.actionEvents) { event ->
                     if (event is RegistrationActionEvent.UserPreferencesSaved) {
+                        mainViewModel.startSession()
                         navigationState.navigateTo(
                             route = Screen.DashboardScreen.route,
                             navOptions = navOptions {
@@ -206,6 +207,7 @@ fun RootAppNavigation(
             ObserveAsEvents(flow = viewModel.actionEvents) { event ->
                 when (event) {
                     is LoginActionEvent.LoginSucceed -> {
+                        mainViewModel.startSession()
                         navigationState.navigateTo(
                             route = Screen.DashboardScreen.route,
                             navOptions = navOptions {
@@ -240,6 +242,7 @@ fun RootAppNavigation(
             ObserveAsEvents(flow = viewModel.actionEvents) { event ->
                 when (event) {
                     AuthPinActionEvent.CorrectPinEntered -> {
+                        mainViewModel.startSession()
                         navigationState.navigateAndClearBackStack(Screen.DashboardScreen.route)
                     }
                     AuthPinActionEvent.BiometricsTriggered -> {
@@ -254,6 +257,7 @@ fun RootAppNavigation(
             ObserveAsEvents(flow = viewModel.biometricEvents) { result ->
                 when (result) {
                     BiometricPromptManager.BiometricResult.AuthenticationSuccess -> {
+                        mainViewModel.startSession()
                         viewModel.onEvent(AuthPinUiEvent.CorrectBiometricsEntered)
                     }
                     BiometricPromptManager.BiometricResult.AuthenticationNotSet -> {
@@ -291,9 +295,6 @@ fun RootAppNavigation(
                 onEvent = viewModel::onEvent,
                 launchedFromWidget = launchedFromWidget
             )
-            LaunchedEffect(key1 = Unit) {
-                mainViewModel.startSession()
-            }
         }
         composable(route = Screen.TransactionsScreen.route) {
             val viewModel = hiltViewModel<TransactionsViewModel>()
