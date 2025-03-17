@@ -86,7 +86,6 @@ fun RootAppNavigation(
     val mainViewModel = hiltViewModel<MainViewModel>()
     val sessionState by mainViewModel.sessionState.collectAsState()
     val securityPreferences by mainViewModel.securityPreferences.collectAsState()
-
     val startScreen = when (sessionState) {
         UserSessionState.Idle -> Screen.RegistrationFlow.route
         UserSessionState.Active -> Screen.DashboardScreen.route
@@ -105,6 +104,7 @@ fun RootAppNavigation(
     NavHost(
 		navController = navigationState.navHostController,
 		startDestination = startScreen,
+//		startDestination = if (launchedFromWidget) Screen.DashboardScreen.route else Screen.RegistrationFlow.route,
 		enterTransition = enterTransition(),
 		exitTransition = exitTransition(),
 		popEnterTransition = popEnterTransition(),
