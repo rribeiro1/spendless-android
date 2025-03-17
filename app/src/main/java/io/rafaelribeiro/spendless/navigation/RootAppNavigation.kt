@@ -229,7 +229,7 @@ fun RootAppNavigation(
             val enrollLauncher = rememberLauncherForActivityResult(
                 contract = ActivityResultContracts.StartActivityForResult(),
                 onResult = {
-                    println("Activity result: $it")
+                    Log.d(Screen.PinPromptScreen.route, "Activity result: $it")
                     when (it.resultCode) {
                         RESULT_CANCELED -> {}
                         else -> {
