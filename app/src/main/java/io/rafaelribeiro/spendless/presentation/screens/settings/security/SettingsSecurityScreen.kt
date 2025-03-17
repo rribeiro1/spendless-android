@@ -25,6 +25,7 @@ import io.rafaelribeiro.spendless.domain.preferences.LockoutDuration
 import io.rafaelribeiro.spendless.domain.preferences.SessionExpiryDuration
 import io.rafaelribeiro.spendless.navigation.NavigationState
 import io.rafaelribeiro.spendless.core.presentation.SpendLessSegmentedButton
+import io.rafaelribeiro.spendless.domain.preferences.Biometrics
 import io.rafaelribeiro.spendless.presentation.theme.SpendLessTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -72,6 +73,21 @@ fun SecurityScreen(
         Column(
             modifier = Modifier.padding(horizontal = 16.dp)
         ) {
+            val enableText = stringResource(R.string.enable)
+            val disableText = stringResource(R.string.disable)
+            SpendLessSegmentedButton(
+                title = stringResource(R.string.biometrics_for_pin_prompt),
+                options = Biometrics.entries,
+                getText = { if (it.ordinal == 0) enableText else disableText },
+                selectedIndex = Biometrics.getIndexFromValue(uiState.biometricsEnabled),
+                onOptionSelected = {
+                    onEvent(
+                        SettingsSecurityUiEvent.BiometricsSelected(
+                            Biometrics.entries[it]
+                        )
+                    )
+                }
+            )
             SpendLessSegmentedButton(
                 title = stringResource(R.string.session_expiry_duration),
                 options = SessionExpiryDuration.entries,

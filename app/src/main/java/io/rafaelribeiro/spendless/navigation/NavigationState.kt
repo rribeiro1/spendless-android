@@ -2,6 +2,8 @@ package io.rafaelribeiro.spendless.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.lifecycle.Lifecycle
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.rememberNavController
@@ -11,13 +13,13 @@ class NavigationState(
 	val navHostController: NavHostController,
 ) {
 	fun navigateTo(route: String, navOptions: NavOptions? = null) {
-		navHostController.navigate(route, navOptions)
-	}
+        navHostController.debounceClick()?.navigate(route, navOptions)
+    }
 
 	fun popBackStack() = navHostController.popBackStack()
 
     fun navigateAndClearBackStack(route: String) {
-        navHostController.navigate(route) {
+        navHostController.debounceClick()?.navigate(route) {
             launchSingleTop = true
             popUpTo(0) { inclusive = true }
         }
@@ -46,3 +48,15 @@ fun rememberNavigationState(
 		NavigationState(navHostController)
 	}
 }
+
+
+private fun NavHostController.debounceClick(): NavHostController? {
+    if (this.currentBackStackEntry?.lifecycleIsResumed() == false)
+        return null
+    return this
+}
+/**
+ * If the lifecycle is not resumed it means this NavBackStackEntry already processed a nav event.
+ * This is used to de-duplicate navigation events.
+ */
+fun NavBackStackEntry.lifecycleIsResumed() = this.lifecycle.currentState == Lifecycle.State.RESUMED

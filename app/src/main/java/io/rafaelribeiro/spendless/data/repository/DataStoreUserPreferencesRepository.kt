@@ -3,10 +3,12 @@ package io.rafaelribeiro.spendless.data.repository
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.IOException
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import io.rafaelribeiro.spendless.domain.preferences.Biometrics
 import io.rafaelribeiro.spendless.domain.preferences.LockoutDuration
 import io.rafaelribeiro.spendless.domain.preferences.SessionExpiryDuration
 import io.rafaelribeiro.spendless.domain.user.UserPreferencesRepository
@@ -31,6 +33,7 @@ class DataStoreUserPreferencesRepository @Inject constructor(
         private val CURRENCY = stringPreferencesKey("currency_symbol")
         private val SESSION_EXPIRY_DURATION = intPreferencesKey("session_expiry_duration")
         private val LOCKED_OUT_DURATION = intPreferencesKey("locked_out_duration")
+        private val BIOMETRIC_ENABLED = booleanPreferencesKey("biometric_enabled")
     }
 
     override val userPreferences: Flow<UserPreferences> = dataStore.data
@@ -65,9 +68,11 @@ class DataStoreUserPreferencesRepository @Inject constructor(
         }.map { preferences ->
             val sessionExpiryDuration = preferences[SESSION_EXPIRY_DURATION] ?: SessionExpiryDuration.MINUTES_5.value
             val lockedOutDuration = preferences[LOCKED_OUT_DURATION] ?: LockoutDuration.SECONDS_30.value
+            val isBiometricEnabled = preferences[BIOMETRIC_ENABLED] ?: Biometrics.DISABLE.value
             SecurityPreferences(
                 sessionExpiryDuration = sessionExpiryDuration,
-                lockedOutDuration = lockedOutDuration
+                lockedOutDuration = lockedOutDuration,
+                isBiometricEnabled = isBiometricEnabled,
             )
         }
 
@@ -90,6 +95,7 @@ class DataStoreUserPreferencesRepository @Inject constructor(
         dataStore.edit { preferences ->
             preferences[SESSION_EXPIRY_DURATION] = securityPreferences.sessionExpiryDuration
             preferences[LOCKED_OUT_DURATION] = securityPreferences.lockedOutDuration
+            preferences[BIOMETRIC_ENABLED] = securityPreferences.isBiometricEnabled
         }
     }
 
@@ -105,6 +111,7 @@ open class UserPreferences(
 data class SecurityPreferences(
     val sessionExpiryDuration: Int = SessionExpiryDuration.MINUTES_5.value,
     val lockedOutDuration: Int = LockoutDuration.SECONDS_30.value,
+    val isBiometricEnabled: Boolean = false,
 ): UserPreferences()
 
 

@@ -24,9 +24,6 @@ import androidx.compose.ui.unit.dp
 import io.rafaelribeiro.spendless.R
 import io.rafaelribeiro.spendless.core.presentation.ErrorDialog
 import io.rafaelribeiro.spendless.core.presentation.PinPromptScreen
-import io.rafaelribeiro.spendless.navigation.NavigationState
-import io.rafaelribeiro.spendless.navigation.Screen
-import io.rafaelribeiro.spendless.navigation.rememberNavigationState
 import io.rafaelribeiro.spendless.presentation.theme.SpendLessTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -34,7 +31,6 @@ import io.rafaelribeiro.spendless.presentation.theme.SpendLessTheme
 fun AuthPinPromptScreen(
     uiState: AuthPinUiState,
     onEvent: (AuthPinUiEvent) -> Unit = {},
-    onLogoutClicked: () -> Unit = {},
     modifier: Modifier,
 ) {
     val isPinLocked = uiState.pinLockRemainingSeconds > 0
@@ -54,7 +50,7 @@ fun AuthPinPromptScreen(
                                 disabledContentColor = MaterialTheme.colorScheme.error.copy(alpha = 0.3f),
                             ),
                             shape = RoundedCornerShape(16.dp),
-                            onClick = onLogoutClicked,
+                            onClick = { onEvent(AuthPinUiEvent.LogoutTapped) },
                         ) {
                             Icon(
                                 tint = MaterialTheme.colorScheme.error,
@@ -78,8 +74,10 @@ fun AuthPinPromptScreen(
                 pinLockRemainingSeconds = uiState.pinLockRemainingSeconds,
                 currentPinSize = uiState.pin.length,
                 pinPadEnabled = uiState.pinPadEnabled,
+                biometricsEnabled = uiState.biometricsEnabled,
                 onNumberClick = { onEvent(AuthPinUiEvent.PinDigitTapped(it)) },
                 onBackspaceClick = { onEvent(AuthPinUiEvent.PinBackspaceTapped) },
+                onBiometricsClick = { onEvent(AuthPinUiEvent.BiometricsTapped) },
             )
         }
         ErrorDialog(
