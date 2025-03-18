@@ -60,20 +60,19 @@ class MainViewModel @Inject constructor(
     fun startSession() {
         viewModelScope.launch {
             userSessionRepository.updateSessionState(UserSessionState.Active)
-            sendActionEvent(MainActionEvent.StartUserSession)
+            //TODO: Get correct session duration from preferences.
+            userSessionRepository.startSession(securityPreferences.value.sessionExpiryDuration.toLong())
         }
     }
 
     fun terminateSession() {
         viewModelScope.launch {
             userSessionRepository.updateSessionState(UserSessionState.Inactive)
-            sendActionEvent(MainActionEvent.CancelUserSession)
+            userSessionRepository.cancelWorker()
         }
     }
 }
 
 sealed interface MainActionEvent {
     data object SessionExpired : MainActionEvent
-    data object StartUserSession : MainActionEvent
-    data object CancelUserSession : MainActionEvent
 }
