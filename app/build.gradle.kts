@@ -72,6 +72,8 @@ dependencies {
     ksp(libs.room.compiler)
     // Work Manager
     implementation(libs.work.runtime.ktx)
+    implementation(libs.androidx.hilt.work)
+    kapt(libs.androidx.hilt.compiler)
     // -- Glance (Widgets)
     implementation(libs.androidx.glance.appwidget)
     implementation(libs.androidx.glance.material3)
