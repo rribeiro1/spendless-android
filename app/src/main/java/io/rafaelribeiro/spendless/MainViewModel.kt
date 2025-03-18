@@ -1,6 +1,5 @@
 package io.rafaelribeiro.spendless
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -8,7 +7,6 @@ import io.rafaelribeiro.spendless.data.repository.SecurityPreferences
 import io.rafaelribeiro.spendless.domain.UserSessionRepository
 import io.rafaelribeiro.spendless.domain.user.UserPreferencesRepository
 import io.rafaelribeiro.spendless.domain.user.UserSessionState
-import io.rafaelribeiro.spendless.workers.UserSessionWorker.Companion.WORKER_TAG
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.StateFlow
@@ -48,13 +46,8 @@ class MainViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             sessionState.collect { state ->
-                when (state) {
-                    UserSessionState.Active -> sendActionEvent(MainActionEvent.StartUserSession)
-                    UserSessionState.Inactive -> sendActionEvent(MainActionEvent.CancelUserSession)
-                    UserSessionState.Expired -> sendActionEvent(MainActionEvent.SessionExpired)
-                    UserSessionState.Idle -> {
-                        Log.i(WORKER_TAG, "Session Idle!")
-                    }
+                if (state == UserSessionState.Expired) {
+                    sendActionEvent(MainActionEvent.SessionExpired)
                 }
             }
         }
@@ -67,19 +60,14 @@ class MainViewModel @Inject constructor(
     fun startSession() {
         viewModelScope.launch {
             userSessionRepository.updateSessionState(UserSessionState.Active)
+            sendActionEvent(MainActionEvent.StartUserSession)
         }
     }
 
     fun terminateSession() {
         viewModelScope.launch {
             userSessionRepository.updateSessionState(UserSessionState.Inactive)
-        }
-    }
-
-    fun expireSession() {
-        viewModelScope.launch {
-            userSessionRepository.updateSessionState(UserSessionState.Expired)
-            Log.i(WORKER_TAG, "Session Expired!")
+            sendActionEvent(MainActionEvent.CancelUserSession)
         }
     }
 }

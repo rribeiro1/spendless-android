@@ -30,7 +30,7 @@ class UserSessionWorker @AssistedInject constructor(
 
         fun enqueue(context: Context, sessionExpiryDuration: Int) {
             val workManager = WorkManager.getInstance(context)
-            val workInfo = workManager.getWorkInfosForUniqueWork(WORK_NAME).get() // Check existing work
+            val workInfo = workManager.getWorkInfosForUniqueWork(WORK_NAME).get()
 
             if (workInfo.isNullOrEmpty() || workInfo.any { it.state.isFinished }) {
                 Log.i(WORKER_TAG, "Enqueueing Worker for $sessionExpiryDuration minutes...")
