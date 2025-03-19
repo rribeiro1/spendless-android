@@ -1,16 +1,12 @@
 package io.rafaelribeiro.spendless
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.rafaelribeiro.spendless.data.repository.DataStoreUserPreferencesRepository
 import io.rafaelribeiro.spendless.data.repository.SecurityPreferences
-import io.rafaelribeiro.spendless.domain.AuthRepository
 import io.rafaelribeiro.spendless.domain.UserSessionRepository
 import io.rafaelribeiro.spendless.domain.user.UserPreferencesRepository
 import io.rafaelribeiro.spendless.domain.user.UserSessionState
-import io.rafaelribeiro.spendless.workers.UserSessionWorker.Companion.WORKER_TAG
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.StateFlow
@@ -47,6 +43,16 @@ class MainViewModel @Inject constructor(
             started = WhileSubscribed(WAIT_UNTIL_NO_CONSUMERS_IN_MILLIS),
         )
 
+    init {
+        viewModelScope.launch {
+            sessionState.collect { state ->
+                if (state == UserSessionState.Expired) {
+                    sendActionEvent(MainActionEvent.SessionExpired)
+                }
+            }
+        }
+    }
+
     private fun sendActionEvent(actionEvent: MainActionEvent) {
         viewModelScope.launch { _actionEvents.send(actionEvent) }
     }
@@ -54,28 +60,19 @@ class MainViewModel @Inject constructor(
     fun startSession() {
         viewModelScope.launch {
             userSessionRepository.updateSessionState(UserSessionState.Active)
-            sendActionEvent(MainActionEvent.StartUserSession)
+            //TODO: Get correct session duration from preferences.
+            userSessionRepository.startSession(securityPreferences.value.sessionExpiryDuration.toLong())
         }
     }
 
     fun terminateSession() {
         viewModelScope.launch {
             userSessionRepository.updateSessionState(UserSessionState.Inactive)
-            sendActionEvent(MainActionEvent.CancelUserSession)
-        }
-    }
-
-    fun expireSession() {
-        viewModelScope.launch {
-            userSessionRepository.updateSessionState(UserSessionState.Expired)
-            Log.i(WORKER_TAG, "Session Expired!")
-            sendActionEvent(MainActionEvent.SessionExpired)
+            userSessionRepository.cancelWorker()
         }
     }
 }
 
 sealed interface MainActionEvent {
     data object SessionExpired : MainActionEvent
-    data object StartUserSession : MainActionEvent
-    data object CancelUserSession : MainActionEvent
 }

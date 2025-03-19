@@ -18,7 +18,6 @@ class SettingsViewModel @Inject constructor() : ViewModel() {
     private val _actionEvents = Channel<SettingsActionEvent>()
     val actionEvents = _actionEvents.receiveAsFlow()
 
-
     fun onEvent(event: SettingsUiEvent) {
         when (event) {
             is SettingsUiEvent.PreferencesClicked -> sendActionEvent(OnPreferencesClicked)
@@ -26,7 +25,6 @@ class SettingsViewModel @Inject constructor() : ViewModel() {
             is SettingsUiEvent.LogoutClicked -> sendActionEvent(OnLogoutClicked)
             is SettingsUiEvent.BackClicked -> sendActionEvent(OnBackClicked)
         }
-
     }
 
     private fun sendActionEvent(event: SettingsActionEvent) {
@@ -34,7 +32,6 @@ class SettingsViewModel @Inject constructor() : ViewModel() {
             _actionEvents.send(event)
         }
     }
-
 }
 
 sealed interface SettingsActionEvent {

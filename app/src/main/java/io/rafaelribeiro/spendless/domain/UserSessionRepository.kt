@@ -6,4 +6,6 @@ import kotlinx.coroutines.flow.Flow
 interface UserSessionRepository {
     val sessionState: Flow<UserSessionState>
     suspend fun updateSessionState(state: UserSessionState)
+    fun startSession(sessionDurationInMinutes: Long)
+    fun cancelWorker()
 }
