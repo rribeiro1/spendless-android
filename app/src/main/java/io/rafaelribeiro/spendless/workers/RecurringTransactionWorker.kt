@@ -26,6 +26,11 @@ class RecurringTransactionWorker @AssistedInject constructor(
         const val WORK_NAME = "recurring_transaction_worker"
     }
 
+    /**
+     * Iterates over all transactions with recurrence and creates new transactions for the next occurrences.
+     * Handle the case where user has not opened the app for a long time and there are multiple occurrences to create.
+     * @return Result.success() if the worker completes successfully.
+     */
     override suspend fun doWork(): Result {
         val transactions = transactionRepository.getAllTransactions().first()
         val recurringTransactions = transactions.filter { it.recurrence != TransactionRecurrenceType.NONE }
@@ -33,12 +38,12 @@ class RecurringTransactionWorker @AssistedInject constructor(
 
         for (transaction in recurringTransactions) {
             Log.i(WORK_NAME, "Processing transaction with description ${transaction.description}")
-            var currentDate = Instant
+            var currentTransactionDate = Instant
                 .ofEpochMilli(transaction.createdAt)
                 .atZone(ZoneId.systemDefault())
                 .toLocalDate()
 
-            var nextDate = getNextOccurrence(currentDate, transaction.recurrence)
+            var nextDate = getNextOccurrence(currentTransactionDate, transaction.recurrence)
             Log.i(WORK_NAME, "Next occurrence calculated for $nextDate, today is $today")
 
             while (nextDate != null && !nextDate.isAfter(LocalDate.now())) {
@@ -53,8 +58,8 @@ class RecurringTransactionWorker @AssistedInject constructor(
                 )
                 transactionRepository.saveTransaction(newTransaction)
                 Log.i(WORK_NAME, "Transaction created")
-                currentDate = nextDate
-                nextDate = getNextOccurrence(currentDate, transaction.recurrence)
+                currentTransactionDate = nextDate
+                nextDate = getNextOccurrence(currentTransactionDate, transaction.recurrence)
                 Log.i(WORK_NAME, "Next occurrence calculated for $nextDate")
             }
         }
