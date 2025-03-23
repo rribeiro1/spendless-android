@@ -9,6 +9,7 @@ import io.rafaelribeiro.spendless.domain.preferences.ThousandSeparator
 import io.rafaelribeiro.spendless.domain.transaction.Transaction
 import io.rafaelribeiro.spendless.domain.transaction.TransactionCategory
 import io.rafaelribeiro.spendless.domain.transaction.TransactionFormatter
+import io.rafaelribeiro.spendless.domain.transaction.TransactionRecurrenceType
 import io.rafaelribeiro.spendless.domain.transaction.TransactionType
 import io.rafaelribeiro.spendless.domain.transaction.toUIModel
 import io.rafaelribeiro.spendless.presentation.screens.dashboard.TransactionUiModel
@@ -66,6 +67,7 @@ class TransactionCreator {
                 note = transaction.note,
                 category = transaction.category,
                 type = transaction.type,
+                recurrence = TransactionRecurrenceType.NONE,
                 createdAt = transaction.createdAt
             )
         }

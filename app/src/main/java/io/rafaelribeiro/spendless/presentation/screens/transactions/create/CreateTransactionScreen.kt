@@ -11,6 +11,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -48,9 +51,12 @@ import io.rafaelribeiro.spendless.domain.preferences.CurrencySymbol
 import io.rafaelribeiro.spendless.domain.preferences.DecimalSeparator
 import io.rafaelribeiro.spendless.domain.preferences.ExpenseFormat
 import io.rafaelribeiro.spendless.domain.transaction.TransactionCategory
+import io.rafaelribeiro.spendless.domain.transaction.TransactionRecurrence
 import io.rafaelribeiro.spendless.domain.transaction.TransactionType
 import io.rafaelribeiro.spendless.presentation.theme.SpendLessTheme
 import io.rafaelribeiro.spendless.presentation.theme.Success
+import java.time.LocalDate
+import kotlinx.coroutines.delay
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -70,7 +76,7 @@ fun CreateTransactionRootScreen(
         CreateTransactionScreen(
             onEvent = onEvent,
             uiState = uiState,
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxWidth()
                 .fillMaxHeight(0.9f)
                 .padding(start = 16.dp, end = 16.dp, top = 16.dp)
@@ -84,13 +90,18 @@ fun CreateTransactionScreen(
     uiState: CreateTransactionUiState,
     modifier: Modifier
 ) {
+    val waitTimeForBottomSheet = 400L
     val focusManager = LocalFocusManager.current
     val focusRequester = remember { FocusRequester() }
     LaunchedEffect(Unit) {
+        delay(waitTimeForBottomSheet)
         focusRequester.requestFocus()
     }
     Column(
-        modifier = modifier,
+        modifier = modifier
+            .verticalScroll(rememberScrollState())
+            .imePadding()
+            .padding(bottom = 16.dp),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -177,6 +188,10 @@ fun CreateTransactionScreen(
             getLeadingIcon = { it.emoji },
             onItemSelected = { onEvent(CreateTransactionUiEvent.OnCategorySelected(it)) },
             modifier = Modifier.padding(top = 62.dp)
+        )
+        RepeatTransactionDropDown(
+            onItemSelected = { onEvent(CreateTransactionUiEvent.OnRecurrenceSelected(it)) },
+            modifier = Modifier.padding(top = 8.dp)
         )
         SpendLessButton(
             text = stringResource(R.string.create),
@@ -352,6 +367,23 @@ fun CreateTransactionNote(
             modifier = Modifier.fillMaxWidth()
         )
     }
+}
+
+@Composable
+fun RepeatTransactionDropDown(
+    onItemSelected: (TransactionRecurrence) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val values = TransactionRecurrence.getRecurrenceOptions(LocalDate.now())
+    SpendLessDropDown(
+        itemBackgroundColor = MaterialTheme.colorScheme.tertiaryContainer,
+        values = values,
+        getText = { it.label },
+        onItemSelected = { onItemSelected(it) },
+        getLeadingIcon = { "" },
+        fixedLeadingIcon = "🔄",
+        modifier = modifier,
+    )
 }
 
 @Preview(showBackground = true)

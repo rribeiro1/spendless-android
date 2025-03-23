@@ -11,6 +11,7 @@ import io.rafaelribeiro.spendless.data.repository.OfflineTransactionRepository
 import io.rafaelribeiro.spendless.data.repository.UserPreferences
 import io.rafaelribeiro.spendless.domain.transaction.Transaction
 import io.rafaelribeiro.spendless.domain.transaction.TransactionCategory
+import io.rafaelribeiro.spendless.domain.transaction.TransactionRecurrence
 import io.rafaelribeiro.spendless.domain.transaction.TransactionType
 import io.rafaelribeiro.spendless.domain.user.UserPreferencesRepository
 import io.rafaelribeiro.spendless.presentation.screens.transactions.TransactionsViewModel.Companion.WAIT_UNTIL_NO_CONSUMERS_IN_MILLIS
@@ -64,6 +65,7 @@ class CreateTransactionViewModel @Inject constructor(
             is CreateTransactionUiEvent.OnNoteChanged -> updateTransactionNote(event.transactionNote)
             is CreateTransactionUiEvent.OnDescriptionChanged -> updateTransactionDescription(event.transactionDescription)
             is CreateTransactionUiEvent.OnAmountChanged -> updateAmount(event.amount)
+            is CreateTransactionUiEvent.OnRecurrenceSelected -> updateRecurrenceType(event.recurrence)
         }
     }
 
@@ -89,6 +91,7 @@ class CreateTransactionViewModel @Inject constructor(
             description = transactionState.description,
             note = transactionState.note,
             category = transactionState.category,
+            recurrence = transactionState.recurrenceType,
             createdAt = System.currentTimeMillis()
         )
     }
@@ -116,6 +119,10 @@ class CreateTransactionViewModel @Inject constructor(
     private fun updateTransactionNote(transactionNote: String) {
         val note = transactionNote.take(NOTE_MAX_SIZE)
         updateState { it.copy(transaction = it.transaction.copy(note = note)) }
+    }
+
+    private fun updateRecurrenceType(recurrence: TransactionRecurrence) {
+        updateState { it.copy(transaction = it.transaction.copy(recurrenceType = recurrence.type)) }
     }
 
     private fun updateTransactionDescription(transactionDescription: String) {
@@ -195,4 +202,5 @@ sealed interface CreateTransactionUiEvent {
     data class OnNoteChanged(val transactionNote: String) : CreateTransactionUiEvent
     data class OnDescriptionChanged(val transactionDescription: String) : CreateTransactionUiEvent
     data class OnAmountChanged(val amount: String) : CreateTransactionUiEvent
+    data class OnRecurrenceSelected(val recurrence: TransactionRecurrence) : CreateTransactionUiEvent
 }
