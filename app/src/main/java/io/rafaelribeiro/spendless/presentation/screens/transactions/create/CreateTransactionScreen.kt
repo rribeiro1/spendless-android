@@ -48,9 +48,11 @@ import io.rafaelribeiro.spendless.domain.preferences.CurrencySymbol
 import io.rafaelribeiro.spendless.domain.preferences.DecimalSeparator
 import io.rafaelribeiro.spendless.domain.preferences.ExpenseFormat
 import io.rafaelribeiro.spendless.domain.transaction.TransactionCategory
+import io.rafaelribeiro.spendless.domain.transaction.TransactionRecurrence
 import io.rafaelribeiro.spendless.domain.transaction.TransactionType
 import io.rafaelribeiro.spendless.presentation.theme.SpendLessTheme
 import io.rafaelribeiro.spendless.presentation.theme.Success
+import java.time.LocalDate
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -70,7 +72,7 @@ fun CreateTransactionRootScreen(
         CreateTransactionScreen(
             onEvent = onEvent,
             uiState = uiState,
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxWidth()
                 .fillMaxHeight(0.9f)
                 .padding(start = 16.dp, end = 16.dp, top = 16.dp)
@@ -177,6 +179,10 @@ fun CreateTransactionScreen(
             getLeadingIcon = { it.emoji },
             onItemSelected = { onEvent(CreateTransactionUiEvent.OnCategorySelected(it)) },
             modifier = Modifier.padding(top = 62.dp)
+        )
+        RepeatTransactionDropDown(
+            onItemSelected = { onEvent(CreateTransactionUiEvent.OnRecurrenceSelected(it)) },
+            modifier = Modifier.padding(top = 8.dp)
         )
         SpendLessButton(
             text = stringResource(R.string.create),
@@ -352,6 +358,23 @@ fun CreateTransactionNote(
             modifier = Modifier.fillMaxWidth()
         )
     }
+}
+
+@Composable
+fun RepeatTransactionDropDown(
+    onItemSelected: (TransactionRecurrence) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val values = TransactionRecurrence.getRecurrenceOptions(LocalDate.now())
+    SpendLessDropDown(
+        itemBackgroundColor = MaterialTheme.colorScheme.tertiaryContainer,
+        values = values,
+        getText = { it.label },
+        onItemSelected = { onItemSelected(it) },
+        getLeadingIcon = { "" },
+        fixedLeadingIcon = "🔄",
+        modifier = modifier,
+    )
 }
 
 @Preview(showBackground = true)

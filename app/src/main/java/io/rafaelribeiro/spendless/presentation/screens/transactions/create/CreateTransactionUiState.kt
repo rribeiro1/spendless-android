@@ -8,6 +8,7 @@ import io.rafaelribeiro.spendless.domain.preferences.DecimalSeparator
 import io.rafaelribeiro.spendless.domain.preferences.ExpenseFormat
 import io.rafaelribeiro.spendless.domain.preferences.ThousandSeparator
 import io.rafaelribeiro.spendless.domain.transaction.TransactionCategory
+import io.rafaelribeiro.spendless.domain.transaction.TransactionRecurrenceType
 import io.rafaelribeiro.spendless.domain.transaction.TransactionType
 
 data class CreateTransactionUiState(
@@ -21,6 +22,7 @@ data class TransactionUiState(
     val amountDisplay: String = "",
     val description: String = "",
     val note: String? = null,
+    val recurrenceType: TransactionRecurrenceType = TransactionRecurrenceType.NONE,
     val createdButtonEnabled: Boolean = false,
     val errorMessage: UiText = Empty,
 )

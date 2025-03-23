@@ -1,8 +1,10 @@
 package io.rafaelribeiro.spendless.presentation.screens.authentication
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
@@ -42,7 +44,7 @@ fun AuthPinPromptScreen(
                     title = {},
                     actions = {
                         FilledTonalIconButton(
-                            modifier = modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                            modifier = modifier.size(44.dp),
                             colors = IconButtonColors(
                                 containerColor = MaterialTheme.colorScheme.error.copy(alpha = 0.08f),
                                 contentColor = MaterialTheme.colorScheme.error,
@@ -55,13 +57,15 @@ fun AuthPinPromptScreen(
                             Icon(
                                 tint = MaterialTheme.colorScheme.error,
                                 imageVector = Icons.AutoMirrored.Filled.Logout,
-                                contentDescription = "Go back"
+                                modifier = Modifier.size(24.dp),
+                                contentDescription = "Go back",
                             )
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors().copy(
                         containerColor = MaterialTheme.colorScheme.background,
-                    )
+                    ),
+                    modifier = Modifier.padding(end = 12.dp).background(Color.Transparent),
                 )
             }
         ) { innerPadding ->

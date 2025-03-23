@@ -17,11 +17,9 @@ object DatabaseModule {
     @Provides
     @Singleton
     fun provideSpendLessDatabase(@ApplicationContext context: Context): SpendLessDatabase {
-        return Room.databaseBuilder(
-            context,
-            SpendLessDatabase::class.java,
-            SpendLessDatabase.DATABASE_NAME
-        ).build()
+        return Room.databaseBuilder(context, SpendLessDatabase::class.java, SpendLessDatabase.DATABASE_NAME)
+            .fallbackToDestructiveMigration()
+            .build()
     }
 
     @Provides

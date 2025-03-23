@@ -10,6 +10,7 @@ fun Transaction.toTransactionEntity(): TransactionEntity = TransactionEntity(
     note = note,
     category = category,
     type = type,
+    recurrence = recurrence,
     createdAt = createdAt
 )
 
@@ -20,6 +21,7 @@ fun TransactionEntity.toTransaction(): Transaction = Transaction(
     note = note,
     category = category,
     type = type,
+    recurrence = recurrence,
     createdAt = createdAt
 )
 

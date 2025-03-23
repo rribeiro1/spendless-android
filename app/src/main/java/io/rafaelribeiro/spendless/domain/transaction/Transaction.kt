@@ -14,6 +14,7 @@ data class Transaction(
     val note: String? = null,
     val category: TransactionCategory,
     val type: TransactionType,
+    val recurrence: TransactionRecurrenceType,
     val createdAt: Long,
 ) {
     companion object {

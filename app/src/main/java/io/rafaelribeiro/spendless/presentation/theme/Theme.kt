@@ -22,6 +22,7 @@ private val SpendLessColorScheme =
         surfaceDim = VibrantYellowGreen, // Secondary Fixed Dim in Figma.
         surfaceContainerLow = GrayLight,
         onSurfaceVariant = GrayDark,
+		tertiaryContainer = SoftBlue,
 	)
 
 @Composable

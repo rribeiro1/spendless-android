@@ -4,11 +4,16 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import io.rafaelribeiro.spendless.data.converter.TransactionCategoryConverter
+import io.rafaelribeiro.spendless.data.converter.TransactionRecurrenceConverter
 import io.rafaelribeiro.spendless.data.converter.TransactionTypeConverter
 import io.rafaelribeiro.spendless.data.entity.TransactionEntity
 
-@Database(entities = [TransactionEntity::class], version = 1, exportSchema = false)
-@TypeConverters(TransactionCategoryConverter::class, TransactionTypeConverter::class)
+@Database(entities = [TransactionEntity::class], version = 2, exportSchema = false)
+@TypeConverters(
+    TransactionCategoryConverter::class,
+    TransactionTypeConverter::class,
+    TransactionRecurrenceConverter::class
+)
 abstract class SpendLessDatabase : RoomDatabase() {
     companion object {
         const val DATABASE_NAME = "spendless"

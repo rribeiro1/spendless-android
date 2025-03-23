@@ -56,6 +56,7 @@ fun <T>SpendLessDropDown(
     itemBackgroundColor: Color,
     values: List<T> = emptyList(),
     getLeadingIcon: (T) -> String,
+    fixedLeadingIcon: String? = null,
     getText: (T) -> String,
     selectedValue: T? = null,
     selectedPosition: Int? = null,
@@ -119,7 +120,7 @@ fun <T>SpendLessDropDown(
                             .background(itemBackgroundColor)
                     ) {
                         Text(
-                            text = getLeadingIcon(values[itemPosition.intValue]),
+                            text = fixedLeadingIcon ?: getLeadingIcon(values[itemPosition.intValue]),
                             style = MaterialTheme.typography.labelMedium,
                         )
                     }
@@ -175,10 +176,10 @@ fun <T>SpendLessDropDown(
                                                     modifier = Modifier
                                                         .size(40.dp)
                                                         .clip(RoundedCornerShape(12.dp))
-                                                        .background(itemBackgroundColor)
+                                                        .background(if (fixedLeadingIcon == null) itemBackgroundColor else Color.Transparent)
                                                 ) {
                                                     Text(
-                                                        text = getLeadingIcon(value),
+                                                        text = if (fixedLeadingIcon == null) getLeadingIcon(value) else "",
                                                         style = MaterialTheme.typography.labelMedium,
                                                     )
                                                 }
@@ -281,15 +282,32 @@ fun DropdownMenuProvider() = object : PopupPositionProvider {
     }
 }
 
-@Preview(showBackground = true, widthDp = 360, heightDp = 640)
+@Preview(showBackground = true, widthDp = 360, heightDp = 100)
 @Composable
-fun DropDownDemoPreview() {
+fun DropDownPreview() {
     SpendLessTheme {
         SpendLessDropDown(
             values = TransactionCategory.categories,
             itemBackgroundColor = MaterialTheme.colorScheme.secondary,
             getLeadingIcon = { it.emoji },
-            getText = { it.displayName }
+            getText = { it.displayName },
+            modifier = Modifier.padding(16.dp)
         )
     }
 }
+
+@Preview(showBackground = true, widthDp = 360, heightDp = 100)
+@Composable
+fun DropDownWithoutItemIconsPreview() {
+    SpendLessTheme {
+        SpendLessDropDown(
+            values = TransactionCategory.categories,
+            itemBackgroundColor = MaterialTheme.colorScheme.tertiaryContainer,
+            getLeadingIcon = { "" },
+            fixedLeadingIcon = "\uD83D\uDD04" /* 🔄 */,
+            getText = { it.displayName },
+            modifier = Modifier.padding(16.dp)
+        )
+    }
+}
+
