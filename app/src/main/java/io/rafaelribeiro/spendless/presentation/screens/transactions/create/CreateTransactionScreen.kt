@@ -11,6 +11,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -53,6 +56,7 @@ import io.rafaelribeiro.spendless.domain.transaction.TransactionType
 import io.rafaelribeiro.spendless.presentation.theme.SpendLessTheme
 import io.rafaelribeiro.spendless.presentation.theme.Success
 import java.time.LocalDate
+import kotlinx.coroutines.delay
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -86,13 +90,18 @@ fun CreateTransactionScreen(
     uiState: CreateTransactionUiState,
     modifier: Modifier
 ) {
+    val waitTimeForBottomSheet = 400L
     val focusManager = LocalFocusManager.current
     val focusRequester = remember { FocusRequester() }
     LaunchedEffect(Unit) {
+        delay(waitTimeForBottomSheet)
         focusRequester.requestFocus()
     }
     Column(
-        modifier = modifier,
+        modifier = modifier
+            .verticalScroll(rememberScrollState())
+            .imePadding()
+            .padding(bottom = 16.dp),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
