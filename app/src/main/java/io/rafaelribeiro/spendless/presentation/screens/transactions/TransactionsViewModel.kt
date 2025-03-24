@@ -56,6 +56,7 @@ class TransactionsViewModel @Inject constructor(
         when (event) {
             is TransactionsUiEvent.TransactionNoteClicked -> showTransactionNote(event.transactionId)
             is TransactionsUiEvent.AddTransactionClicked -> sendActionEvent(TransactionsActionEvent.NavigateToAddTransaction)
+            is TransactionsUiEvent.DownloadTransactionsClicked -> sendActionEvent(TransactionsActionEvent.NavigateToDownloadTransaction)
         }
     }
 
@@ -93,11 +94,10 @@ class TransactionsViewModel @Inject constructor(
     }
 }
 
-sealed interface TransactionsActionEvent {
-    data object NavigateToAddTransaction : TransactionsActionEvent
-}
+
 
 sealed interface TransactionsUiEvent {
     data class TransactionNoteClicked(val transactionId: Long) : TransactionsUiEvent
     data object AddTransactionClicked : TransactionsUiEvent
+    data object DownloadTransactionsClicked : TransactionsUiEvent
 }

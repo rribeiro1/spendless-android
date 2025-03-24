@@ -76,7 +76,12 @@ fun <T>SpendLessDropDown(
             }
         )
     }
-
+    fun hasLeadingIcon(): Boolean {
+        return getLeadingIcon(values[itemPosition.intValue]).isNotEmpty() || fixedLeadingIcon != null
+    }
+    fun openedDropDownMenuHeight(): Int {
+        return if (values.size >= 4) 192 else values.size * 48
+    }
     if (title != null) {
         Text(
             text = title,
@@ -110,19 +115,21 @@ fun <T>SpendLessDropDown(
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.padding(start = 4.dp)
+                    modifier = Modifier.padding(start = if (hasLeadingIcon()) 4.dp else 16.dp)
                 ) {
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier
-                            .size(40.dp)
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(itemBackgroundColor)
-                    ) {
-                        Text(
-                            text = fixedLeadingIcon ?: getLeadingIcon(values[itemPosition.intValue]),
-                            style = MaterialTheme.typography.labelMedium,
-                        )
+                    if (hasLeadingIcon()) {
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier
+                                .size(40.dp)
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(itemBackgroundColor)
+                        ) {
+                            Text(
+                                text = fixedLeadingIcon ?: getLeadingIcon(values[itemPosition.intValue]),
+                                style = MaterialTheme.typography.labelMedium,
+                            )
+                        }
                     }
                     Text(
                         text = getText(values[itemPosition.intValue]),
@@ -150,7 +157,7 @@ fun <T>SpendLessDropDown(
                 ) {
                     Box(
                         modifier = Modifier
-                            .height(200.dp)
+                            .height(openedDropDownMenuHeight().dp)
                             .fillMaxWidth()
                     ) {
                         Column(
@@ -166,22 +173,27 @@ fun <T>SpendLessDropDown(
                                             verticalAlignment = Alignment.CenterVertically,
                                             modifier = Modifier
                                                 .fillMaxSize()
+                                                .padding(horizontal = if (hasLeadingIcon()) 0.dp else 16.dp)
                                         ) {
                                             Row(
                                                 verticalAlignment = Alignment.CenterVertically,
                                                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                                             ) {
-                                                Box(
-                                                    contentAlignment = Alignment.Center,
-                                                    modifier = Modifier
-                                                        .size(40.dp)
-                                                        .clip(RoundedCornerShape(12.dp))
-                                                        .background(if (fixedLeadingIcon == null) itemBackgroundColor else Color.Transparent)
-                                                ) {
-                                                    Text(
-                                                        text = if (fixedLeadingIcon == null) getLeadingIcon(value) else "",
-                                                        style = MaterialTheme.typography.labelMedium,
-                                                    )
+                                                if (hasLeadingIcon()) {
+                                                    Box(
+                                                        contentAlignment = Alignment.Center,
+                                                        modifier = Modifier
+                                                            .size(40.dp)
+                                                            .clip(RoundedCornerShape(12.dp))
+                                                            .background(if (fixedLeadingIcon == null) itemBackgroundColor else Color.Transparent)
+                                                    ) {
+                                                        Text(
+                                                            text = if (fixedLeadingIcon == null) getLeadingIcon(
+                                                                value
+                                                            ) else "",
+                                                            style = MaterialTheme.typography.labelMedium,
+                                                        )
+                                                    }
                                                 }
                                                 Text(
                                                     text = getText(value),
@@ -219,15 +231,17 @@ fun <T>SpendLessDropDown(
                         val scrollbarHeight = 100.dp
                         val scrollbarOffset = (scrollFraction * (200.dp - scrollbarHeight)).coerceIn(20.dp, 180.dp - scrollbarHeight)
 
-                        Box(
-                            modifier = Modifier
-                                .align(Alignment.TopEnd)
-                                .offset(y = scrollbarOffset, x = (-4).dp)
-                                .width(4.dp)
-                                .height(scrollbarHeight)
-                                .clip(RoundedCornerShape(4.dp))
-                                .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f))
-                        )
+                        if (values.size > 4) {
+                            Box(
+                                modifier = Modifier
+                                    .align(Alignment.TopEnd)
+                                    .offset(y = scrollbarOffset, x = (-4).dp)
+                                    .width(4.dp)
+                                    .height(scrollbarHeight)
+                                    .clip(RoundedCornerShape(4.dp))
+                                    .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f))
+                            )
+                        }
                     }
                 }
             }
@@ -305,6 +319,21 @@ fun DropDownWithoutItemIconsPreview() {
             itemBackgroundColor = MaterialTheme.colorScheme.tertiaryContainer,
             getLeadingIcon = { "" },
             fixedLeadingIcon = "\uD83D\uDD04" /* 🔄 */,
+            getText = { it.displayName },
+            modifier = Modifier.padding(16.dp)
+        )
+    }
+}
+
+@Preview(showBackground = true, widthDp = 360, heightDp = 100)
+@Composable
+fun DropDownWithoutLeadingIconPreview() {
+    SpendLessTheme {
+        SpendLessDropDown(
+            values = TransactionCategory.categories,
+            itemBackgroundColor = MaterialTheme.colorScheme.secondary,
+            getLeadingIcon = { "" },
+            fixedLeadingIcon = null,
             getText = { it.displayName },
             modifier = Modifier.padding(16.dp)
         )

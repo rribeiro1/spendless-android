@@ -188,19 +188,3 @@ class CreateTransactionViewModel @Inject constructor(
         const val AMOUNT_DIGITS_MAX_SIZE = 10
     }
 }
-
-sealed interface CreateTransactionActionEvent {
-    data object CancelTransactionCreation : CreateTransactionActionEvent
-    data object TransactionCreated : CreateTransactionActionEvent
-}
-
-sealed interface CreateTransactionUiEvent {
-    data object OnCreatedClicked : CreateTransactionUiEvent
-    data object OnCancelClicked : CreateTransactionUiEvent
-    data class OnTransactionTypeSelected(val transactionType: TransactionType) : CreateTransactionUiEvent
-    data class OnCategorySelected(val transactionCategory: TransactionCategory) : CreateTransactionUiEvent
-    data class OnNoteChanged(val transactionNote: String) : CreateTransactionUiEvent
-    data class OnDescriptionChanged(val transactionDescription: String) : CreateTransactionUiEvent
-    data class OnAmountChanged(val amount: String) : CreateTransactionUiEvent
-    data class OnRecurrenceSelected(val recurrence: TransactionRecurrence) : CreateTransactionUiEvent
-}

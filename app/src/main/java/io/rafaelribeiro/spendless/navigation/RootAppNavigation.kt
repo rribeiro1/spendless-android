@@ -72,6 +72,9 @@ import io.rafaelribeiro.spendless.presentation.screens.transactions.create.Creat
 import io.rafaelribeiro.spendless.presentation.screens.transactions.create.CreateTransactionActionEvent.TransactionCreated
 import io.rafaelribeiro.spendless.presentation.screens.transactions.create.CreateTransactionRootScreen
 import io.rafaelribeiro.spendless.presentation.screens.transactions.create.CreateTransactionViewModel
+import io.rafaelribeiro.spendless.presentation.screens.transactions.export.ExportTransactionActionEvent
+import io.rafaelribeiro.spendless.presentation.screens.transactions.export.ExportTransactionRootScreen
+import io.rafaelribeiro.spendless.presentation.screens.transactions.export.ExportTransactionViewModel
 import io.rafaelribeiro.spendless.workers.UserSessionWorker.Companion.WORKER_TAG
 import kotlinx.coroutines.flow.Flow
 
@@ -284,6 +287,9 @@ fun RootAppNavigation(
                     is DashboardActionEvent.OnSettingsClicked -> {
                         navigationState.navigateTo(Screen.SettingsFlow.route)
                     }
+                    is DashboardActionEvent.ExportTransactions -> {
+                        navigationState.navigateTo(Screen.ExportTransactionScreen.route)
+                    }
                 }
             }
             DashboardScreen(
@@ -300,6 +306,9 @@ fun RootAppNavigation(
                 when (event) {
                     is TransactionsActionEvent.NavigateToAddTransaction -> {
                         navigationState.navigateTo(Screen.CreateTransactionScreen.route)
+                    }
+                    is TransactionsActionEvent.NavigateToDownloadTransaction -> {
+                        navigationState.navigateTo(Screen.ExportTransactionScreen.route)
                     }
                 }
             }
@@ -326,6 +335,23 @@ fun RootAppNavigation(
                 onEvent = viewModel::onEvent,
             )
         }
+        dialog(route = Screen.ExportTransactionScreen.route) {
+            val viewModel = hiltViewModel<ExportTransactionViewModel>()
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            ObserveAsEvents(viewModel.actionEvents) {
+                when (it) {
+                    is ExportTransactionActionEvent.CancelExportCreation -> {
+                        navigationState.popBackStack()
+                    }
+                }
+            }
+            ExportTransactionRootScreen(
+                modifier = modifier,
+                uiState = uiState,
+                onEvent = viewModel::onEvent,
+            )
+        }
+
         navigation(
             startDestination = Screen.SettingsMainScreen.route,
             route = Screen.SettingsFlow.route,
