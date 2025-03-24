@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -149,7 +150,7 @@ fun CreateTransactionScreen(
                 keyboardActions = KeyboardActions(
                     onNext = { focusManager.moveFocus(FocusDirection.Down) },
                 ),
-                modifier = Modifier.padding(top = 60.dp)
+                modifier = Modifier.padding(top = 40.dp)
             )
             CreateTransactionAmount(
                 amountDisplay = uiState.transaction.amountDisplay,
@@ -181,14 +182,23 @@ fun CreateTransactionScreen(
                 modifier = Modifier.padding(top = 24.dp, start = 56.dp, end = 56.dp)
             )
         }
-        SpendLessDropDown(
-            itemBackgroundColor = MaterialTheme.colorScheme.secondary,
-            values = TransactionCategory.categories,
-            getText = { it.displayName },
-            getLeadingIcon = { it.emoji },
-            onItemSelected = { onEvent(CreateTransactionUiEvent.OnCategorySelected(it)) },
-            modifier = Modifier.padding(top = 62.dp)
-        )
+        if (uiState.transaction.transactionType == TransactionType.EXPENSE) {
+            SpendLessDropDown(
+                itemBackgroundColor = MaterialTheme.colorScheme.secondary,
+                values = TransactionCategory.categories - TransactionCategory.INCOME,
+                getText = { it.displayName },
+                getLeadingIcon = { it.emoji },
+                onItemSelected = { onEvent(CreateTransactionUiEvent.OnCategorySelected(it)) },
+                modifier = Modifier.padding(top = 40.dp)
+            )
+        } else {
+            // Add space to keep the layout consistent.
+            Box(
+                modifier = Modifier
+                    .height(88.dp)
+                    .padding(top = 62.dp)
+            )
+        }
         RepeatTransactionDropDown(
             onItemSelected = { onEvent(CreateTransactionUiEvent.OnRecurrenceSelected(it)) },
             modifier = Modifier.padding(top = 8.dp)
@@ -388,13 +398,36 @@ fun RepeatTransactionDropDown(
 
 @Preview(showBackground = true)
 @Composable
-fun CreateTransactionScreenPreview() {
+fun CreateTransactionExpenseScreenPreview() {
     SpendLessTheme {
         CreateTransactionScreen(
             onEvent = {},
             uiState = CreateTransactionUiState(
                 transaction = TransactionUiState(
                     amountDisplay = ""
+                ),
+                preferences = TransactionPreferencesUiState(
+                    expensesFormat = ExpenseFormat.PARENTHESES,
+                )
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(0.92f)
+                .padding(16.dp)
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun CreateTransactionIncomeScreenPreview() {
+    SpendLessTheme {
+        CreateTransactionScreen(
+            onEvent = {},
+            uiState = CreateTransactionUiState(
+                transaction = TransactionUiState(
+                    amountDisplay = "",
+                    transactionType = TransactionType.INCOME
                 ),
                 preferences = TransactionPreferencesUiState(
                     expensesFormat = ExpenseFormat.PARENTHESES,

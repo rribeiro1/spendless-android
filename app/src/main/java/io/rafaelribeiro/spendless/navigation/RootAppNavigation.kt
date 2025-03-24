@@ -374,6 +374,9 @@ fun RootAppNavigation(
                 ObserveAsEvents(flow = viewModel.actionEvents) { event ->
                     when (event) {
                         is SettingsSecurityActionEvent.OnBackClicked -> navigationState.popBackStack()
+                        is SettingsSecurityActionEvent.RestartSession -> {
+                            mainViewModel.startSession()
+                        }
                     }
                 }
                 SettingsSecurityScreen(

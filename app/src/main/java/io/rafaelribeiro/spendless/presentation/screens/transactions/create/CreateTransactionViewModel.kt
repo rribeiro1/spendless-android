@@ -90,7 +90,7 @@ class CreateTransactionViewModel @Inject constructor(
             amount = amount,
             description = transactionState.description,
             note = transactionState.note,
-            category = transactionState.category,
+            category = if (transactionState.transactionType == TransactionType.INCOME) TransactionCategory.INCOME else transactionState.category,
             recurrence = transactionState.recurrenceType,
             createdAt = System.currentTimeMillis()
         )
