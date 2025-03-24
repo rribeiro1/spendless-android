@@ -35,28 +35,27 @@ class OfflineUserSessionRepository @Inject constructor(
         }
     }
 
+    /**
+     * Starts a new session by enqueuing a [UserSessionWorker] to run after [sessionDurationInMinutes] minutes.
+     * We don't need to check whether worker is already enqueued because we are using [ExistingWorkPolicy.REPLACE]
+     * in case the user changes the session duration in the settings.
+     * @param sessionDurationInMinutes The duration of the session in minutes.
+     * @see UserSessionWorker
+     */
     override fun startSession(sessionDurationInMinutes: Long) {
-        val workInfo = workManager.getWorkInfosForUniqueWork(WORK_NAME).get()
-
-        if (workInfo.isNullOrEmpty() || workInfo.any { it.state.isFinished }) {
-            Log.i(WORKER_TAG, "Enqueueing Worker for $sessionDurationInMinutes minutes...")
-            val constraints = Constraints.Builder()
-                .setRequiresBatteryNotLow(false)
-                .build()
-
-            val workRequest = OneTimeWorkRequestBuilder<UserSessionWorker>()
-                .setInitialDelay(sessionDurationInMinutes, TimeUnit.MINUTES)
-                .setConstraints(constraints)
-                .build()
-
-            workManager.enqueueUniqueWork(
-                WORK_NAME,
-                ExistingWorkPolicy.REPLACE,
-                workRequest
-            )
-        } else {
-            Log.i(WORKER_TAG, "Worker is already running or enqueued...")
-        }
+        Log.i(WORKER_TAG, "Enqueueing Session Worker for $sessionDurationInMinutes minutes...")
+        val constraints = Constraints.Builder()
+            .setRequiresBatteryNotLow(false)
+            .build()
+        val workRequest = OneTimeWorkRequestBuilder<UserSessionWorker>()
+            .setInitialDelay(sessionDurationInMinutes, TimeUnit.MINUTES)
+            .setConstraints(constraints)
+            .build()
+        workManager.enqueueUniqueWork(
+            WORK_NAME,
+            ExistingWorkPolicy.REPLACE,
+            workRequest
+        )
     }
 
     override fun cancelWorker() {

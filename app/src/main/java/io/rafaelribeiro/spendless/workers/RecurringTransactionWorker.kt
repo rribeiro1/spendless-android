@@ -46,7 +46,7 @@ class RecurringTransactionWorker @AssistedInject constructor(
             var nextDate = getNextOccurrence(currentTransactionDate, transaction.recurrence)
             Log.i(WORK_NAME, "Next occurrence calculated for $nextDate, today is $today")
 
-            while (nextDate != null && !nextDate.isAfter(LocalDate.now())) {
+            while (nextDate != null && nextDate.isBefore(today)) {
                 Log.i(WORK_NAME, "Creating transaction with description ${transaction.description} for $nextDate")
                 val newTransaction = transaction.copy(
                     id = 0,

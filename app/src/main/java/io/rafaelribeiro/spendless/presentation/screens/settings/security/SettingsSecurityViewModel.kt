@@ -13,6 +13,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
@@ -83,6 +84,7 @@ class SettingsSecurityViewModel @Inject constructor(
 
     private fun saveSecurityPreferencesToDataStore() {
         viewModelScope.launch {
+            restartSessionIfRequired(securityPreferences.first())
             val securityPreferences = SecurityPreferences(
                 sessionExpiryDuration = _uiState.value.sessionExpiryDuration.value,
                 lockedOutDuration = _uiState.value.lockoutDuration.value,
@@ -109,10 +111,17 @@ class SettingsSecurityViewModel @Inject constructor(
             }
         }
     }
+
+    private fun restartSessionIfRequired(securityPreferences: SecurityPreferences) {
+        if (securityPreferences.sessionExpiryDuration != _uiState.value.sessionExpiryDuration.value) {
+            sendActionEvent(SettingsSecurityActionEvent.RestartSession)
+        }
+    }
 }
 
 sealed interface SettingsSecurityActionEvent {
     data object OnBackClicked : SettingsSecurityActionEvent
+    data object RestartSession : SettingsSecurityActionEvent
 }
 
 
