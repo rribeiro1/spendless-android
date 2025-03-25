@@ -3,7 +3,7 @@ package io.rafaelribeiro.spendless.presentation.screens.transactions
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.rafaelribeiro.spendless.data.repository.DefaultTransactionFormatter
+import io.rafaelribeiro.spendless.domain.transaction.DefaultTransactionFormatter
 import io.rafaelribeiro.spendless.data.repository.OfflineTransactionRepository
 import io.rafaelribeiro.spendless.data.repository.UserPreferences
 import io.rafaelribeiro.spendless.domain.user.UserPreferencesRepository
@@ -56,6 +56,7 @@ class TransactionsViewModel @Inject constructor(
         when (event) {
             is TransactionsUiEvent.TransactionNoteClicked -> showTransactionNote(event.transactionId)
             is TransactionsUiEvent.AddTransactionClicked -> sendActionEvent(TransactionsActionEvent.NavigateToAddTransaction)
+            is TransactionsUiEvent.DownloadTransactionsClicked -> sendActionEvent(TransactionsActionEvent.NavigateToDownloadTransaction)
         }
     }
 
@@ -93,11 +94,10 @@ class TransactionsViewModel @Inject constructor(
     }
 }
 
-sealed interface TransactionsActionEvent {
-    data object NavigateToAddTransaction : TransactionsActionEvent
-}
+
 
 sealed interface TransactionsUiEvent {
     data class TransactionNoteClicked(val transactionId: Long) : TransactionsUiEvent
     data object AddTransactionClicked : TransactionsUiEvent
+    data object DownloadTransactionsClicked : TransactionsUiEvent
 }

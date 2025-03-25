@@ -1,4 +1,4 @@
-package io.rafaelribeiro.spendless.domain.transaction
+package io.rafaelribeiro.spendless.service
 
 import io.rafaelribeiro.spendless.domain.preferences.CurrencySymbol
 import io.rafaelribeiro.spendless.domain.preferences.DecimalSeparator

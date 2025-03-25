@@ -38,6 +38,18 @@ class OfflineTransactionRepository @Inject constructor(
         return transactionDao.getMostPopularCategory()
     }
 
+    override suspend fun getTransactionsFromLastThreeMonths(): List<Transaction> {
+        return transactionDao.getTransactionsFromLastThreeMonths().map { it.toTransaction() }
+    }
+
+    override suspend fun getTransactionsFromCurrentMonth(): List<Transaction> {
+        return transactionDao.getTransactionsFromCurrentMonth().map { it.toTransaction() }
+    }
+
+    override suspend fun getTransactionsFromLastMonth(): List<Transaction> {
+        return transactionDao.getTransactionsFromLastMonth().map { it.toTransaction() }
+    }
+
     override suspend fun saveTransaction(transaction: Transaction) {
         transactionDao.insertTransaction(transaction.toTransactionEntity())
     }

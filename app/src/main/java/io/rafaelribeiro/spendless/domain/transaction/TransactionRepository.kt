@@ -9,6 +9,9 @@ interface TransactionRepository {
     fun getTotalAmountLastWeek(): Flow<Double?>
     fun getBiggestTransaction(): Flow<Transaction?>
     fun getMostPopularCategory(): Flow<TransactionCategory?>
+    suspend fun getTransactionsFromLastThreeMonths(): List<Transaction>
+    suspend fun getTransactionsFromCurrentMonth(): List<Transaction>
+    suspend fun getTransactionsFromLastMonth(): List<Transaction>
     suspend fun saveTransaction(transaction: Transaction)
     suspend fun deleteAllTransactions()
 }

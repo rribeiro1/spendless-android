@@ -1,14 +1,14 @@
-package io.rafaelribeiro.spendless.data.repository
+package io.rafaelribeiro.spendless.domain.transaction
 
+import io.rafaelribeiro.spendless.data.repository.UserPreferences
 import io.rafaelribeiro.spendless.domain.preferences.CurrencySymbol
 import io.rafaelribeiro.spendless.domain.preferences.DecimalSeparator
 import io.rafaelribeiro.spendless.domain.preferences.ExpenseFormat
-import io.rafaelribeiro.spendless.domain.transaction.ExpenseFormatter
-import io.rafaelribeiro.spendless.domain.transaction.TransactionFormatter
 import io.rafaelribeiro.spendless.domain.preferences.ThousandSeparator
+import io.rafaelribeiro.spendless.service.ExpenseFormatter
 import java.time.Instant
 import java.time.LocalDateTime
-import java.time.ZoneId.systemDefault
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 import javax.inject.Inject
@@ -31,11 +31,11 @@ class DefaultTransactionFormatter @Inject constructor() : TransactionFormatter {
     override fun formatDateTime(timestamp: Long): String {
         val instant = Instant.ofEpochMilli(timestamp)
         val formatter = DateTimeFormatter.ofPattern("MMM d, yyyy", Locale.ENGLISH)
-        return LocalDateTime.ofInstant(instant, systemDefault()).format(formatter)
+        return LocalDateTime.ofInstant(instant, ZoneId.systemDefault()).format(formatter)
     }
-}
 
-private fun <T : Enum<T>> getEnumValue(
-    enumClass: Class<T>,
-    name: String
-): T = enumClass.enumConstants?.firstOrNull { it.name == name } ?: enumClass.enumConstants!!.first()
+    private fun <T : Enum<T>> getEnumValue(
+        enumClass: Class<T>,
+        name: String
+    ): T = enumClass.enumConstants?.firstOrNull { it.name == name } ?: enumClass.enumConstants!!.first()
+}

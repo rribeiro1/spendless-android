@@ -24,7 +24,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.rafaelribeiro.spendless.R
-import io.rafaelribeiro.spendless.core.presentation.ErrorDialog
+import io.rafaelribeiro.spendless.core.presentation.SpendLessMessageDialog
 import io.rafaelribeiro.spendless.core.presentation.PinPromptScreen
 import io.rafaelribeiro.spendless.presentation.theme.SpendLessTheme
 
@@ -84,9 +84,9 @@ fun AuthPinPromptScreen(
                 onBiometricsClick = { onEvent(AuthPinUiEvent.BiometricsTapped) },
             )
         }
-        ErrorDialog(
+        SpendLessMessageDialog(
             modifier = modifier.align(Alignment.BottomCenter),
-            errorMessage = uiState.errorMessage,
+            message = uiState.errorMessage,
         )
     }
 }

@@ -10,13 +10,11 @@ import io.rafaelribeiro.spendless.core.data.BiometricPromptManager
 
 
 @Module
-@InstallIn(SingletonComponent::class) // IMPORTANT: Installed in ActivityComponent
+@InstallIn(SingletonComponent::class)
 object BiometricModule {
 
     @Provides
-    fun provideBiometricPromptManager(
-        @ApplicationContext context: Context,
-    ): BiometricPromptManager {
+    fun provideBiometricPromptManager(@ApplicationContext context: Context): BiometricPromptManager {
         return BiometricPromptManager(context)
     }
 }

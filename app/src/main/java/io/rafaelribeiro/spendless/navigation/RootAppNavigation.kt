@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.provider.Settings
+import android.widget.Toast
 import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResultLauncher
@@ -38,7 +39,6 @@ import io.rafaelribeiro.spendless.MainActivity
 import io.rafaelribeiro.spendless.MainViewModel
 import io.rafaelribeiro.spendless.R
 import io.rafaelribeiro.spendless.core.data.BiometricPromptManager
-import io.rafaelribeiro.spendless.workers.UserSessionWorker
 import io.rafaelribeiro.spendless.domain.user.UserSessionState
 import io.rafaelribeiro.spendless.presentation.screens.authentication.AuthPinActionEvent
 import io.rafaelribeiro.spendless.presentation.screens.authentication.AuthPinPromptScreen
@@ -59,6 +59,7 @@ import io.rafaelribeiro.spendless.presentation.screens.registration.Registration
 import io.rafaelribeiro.spendless.presentation.screens.settings.SettingsActionEvent
 import io.rafaelribeiro.spendless.presentation.screens.settings.SettingsRootScreen
 import io.rafaelribeiro.spendless.presentation.screens.settings.SettingsViewModel
+import io.rafaelribeiro.spendless.presentation.screens.settings.account.SettingAccountRootScreen
 import io.rafaelribeiro.spendless.presentation.screens.settings.preferences.SettingsPreferencesActionEvent
 import io.rafaelribeiro.spendless.presentation.screens.settings.preferences.SettingsPreferencesScreen
 import io.rafaelribeiro.spendless.presentation.screens.settings.preferences.SettingsPreferencesViewModel
@@ -72,6 +73,9 @@ import io.rafaelribeiro.spendless.presentation.screens.transactions.create.Creat
 import io.rafaelribeiro.spendless.presentation.screens.transactions.create.CreateTransactionActionEvent.TransactionCreated
 import io.rafaelribeiro.spendless.presentation.screens.transactions.create.CreateTransactionRootScreen
 import io.rafaelribeiro.spendless.presentation.screens.transactions.create.CreateTransactionViewModel
+import io.rafaelribeiro.spendless.presentation.screens.transactions.export.ExportTransactionActionEvent
+import io.rafaelribeiro.spendless.presentation.screens.transactions.export.ExportTransactionRootScreen
+import io.rafaelribeiro.spendless.presentation.screens.transactions.export.ExportTransactionViewModel
 import io.rafaelribeiro.spendless.workers.UserSessionWorker.Companion.WORKER_TAG
 import kotlinx.coroutines.flow.Flow
 
@@ -284,6 +288,9 @@ fun RootAppNavigation(
                     is DashboardActionEvent.OnSettingsClicked -> {
                         navigationState.navigateTo(Screen.SettingsFlow.route)
                     }
+                    is DashboardActionEvent.ExportTransactions -> {
+                        navigationState.navigateTo(Screen.ExportTransactionScreen.route)
+                    }
                 }
             }
             DashboardScreen(
@@ -300,6 +307,9 @@ fun RootAppNavigation(
                 when (event) {
                     is TransactionsActionEvent.NavigateToAddTransaction -> {
                         navigationState.navigateTo(Screen.CreateTransactionScreen.route)
+                    }
+                    is TransactionsActionEvent.NavigateToDownloadTransaction -> {
+                        navigationState.navigateTo(Screen.ExportTransactionScreen.route)
                     }
                 }
             }
@@ -326,16 +336,39 @@ fun RootAppNavigation(
                 onEvent = viewModel::onEvent,
             )
         }
+        dialog(route = Screen.ExportTransactionScreen.route) {
+            val viewModel = hiltViewModel<ExportTransactionViewModel>()
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            ObserveAsEvents(viewModel.actionEvents) {
+                when (it) {
+                    is ExportTransactionActionEvent.CancelExportCreation -> {
+                        navigationState.popBackStack()
+                    }
+                    is ExportTransactionActionEvent.TransactionExportSuccess -> {
+                        Toast.makeText(context, R.string.file_exported, Toast.LENGTH_LONG).show()
+                        navigationState.popBackStack()
+                    }
+                    is ExportTransactionActionEvent.TransactionExportFailed -> {
+                        Toast.makeText(context, R.string.fail_to_save_file, Toast.LENGTH_LONG).show()
+                        navigationState.popBackStack()
+                    }
+                }
+            }
+            ExportTransactionRootScreen(
+                modifier = modifier,
+                uiState = uiState,
+                onEvent = viewModel::onEvent,
+            )
+        }
         navigation(
             startDestination = Screen.SettingsMainScreen.route,
             route = Screen.SettingsFlow.route,
         ) {
-            composable(route = Screen.SettingsMainScreen.route) {
-                val viewModel = hiltViewModel<SettingsViewModel>()
+            composable(route = Screen.SettingsMainScreen.route) { entry ->
+                val viewModel = entry.sharedViewModel<SettingsViewModel>(navigationState.navHostController)
                 ObserveAsEvents(flow = viewModel.actionEvents) { event ->
                     when (event) {
                         is SettingsActionEvent.OnBackClicked -> navigationState.popBackStack()
-
                         is SettingsActionEvent.OnPreferencesClicked -> {
                             navigationState.navigateTo(Screen.SettingsPreferences.route)
                         }
@@ -345,6 +378,9 @@ fun RootAppNavigation(
                         is SettingsActionEvent.OnLogoutClicked -> {
                             mainViewModel.terminateSession()
                             navigationState.navigateAndClearBackStack(Screen.LoginScreen.route)
+                        }
+                        is SettingsActionEvent.OnAccountClicked -> {
+                            navigationState.navigateTo(Screen.SettingsAccount.route)
                         }
                     }
                 }
@@ -384,6 +420,16 @@ fun RootAppNavigation(
                     navigationState = navigationState,
                     onEvent = viewModel::onSecurityEvent,
                     uiState = uiState,
+                )
+            }
+            composable(route = Screen.SettingsAccount.route) { entry ->
+                val viewModel = entry.sharedViewModel<SettingsViewModel>(navigationState.navHostController)
+                val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+                SettingAccountRootScreen(
+                    uiState = uiState,
+                    onEvent = viewModel::onEvent,
+                    navigationState = navigationState,
+                    modifier = modifier,
                 )
             }
         }

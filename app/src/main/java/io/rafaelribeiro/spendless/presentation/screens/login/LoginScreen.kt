@@ -32,7 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.navOptions
 import io.rafaelribeiro.spendless.R
-import io.rafaelribeiro.spendless.core.presentation.ErrorDialog
+import io.rafaelribeiro.spendless.core.presentation.SpendLessMessageDialog
 import io.rafaelribeiro.spendless.core.presentation.SpendLessButton
 import io.rafaelribeiro.spendless.core.presentation.SpendLessTextField
 import io.rafaelribeiro.spendless.navigation.NavigationState
@@ -73,9 +73,9 @@ fun LoginRootScreen(
                 },
             )
         }
-        ErrorDialog(
+        SpendLessMessageDialog(
             modifier = modifier.align(Alignment.BottomCenter),
-            errorMessage = uiState.errorMessage,
+            message = uiState.errorMessage,
         )
     }
 }

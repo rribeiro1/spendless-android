@@ -3,9 +3,8 @@ package io.rafaelribeiro.spendless.presentation.screens.dashboard
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.rafaelribeiro.spendless.core.data.TransactionCreator
 import io.rafaelribeiro.spendless.core.presentation.combine
-import io.rafaelribeiro.spendless.data.repository.DefaultTransactionFormatter
+import io.rafaelribeiro.spendless.domain.transaction.DefaultTransactionFormatter
 import io.rafaelribeiro.spendless.data.repository.UserPreferences
 import io.rafaelribeiro.spendless.domain.AuthRepository
 import io.rafaelribeiro.spendless.domain.transaction.TransactionRepository
@@ -59,19 +58,10 @@ class DashboardViewModel @Inject constructor(
     fun onEvent(event: DashboardUiEvent) {
         when (event) {
             is DashboardUiEvent.AddTransactionClicked -> sendActionEvent(DashboardActionEvent.AddTransaction)
-            is DashboardUiEvent.DownloadTransactionsClicked -> clearData()
+            is DashboardUiEvent.DownloadTransactionsClicked -> sendActionEvent(DashboardActionEvent.ExportTransactions)
             is DashboardUiEvent.SettingsClicked -> sendActionEvent(DashboardActionEvent.OnSettingsClicked)
             is DashboardUiEvent.TransactionNoteClicked -> showTransactionNote(event.transactionId)
             is DashboardUiEvent.ShowAllTransactionsClicked -> sendActionEvent(DashboardActionEvent.ShowAllTransactions)
-        }
-    }
-
-    fun clearData() {
-        viewModelScope.launch {
-            transactionRepository.deleteAllTransactions()
-            TransactionCreator.createTransactions(3).forEach {
-                transactionRepository.saveTransaction(it)
-            }
         }
     }
 
@@ -125,6 +115,7 @@ sealed interface DashboardActionEvent {
     data object ShowAllTransactions : DashboardActionEvent
     data object AddTransaction : DashboardActionEvent
     data object OnSettingsClicked : DashboardActionEvent
+    data object ExportTransactions : DashboardActionEvent
 }
 
 sealed interface DashboardUiEvent {

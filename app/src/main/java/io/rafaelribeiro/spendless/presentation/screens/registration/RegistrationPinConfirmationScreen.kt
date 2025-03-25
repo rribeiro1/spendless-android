@@ -18,7 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import io.rafaelribeiro.spendless.R
-import io.rafaelribeiro.spendless.core.presentation.ErrorDialog
+import io.rafaelribeiro.spendless.core.presentation.SpendLessMessageDialog
 import io.rafaelribeiro.spendless.core.presentation.PinPromptScreen
 import io.rafaelribeiro.spendless.navigation.NavigationState
 
@@ -65,9 +65,9 @@ fun RegistrationPinConfirmationScreen(
                 onBackspaceClick = { onEvent(RegistrationUiEvent.PinConfirmationBackspaceTapped) },
             )
         }
-        ErrorDialog(
+        SpendLessMessageDialog(
             modifier = modifier.align(Alignment.BottomCenter),
-            errorMessage = uiState.errorMessage,
+            message = uiState.errorMessage,
         )
     }
 }

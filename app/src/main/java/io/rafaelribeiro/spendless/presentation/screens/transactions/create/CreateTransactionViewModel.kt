@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.rafaelribeiro.spendless.R
 import io.rafaelribeiro.spendless.core.presentation.UiText
-import io.rafaelribeiro.spendless.data.repository.DefaultTransactionFormatter
+import io.rafaelribeiro.spendless.domain.transaction.DefaultTransactionFormatter
 import io.rafaelribeiro.spendless.data.repository.OfflineTransactionRepository
 import io.rafaelribeiro.spendless.data.repository.UserPreferences
 import io.rafaelribeiro.spendless.domain.transaction.Transaction
@@ -187,20 +187,4 @@ class CreateTransactionViewModel @Inject constructor(
         const val NOTE_MAX_SIZE = 100
         const val AMOUNT_DIGITS_MAX_SIZE = 10
     }
-}
-
-sealed interface CreateTransactionActionEvent {
-    data object CancelTransactionCreation : CreateTransactionActionEvent
-    data object TransactionCreated : CreateTransactionActionEvent
-}
-
-sealed interface CreateTransactionUiEvent {
-    data object OnCreatedClicked : CreateTransactionUiEvent
-    data object OnCancelClicked : CreateTransactionUiEvent
-    data class OnTransactionTypeSelected(val transactionType: TransactionType) : CreateTransactionUiEvent
-    data class OnCategorySelected(val transactionCategory: TransactionCategory) : CreateTransactionUiEvent
-    data class OnNoteChanged(val transactionNote: String) : CreateTransactionUiEvent
-    data class OnDescriptionChanged(val transactionDescription: String) : CreateTransactionUiEvent
-    data class OnAmountChanged(val amount: String) : CreateTransactionUiEvent
-    data class OnRecurrenceSelected(val recurrence: TransactionRecurrence) : CreateTransactionUiEvent
 }

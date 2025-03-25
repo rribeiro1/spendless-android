@@ -8,7 +8,7 @@ import io.rafaelribeiro.spendless.data.repository.toUserPreferences
 import io.rafaelribeiro.spendless.domain.preferences.CurrencySymbol
 import io.rafaelribeiro.spendless.domain.preferences.DecimalSeparator
 import io.rafaelribeiro.spendless.domain.preferences.ExpenseFormat
-import io.rafaelribeiro.spendless.domain.transaction.ExpenseFormatter
+import io.rafaelribeiro.spendless.service.ExpenseFormatter
 import io.rafaelribeiro.spendless.domain.preferences.ThousandSeparator
 import io.rafaelribeiro.spendless.domain.user.UserPreferencesRepository
 import io.rafaelribeiro.spendless.presentation.screens.settings.preferences.SettingsPreferencesUiEvent.ButtonClicked
