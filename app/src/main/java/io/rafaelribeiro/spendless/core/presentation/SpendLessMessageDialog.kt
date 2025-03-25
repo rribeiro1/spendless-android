@@ -60,7 +60,7 @@ fun SpendLessMessageDialog(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(16.dp)
-                        .background(MaterialTheme.colorScheme.error)
+                        .background(if (isError) MaterialTheme.colorScheme.error else Success)
                 )
             }
         }

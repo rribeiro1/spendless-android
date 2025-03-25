@@ -4,5 +4,5 @@ enum class TransactionExportRange(val displayName: String) {
     LAST_THREE_MONTHS("Last three months"),
     LAST_MONTH("Last month"),
     CURRENT_MONTH("Current month"),
-    SPECIFIC_MONTH("Specific Month"),
+    // SPECIFIC_MONTH("Specific Month") TODO: Implement this feature in the future.
 }

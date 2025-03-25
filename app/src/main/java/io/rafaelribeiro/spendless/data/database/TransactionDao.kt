@@ -31,6 +31,28 @@ interface TransactionDao {
     @Query("SELECT COALESCE(SUM(amount), 0) FROM transactions")
     fun getBalance(): Flow<Double?>
 
+    @Query("""
+        SELECT *
+        FROM transactions
+        WHERE createdAt >= (strftime('%s', 'now', 'start of month') * 1000)
+    """)
+    suspend fun getTransactionsFromCurrentMonth(): List<TransactionEntity>
+
+    @Query("""
+        SELECT *
+        FROM transactions
+        WHERE createdAt >= (strftime('%s', 'now', 'start of month', '-1 month') * 1000)
+        AND createdAt < (strftime('%s', 'now', 'start of month') * 1000)
+    """)
+    suspend fun getTransactionsFromLastMonth(): List<TransactionEntity>
+
+    @Query("""
+        SELECT *
+        FROM transactions
+        WHERE createdAt >= (strftime('%s', 'now', 'start of month', '-3 months') * 1000)
+    """)
+    suspend fun getTransactionsFromLastThreeMonths(): List<TransactionEntity>
+
     /**
      * Retrieves the total sum of expenses for the **previous full week** (Monday to Sunday).
      *

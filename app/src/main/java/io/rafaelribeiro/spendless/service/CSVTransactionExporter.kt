@@ -44,16 +44,16 @@ class CSVTransactionExporter @Inject constructor() : TransactionExporter {
 
     private fun List<Transaction>.toCsv(): String {
         val header = listOf("id", "amount", "description", "note", "category", "type", "recurrence", "createdAt")
-        val rows = this.map { tx ->
+        val rows = this.map { transaction ->
             listOf(
-                tx.id.toString(),
-                tx.amount.toString(),
-                tx.description,
-                tx.note.orEmpty(),
-                tx.category.name,
-                tx.type.name,
-                tx.recurrence.name,
-                tx.createdAt.toString()
+                transaction.id.toString(),
+                transaction.amount.toString(),
+                transaction.description,
+                transaction.note.orEmpty(),
+                transaction.category.name,
+                transaction.type.name,
+                transaction.recurrence.name,
+                transaction.createdAt.toString()
             )
         }
         return buildString {

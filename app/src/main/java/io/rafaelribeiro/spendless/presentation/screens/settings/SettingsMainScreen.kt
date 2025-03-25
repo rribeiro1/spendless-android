@@ -15,6 +15,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -94,6 +95,9 @@ fun SettingsMainScreen(
             SettingItemList(stringResource(R.string.security), Icons.Default.Lock) {
                 onEvent(SettingsUiEvent.SecurityClicked)
             }
+            SettingItemList(stringResource(R.string.account), Icons.Default.AccountCircle) {
+                onEvent(SettingsUiEvent.AccountClicked)
+            }
         }
 
         Column(
@@ -117,7 +121,7 @@ fun SettingsMainScreen(
 }
 
 @Composable
-private fun SettingItemList(
+fun SettingItemList(
     title: String,
     icon: ImageVector,
     iconContainerColor: Color = MaterialTheme.colorScheme.surfaceContainerLow,

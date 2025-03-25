@@ -39,8 +39,6 @@ import io.rafaelribeiro.spendless.MainActivity
 import io.rafaelribeiro.spendless.MainViewModel
 import io.rafaelribeiro.spendless.R
 import io.rafaelribeiro.spendless.core.data.BiometricPromptManager
-import io.rafaelribeiro.spendless.core.presentation.UiText
-import io.rafaelribeiro.spendless.workers.UserSessionWorker
 import io.rafaelribeiro.spendless.domain.user.UserSessionState
 import io.rafaelribeiro.spendless.presentation.screens.authentication.AuthPinActionEvent
 import io.rafaelribeiro.spendless.presentation.screens.authentication.AuthPinPromptScreen
@@ -61,6 +59,7 @@ import io.rafaelribeiro.spendless.presentation.screens.registration.Registration
 import io.rafaelribeiro.spendless.presentation.screens.settings.SettingsActionEvent
 import io.rafaelribeiro.spendless.presentation.screens.settings.SettingsRootScreen
 import io.rafaelribeiro.spendless.presentation.screens.settings.SettingsViewModel
+import io.rafaelribeiro.spendless.presentation.screens.settings.account.SettingAccountRootScreen
 import io.rafaelribeiro.spendless.presentation.screens.settings.preferences.SettingsPreferencesActionEvent
 import io.rafaelribeiro.spendless.presentation.screens.settings.preferences.SettingsPreferencesScreen
 import io.rafaelribeiro.spendless.presentation.screens.settings.preferences.SettingsPreferencesViewModel
@@ -346,11 +345,11 @@ fun RootAppNavigation(
                         navigationState.popBackStack()
                     }
                     is ExportTransactionActionEvent.TransactionExportSuccess -> {
-                        Toast.makeText(context, R.string.csv_file_exported, Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, R.string.file_exported, Toast.LENGTH_LONG).show()
                         navigationState.popBackStack()
                     }
                     is ExportTransactionActionEvent.TransactionExportFailed -> {
-                        Toast.makeText(context, R.string.fail_to_save_csv_file, Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, R.string.fail_to_save_file, Toast.LENGTH_LONG).show()
                         navigationState.popBackStack()
                     }
                 }
@@ -365,12 +364,11 @@ fun RootAppNavigation(
             startDestination = Screen.SettingsMainScreen.route,
             route = Screen.SettingsFlow.route,
         ) {
-            composable(route = Screen.SettingsMainScreen.route) {
-                val viewModel = hiltViewModel<SettingsViewModel>()
+            composable(route = Screen.SettingsMainScreen.route) { entry ->
+                val viewModel = entry.sharedViewModel<SettingsViewModel>(navigationState.navHostController)
                 ObserveAsEvents(flow = viewModel.actionEvents) { event ->
                     when (event) {
                         is SettingsActionEvent.OnBackClicked -> navigationState.popBackStack()
-
                         is SettingsActionEvent.OnPreferencesClicked -> {
                             navigationState.navigateTo(Screen.SettingsPreferences.route)
                         }
@@ -380,6 +378,9 @@ fun RootAppNavigation(
                         is SettingsActionEvent.OnLogoutClicked -> {
                             mainViewModel.terminateSession()
                             navigationState.navigateAndClearBackStack(Screen.LoginScreen.route)
+                        }
+                        is SettingsActionEvent.OnAccountClicked -> {
+                            navigationState.navigateTo(Screen.SettingsAccount.route)
                         }
                     }
                 }
@@ -419,6 +420,16 @@ fun RootAppNavigation(
                     navigationState = navigationState,
                     onEvent = viewModel::onSecurityEvent,
                     uiState = uiState,
+                )
+            }
+            composable(route = Screen.SettingsAccount.route) { entry ->
+                val viewModel = entry.sharedViewModel<SettingsViewModel>(navigationState.navHostController)
+                val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+                SettingAccountRootScreen(
+                    uiState = uiState,
+                    onEvent = viewModel::onEvent,
+                    navigationState = navigationState,
+                    modifier = modifier,
                 )
             }
         }

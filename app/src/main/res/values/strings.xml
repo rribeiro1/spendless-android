@@ -61,6 +61,12 @@
     <string name="export">Export</string>
     <string name="export_range">Export Range</string>
     <string name="export_format">Export Format</string>
-    <string name="fail_to_save_csv_file">Fail to export CSV file to Downloads folder, please try again!.</string>
-    <string name="csv_file_exported">CSV file exported to Downloads folder with Success</string>
+    <string name="fail_to_save_file">Fail to export transactions to Downloads folder, please try again!.</string>
+    <string name="file_exported">Transactions exported to Downloads folder with Success</string>
+    <string name="account">Account</string>
+    <string name="delete_account">Delete Account</string>
+    <string name="add_fake_transactions">Add Fake Transactions</string>
+    <string name="delete_transactions">Delete All Transactions</string>
+    <string name="transactions_deleted">Transactions deleted with Success</string>
+    <string name="fake_transactions_created">Fake Transactions created for app testing purpose.</string>
 </resources>

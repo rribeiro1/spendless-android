@@ -6,7 +6,12 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.rafaelribeiro.spendless.domain.transaction.TransactionExportFormat
+import io.rafaelribeiro.spendless.domain.transaction.TransactionExportFormat.CSV
+import io.rafaelribeiro.spendless.domain.transaction.TransactionExportFormat.PDF
 import io.rafaelribeiro.spendless.domain.transaction.TransactionExportRange
+import io.rafaelribeiro.spendless.domain.transaction.TransactionExportRange.LAST_THREE_MONTHS
+import io.rafaelribeiro.spendless.domain.transaction.TransactionExportRange.CURRENT_MONTH
+import io.rafaelribeiro.spendless.domain.transaction.TransactionExportRange.LAST_MONTH
 import io.rafaelribeiro.spendless.domain.transaction.TransactionRepository
 import io.rafaelribeiro.spendless.service.TransactionExporter
 import javax.inject.Inject
@@ -14,7 +19,6 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -23,7 +27,8 @@ import javax.inject.Named
 
 @HiltViewModel
 class ExportTransactionViewModel @Inject constructor(
-    @Named("csv") private val transactionExporter: TransactionExporter,
+    @Named("csv") private val csvTransactionExporter: TransactionExporter,
+    @Named("pdf") private val pdfTransactionExporter: TransactionExporter,
     @ApplicationContext private val context: Context,
     private val transactionRepository: TransactionRepository
 ) : ViewModel() {
@@ -50,8 +55,15 @@ class ExportTransactionViewModel @Inject constructor(
     private fun exportTransactions() {
         viewModelScope.launch {
             try {
-                val transactions = transactionRepository.getAllTransactions().first()
-                transactionExporter.export(transactions, context)
+                val transactions = when (uiState.value.exportRange) {
+                    LAST_THREE_MONTHS -> transactionRepository.getTransactionsFromLastThreeMonths()
+                    LAST_MONTH -> transactionRepository.getTransactionsFromLastMonth()
+                    CURRENT_MONTH -> transactionRepository.getTransactionsFromCurrentMonth()
+                }
+                when (uiState.value.exportFormat) {
+                    CSV -> csvTransactionExporter.export(transactions, context)
+                    PDF -> pdfTransactionExporter.export(transactions, context)
+                }
                 sendActionEvent(ExportTransactionActionEvent.TransactionExportSuccess)
             } catch (e: Exception) {
                 sendActionEvent(ExportTransactionActionEvent.TransactionExportFailed)
