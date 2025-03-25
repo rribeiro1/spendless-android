@@ -23,15 +23,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import io.rafaelribeiro.spendless.presentation.theme.Success
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun ErrorDialog(
-    errorMessage: UiText,
+fun SpendLessMessageDialog(
+    message: UiText,
+    isError: Boolean = true,
     modifier: Modifier = Modifier,
 ) {
     AnimatedVisibility(
-        visible = errorMessage.isNotEmpty(),
+        visible = message.isNotEmpty(),
         enter = fadeIn(animationSpec = tween(durationMillis = 300)),
         exit = fadeOut(animationSpec = tween(durationMillis = 300)),
         modifier = modifier.imePadding(),
@@ -41,12 +43,12 @@ fun ErrorDialog(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(48.dp)
-                    .background(MaterialTheme.colorScheme.error)
+                    .background(if (isError) MaterialTheme.colorScheme.error else Success)
                     .padding(vertical = 12.dp, horizontal = 16.dp),
                 contentAlignment = Alignment.Center,
             ) {
                 Text(
-                    text = errorMessage.asString(),
+                    text = message.asString(),
                     color = MaterialTheme.colorScheme.onError,
                     style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Medium),
                     modifier = Modifier.align(Alignment.Center),
@@ -68,5 +70,15 @@ fun ErrorDialog(
 @Preview
 @Composable
 fun ErrorDialogPreview() {
-    ErrorDialog(errorMessage = UiText.DynamicString("Error message"))
+    SpendLessMessageDialog(message = UiText.DynamicString("Error message"))
 }
+
+@Preview
+@Composable
+fun SuccessDialogPreview() {
+    SpendLessMessageDialog(
+        message = UiText.DynamicString("Transaction saved!"),
+        isError = false
+    )
+}
+

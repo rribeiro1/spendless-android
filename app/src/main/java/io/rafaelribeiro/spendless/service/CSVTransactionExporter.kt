@@ -9,7 +9,7 @@ import androidx.annotation.RequiresApi
 import io.rafaelribeiro.spendless.domain.transaction.Transaction
 import javax.inject.Inject
 
-class CsvTransactionExportService @Inject constructor() : TransactionExportService {
+class CSVTransactionExporter @Inject constructor() : TransactionExporter {
     override val fileName = "transactions.csv"
     override val mimeType = "text/csv"
 

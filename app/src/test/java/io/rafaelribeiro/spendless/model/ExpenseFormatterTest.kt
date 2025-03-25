@@ -5,7 +5,7 @@ import assertk.assertions.isEqualTo
 import io.rafaelribeiro.spendless.domain.preferences.CurrencySymbol
 import io.rafaelribeiro.spendless.domain.preferences.DecimalSeparator
 import io.rafaelribeiro.spendless.domain.preferences.ExpenseFormat
-import io.rafaelribeiro.spendless.domain.transaction.ExpenseFormatter
+import io.rafaelribeiro.spendless.service.ExpenseFormatter
 import io.rafaelribeiro.spendless.domain.preferences.ThousandSeparator
 import org.junit.jupiter.api.Test
 

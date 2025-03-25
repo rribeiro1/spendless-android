@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.provider.Settings
+import android.widget.Toast
 import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResultLauncher
@@ -38,6 +39,7 @@ import io.rafaelribeiro.spendless.MainActivity
 import io.rafaelribeiro.spendless.MainViewModel
 import io.rafaelribeiro.spendless.R
 import io.rafaelribeiro.spendless.core.data.BiometricPromptManager
+import io.rafaelribeiro.spendless.core.presentation.UiText
 import io.rafaelribeiro.spendless.workers.UserSessionWorker
 import io.rafaelribeiro.spendless.domain.user.UserSessionState
 import io.rafaelribeiro.spendless.presentation.screens.authentication.AuthPinActionEvent
@@ -343,6 +345,14 @@ fun RootAppNavigation(
                     is ExportTransactionActionEvent.CancelExportCreation -> {
                         navigationState.popBackStack()
                     }
+                    is ExportTransactionActionEvent.TransactionExportSuccess -> {
+                        Toast.makeText(context, R.string.csv_file_exported, Toast.LENGTH_SHORT).show()
+                        navigationState.popBackStack()
+                    }
+                    is ExportTransactionActionEvent.TransactionExportFailed -> {
+                        Toast.makeText(context, R.string.fail_to_save_csv_file, Toast.LENGTH_SHORT).show()
+                        navigationState.popBackStack()
+                    }
                 }
             }
             ExportTransactionRootScreen(
@@ -351,7 +361,6 @@ fun RootAppNavigation(
                 onEvent = viewModel::onEvent,
             )
         }
-
         navigation(
             startDestination = Screen.SettingsMainScreen.route,
             route = Screen.SettingsFlow.route,

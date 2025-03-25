@@ -3,7 +3,7 @@ package io.rafaelribeiro.spendless.presentation.screens.transactions
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.rafaelribeiro.spendless.service.DefaultTransactionFormatter
+import io.rafaelribeiro.spendless.domain.transaction.DefaultTransactionFormatter
 import io.rafaelribeiro.spendless.data.repository.OfflineTransactionRepository
 import io.rafaelribeiro.spendless.data.repository.UserPreferences
 import io.rafaelribeiro.spendless.domain.user.UserPreferencesRepository
