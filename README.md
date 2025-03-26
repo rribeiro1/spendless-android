@@ -5,13 +5,13 @@ users income and expenses while also securing the data in terms of accessing the
 
 ## Screenshots
 
-<table>
+<table style="border: none">
   <tr>
-    <td><img src="screenshots/dashboard.jpeg" alt="Home" width="100"/></td>
-    <td><img src="screenshots/add_transaction.jpeg" alt="Add Expense" width="100"/></td>
-    <td><img src="screenshots/preferences.jpeg" alt="Reports" width="100"/></td>
-    <td><img src="screenshots/pin.jpeg" alt="Pin" width="100"/></td>
-    <td><img src="screenshots/report.jpeg" alt="Report" width="100"/></td>
+    <td><img src="screenshots/dashboard.jpeg" alt="Home" width="125"/></td>
+    <td><img src="screenshots/add_transaction.jpeg" alt="Add Expense" width="125"/></td>
+    <td><img src="screenshots/preferences.jpeg" alt="Reports" width="125"/></td>
+    <td><img src="screenshots/pin.jpeg" alt="Pin" width="125"/></td>
+    <td><img src="screenshots/report.jpeg" alt="Report" width="125"/></td>
   </tr>
   <tr>
     <td align="center">Dashboard</td>
