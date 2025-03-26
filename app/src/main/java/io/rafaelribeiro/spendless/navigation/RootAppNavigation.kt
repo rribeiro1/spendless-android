@@ -207,15 +207,7 @@ fun RootAppNavigation(
 			val uiState by viewModel.uiState.collectAsStateWithLifecycle()
             ObserveAsEvents(flow = viewModel.actionEvents) { event ->
                 when (event) {
-                    is LoginActionEvent.LoginSucceed -> {
-                        mainViewModel.startSession()
-                        navigationState.navigateTo(
-                            route = Screen.DashboardScreen.route,
-                            navOptions = navOptions {
-                                popUpTo(Screen.LoginScreen.route) { inclusive = true }
-                            }
-                        )
-                    }
+                    is LoginActionEvent.LoginSucceed -> mainViewModel.startSession()
                 }
             }
 			LoginRootScreen(
@@ -234,21 +226,14 @@ fun RootAppNavigation(
                     Log.d(Screen.PinPromptScreen.route, "Activity result: $it")
                     when (it.resultCode) {
                         RESULT_CANCELED -> {}
-                        else -> {
-                            showBiometricPrompt(viewModel, activity, context)
-                        }
+                        else -> showBiometricPrompt(viewModel, activity, context)
                     }
                 }
             )
             ObserveAsEvents(flow = viewModel.actionEvents) { event ->
                 when (event) {
-                    AuthPinActionEvent.CorrectPinEntered -> {
-                        mainViewModel.startSession()
-                        navigationState.navigateAndClearBackStack(Screen.DashboardScreen.route)
-                    }
-                    AuthPinActionEvent.BiometricsTriggered -> {
-                        showBiometricPrompt(viewModel, activity, context)
-                    }
+                    AuthPinActionEvent.CorrectPinEntered -> mainViewModel.startSession()
+                    AuthPinActionEvent.BiometricsTriggered -> showBiometricPrompt(viewModel, activity, context)
                     AuthPinActionEvent.LogoutClicked -> {
                         mainViewModel.terminateSession()
                         navigationState.navigateAndClearBackStack(Screen.LoginScreen.route)

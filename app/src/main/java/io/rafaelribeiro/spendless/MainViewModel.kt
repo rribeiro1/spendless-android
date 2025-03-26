@@ -56,8 +56,7 @@ class MainViewModel @Inject constructor(
                when (session) {
                    UserSessionState.Inactive -> userSessionRepository.cancelWorker()
                    UserSessionState.Active -> userSessionRepository.startSession(sessionExpiryDuration.toLong())
-                   UserSessionState.Idle -> {}
-                   UserSessionState.Expired -> {}
+                   else -> {}
                }
            }
        }
