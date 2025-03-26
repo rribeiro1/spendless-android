@@ -49,6 +49,18 @@ class FakeTransactionRepository @Inject constructor() : TransactionRepository {
         }
     }
 
+    override suspend fun getTransactionsFromLastThreeMonths(): List<Transaction> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getTransactionsFromCurrentMonth(): List<Transaction> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getTransactionsFromLastMonth(): List<Transaction> {
+        TODO("Not yet implemented")
+    }
+
     override suspend fun saveTransaction(transaction: Transaction) {}
 
     override suspend fun deleteAllTransactions() {}

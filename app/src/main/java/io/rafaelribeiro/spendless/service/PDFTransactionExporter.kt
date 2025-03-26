@@ -118,7 +118,7 @@ class PDFTransactionExporter @Inject constructor() : TransactionExporter {
             canvas.drawText(tx.description.take(30), currentX, yPosition, textPaint)
             currentX += columnWidths[2]
 
-            canvas.drawText(tx.category.displayName, currentX, yPosition, textPaint)
+            canvas.drawText("${tx.category.emoji} ${tx.category.displayName}", currentX, yPosition, textPaint)
 
             yPosition += 20f
         }
