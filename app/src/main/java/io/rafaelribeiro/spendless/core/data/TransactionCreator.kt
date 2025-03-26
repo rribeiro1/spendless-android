@@ -26,6 +26,38 @@ import kotlin.random.Random
  */
 class TransactionCreator {
     companion object {
+        private val expenseDescriptionsByCategory = mapOf(
+            "Gym" to TransactionCategory.HEALTH,
+            "School" to TransactionCategory.EDUCATION,
+            "Kebab" to TransactionCategory.FOOD,
+            "McDonalds" to TransactionCategory.FOOD,
+            "Taxi" to TransactionCategory.TRANSPORTATION,
+            "Groceries" to TransactionCategory.FOOD,
+            "Spotify" to TransactionCategory.ENTERTAINMENT,
+            "Netflix" to TransactionCategory.ENTERTAINMENT,
+            "Zara" to TransactionCategory.CLOTHING,
+            "Books" to TransactionCategory.EDUCATION,
+            "Gas" to TransactionCategory.TRANSPORTATION,
+            "Uber" to TransactionCategory.TRANSPORTATION,
+            "Haircut" to TransactionCategory.PERSONAL_CARE,
+            "Dinner" to TransactionCategory.FOOD,
+            "Snacks" to TransactionCategory.FOOD,
+            "Coffee" to TransactionCategory.FOOD,
+            "Train" to TransactionCategory.TRANSPORTATION,
+            "Pharmacy" to TransactionCategory.HEALTH,
+            "Bakery" to TransactionCategory.FOOD,
+            "Lunch" to TransactionCategory.FOOD,
+            "Salary" to TransactionCategory.INCOME,
+            "Freelance" to TransactionCategory.INCOME,
+        )
+
+        private val expenseAmounts = listOf(
+            -10.0, -15.5, -7.99, -1120.0, -45.0, -89.99, -12.5, -60.0, -33.33, -99.9,
+            -25.0, -50.0, -18.0, -75.25, -22.0, -5.0, -30.0, -55.5, -11.11, -90.0
+        )
+
+        private val incomeAmounts = listOf(1099.00, 1500.50, 499.50, 1120.0, 450.0, 899.99)
+
         private val testTransactionFormatter: TransactionFormatter = object : TransactionFormatter {
             override fun formatAmount(amount: Double, preferences: UserPreferences, amountOnly: Boolean): String {
                 val formatter = ExpenseFormatter(
@@ -81,91 +113,26 @@ class TransactionCreator {
         }
 
         private fun randomTransaction(): TransactionTest {
-            val transactions = listOf(
-                TransactionTest(
-                    description = "Amazon",
-                    category = TransactionCategory.HOME,
-                    type = TransactionType.EXPENSE,
-                    amount = -100.00,
-                    amountDisplay = "-$100.00",
-                    createdAt = randomTimestamp()
-                ),
-                TransactionTest(
-                    description = "McDonald's",
-                    category = TransactionCategory.FOOD,
-                    type = TransactionType.EXPENSE,
-                    amount = -1450.00,
-                    amountDisplay = "-$1450.00",
-                    createdAt = randomTimestamp(),
-                    note = "I was hungry today so I bought quite everything from the menu, I should stop doing this"
-                ),
-                TransactionTest(
-                    description = "Netflix Monthly Subscription from Brazil",
-                    category = TransactionCategory.ENTERTAINMENT,
-                    type = TransactionType.EXPENSE,
-                    amount = -10.00,
-                    amountDisplay = "-$10.00",
-                    createdAt = randomTimestamp()
-                ),
-                TransactionTest(
-                    description = "Zara",
-                    category = TransactionCategory.CLOTHING,
-                    type = TransactionType.EXPENSE,
-                    amount = -12492.50,
-                    amountDisplay = "-$12,492.50",
-                    createdAt = randomTimestamp()
-                ),
-                TransactionTest(
-                    description = "Gym - Monthly Membership John Reed",
-                    category = TransactionCategory.HEALTH,
-                    type = TransactionType.EXPENSE,
-                    amount = -100.00,
-                    amountDisplay = "-$100.00",
-                    createdAt = randomTimestamp(),
-                    note = "I am trying to get back in shape, let's see how it goes. But I am more like an gym investor because I just pay and don't go."
-                ),
-                TransactionTest(
-                    description = "Haircut",
-                    category = TransactionCategory.PERSONAL_CARE,
-                    type = TransactionType.EXPENSE,
-                    amount = -50.00,
-                    amountDisplay = "-$50.00",
-                    createdAt = randomTimestamp(),
-                    note = "I was looking like a caveman, so I decided to cut my hair."
-                ),
-                TransactionTest(
-                    description = "Uber",
-                    category = TransactionCategory.TRANSPORTATION,
-                    type = TransactionType.EXPENSE,
-                    amount = -10.00,
-                    amountDisplay = "-$10.00",
-                    createdAt = randomTimestamp(),
-                    note = "I was late for a meeting, so I had to take an Uber."
-                ),
-                TransactionTest(
-                    description = "Udemy",
-                    category = TransactionCategory.EDUCATION,
-                    type = TransactionType.EXPENSE,
-                    amount = -140.50,
-                    amountDisplay = "-$140.50",
-                    createdAt = randomTimestamp(),
-                    note = "I am learning this android thing, let's see if I can get a job with this."
-                ),
-                TransactionTest(
-                    description = "Rick's share - Birthday Present from Rafael",
-                    category = TransactionCategory.SAVINGS,
-                    type = TransactionType.INCOME,
-                    amount = 100.00,
-                    amountDisplay = "$100.00",
-                    createdAt = randomTimestamp(),
-                    note = "Birthday present from Rafael."
-                ),
+            val (description, category) = expenseDescriptionsByCategory.entries.random()
+            val includeNote = Random.nextBoolean()
+            val type = if (category == TransactionCategory.INCOME) TransactionType.INCOME else TransactionType.EXPENSE
+            val amount = if (type == TransactionType.INCOME) incomeAmounts.random() else expenseAmounts.random()
+            val amountDisplay = amount.toString()
+            val note = if (includeNote) "This is a note for $description." else null
+
+            return TransactionTest(
+                description = description,
+                category = category,
+                type = type,
+                amount = amount,
+                amountDisplay = amountDisplay,
+                createdAt = randomTimestamp(),
+                note = note
             )
-            return transactions.random()
         }
 
         private fun randomTimestamp(): Long {
-            val daysAgo = Random.nextInt(0, 30)
+            val daysAgo = Random.nextInt(0, 120) // Approx. 4 months
             return Instant.now().minus(daysAgo.toLong(), ChronoUnit.DAYS).toEpochMilli()
         }
     }
