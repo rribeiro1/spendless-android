@@ -19,6 +19,9 @@ interface TransactionDao {
     @Query("SELECT * FROM transactions WHERE type = 'EXPENSE' ORDER BY amount ASC LIMIT 1")
     fun getLargestTransaction(): Flow<TransactionEntity?>
 
+    @Query("SELECT * FROM transactions WHERE type = 'EXPENSE'")
+    fun getExpenses(): Flow<List<TransactionEntity>>
+
     @Query("SELECT category FROM transactions GROUP BY category ORDER BY COUNT(*) DESC LIMIT 1")
     fun getMostPopularCategory(): Flow<TransactionCategory?>
 
@@ -85,4 +88,13 @@ interface TransactionDao {
         AND createdAt < (strftime('%s', 'now', 'start of day', 'weekday 0', '-6 days') * 1000)
     """)
     fun getTotalAmountLastWeek(): Flow<Double?>
+
+    @Query("""
+        SELECT *
+        FROM transactions
+        WHERE type = 'EXPENSE'
+        AND createdAt >= (strftime('%s', 'now', 'start of day', 'weekday 0', '-13 days') * 1000)
+        AND createdAt < (strftime('%s', 'now', 'start of day', 'weekday 0', '-6 days') * 1000)
+    """)
+    fun getTransactionsLastWeek(): Flow<List<TransactionEntity>>
 }

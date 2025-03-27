@@ -9,7 +9,7 @@ import io.rafaelribeiro.spendless.data.converter.TransactionRecurrenceConverter
 import io.rafaelribeiro.spendless.data.converter.TransactionTypeConverter
 import io.rafaelribeiro.spendless.data.entity.TransactionEntity
 
-@Database(entities = [TransactionEntity::class], version = 3, exportSchema = false)
+@Database(entities = [TransactionEntity::class], version = 4, exportSchema = false)
 @TypeConverters(
     TransactionCategoryConverter::class,
     TransactionTypeConverter::class,
