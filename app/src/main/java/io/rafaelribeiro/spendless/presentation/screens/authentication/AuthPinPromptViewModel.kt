@@ -1,5 +1,6 @@
 package io.rafaelribeiro.spendless.presentation.screens.authentication
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -10,9 +11,10 @@ import io.rafaelribeiro.spendless.core.presentation.UiText.Companion.Empty
 import io.rafaelribeiro.spendless.data.repository.DataStoreUserPreferencesRepository
 import io.rafaelribeiro.spendless.data.repository.SecurityPreferences
 import io.rafaelribeiro.spendless.domain.AuthRepository
+import io.rafaelribeiro.spendless.domain.PinLockTickerRepository
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationViewModel.Companion.ERROR_MESSAGE_DURATION
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationViewModel.Companion.PIN_MAX_SIZE
-import kotlinx.coroutines.Job
+import io.rafaelribeiro.spendless.workers.PinLockWorker.Companion.WORKER_NAME
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -20,6 +22,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
@@ -32,20 +35,26 @@ import javax.inject.Inject
 @HiltViewModel
 class AuthPinPromptViewModel @Inject constructor(
     private val authRepository: AuthRepository,
-    dataStoreUserPreferencesRepository: DataStoreUserPreferencesRepository,
+    val dataStoreUserPreferencesRepository: DataStoreUserPreferencesRepository,
     internal val biometricManager: BiometricPromptManager,
+    val pinLockTickerRepository: PinLockTickerRepository,
 ) : ViewModel() {
     companion object {
         const val PIN_MAX_WRONG_COUNT = 2
-        const val PIN_LOCK_TIMER_INTERVAL = 1000L
         const val CLEAR_PIN_DIGIT_DELAY = 111L
     }
-    private var pinLockTimerJob: Job? = null
 
     private val securityPreferences: StateFlow<SecurityPreferences> = dataStoreUserPreferencesRepository.securityPreferences
         .stateIn(
             scope = viewModelScope,
             initialValue = SecurityPreferences(),
+            started = SharingStarted.WhileSubscribed(5000L),
+        )
+
+    private val pinLockRemainingSeconds: StateFlow<Int?> = dataStoreUserPreferencesRepository.pinLockStatePreferences
+        .stateIn(
+            scope = viewModelScope,
+            initialValue = null,
             started = SharingStarted.WhileSubscribed(5000L),
         )
 
@@ -69,18 +78,30 @@ class AuthPinPromptViewModel @Inject constructor(
         getPinPromptData()
             .onEach { _authPinUiState.value = it  }
             .launchIn(viewModelScope)
+        checkPinLockTimer()
+    }
+
+    private fun checkPinLockTimer() {
+        viewModelScope.launch {
+            pinLockRemainingSeconds.firstOrNull()?.let { remainingSeconds ->
+                setupPinLockTimer(remainingSeconds)
+            }
+        }
     }
 
     private fun getPinPromptData(): Flow<AuthPinUiState> {
         return combine(
             securityPreferences,
+            pinLockRemainingSeconds,
             authRepository.userName,
-        ) { securityPreferences, username ->
+        ) { securityPreferences, pinLockRemainingSeconds, username ->
             AuthPinUiState(
                 isLoading = false,
                 username = username,
                 totalPinLockDuration = securityPreferences.lockedOutDuration,
                 biometricsEnabled = securityPreferences.isBiometricEnabled,
+                pinLockRemainingSeconds = pinLockRemainingSeconds ?: 0,
+                pinPadEnabled = pinLockRemainingSeconds == null || pinLockRemainingSeconds == 0,
             )
         }
     }
@@ -144,21 +165,18 @@ class AuthPinPromptViewModel @Inject constructor(
             updateUiState { it.copy(wrongPinCount = it.wrongPinCount + 1) }
         } else {
             updateUiState { it.copy(pinPadEnabled = false) } // Disable PinPad
-            startPinLockTimer() // try your PIN again in 00:30
+            viewModelScope.launch {
+                val totalPinLockDuration = _authPinUiState.value.totalPinLockDuration
+                dataStoreUserPreferencesRepository.savePinLockState(totalPinLockDuration)
+                setupPinLockTimer(totalPinLockDuration)
+            }
         }
     }
 
-    private fun startPinLockTimer() {
-        pinLockTimerJob?.cancel()
-        pinLockTimerJob = viewModelScope.launch {
-            val lockDurationSeconds = _authPinUiState.value.totalPinLockDuration
-            for (seconds in lockDurationSeconds downTo 0) {
-                updateUiState { it.copy(pinLockRemainingSeconds = seconds) } // Ticking
-                if (seconds == 0) break
-                delay(PIN_LOCK_TIMER_INTERVAL) // Wait for 1 second
-            }
-            updateUiState { it.copy(pinPadEnabled = true, wrongPinCount = 0) } // Re-enable PinPad
-        }
+    private fun setupPinLockTimer(remainingSeconds: Int) {
+        Log.d(WORKER_NAME, "remainingSeconds: $remainingSeconds")
+        if (remainingSeconds > 0)
+            pinLockTickerRepository.startSession(remainingSeconds)
     }
 
     private suspend fun resetPinValues(withDelay: Boolean = false) {
