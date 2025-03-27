@@ -211,32 +211,3 @@ class RegistrationViewModel @Inject constructor(
 		viewModelScope.launch { _actionEvents.send(actionEvent) }
 	}
 }
-
-sealed interface RegistrationActionEvent {
-	data object UsernameCheckSuccess : RegistrationActionEvent
-	data object PinCreated : RegistrationActionEvent
-	data object PinConfirmed : RegistrationActionEvent
-	data object PinMismatch : RegistrationActionEvent
-	data object AlreadyHaveAccount : RegistrationActionEvent
-    data object UserPreferencesSaved : RegistrationActionEvent
-}
-
-sealed interface RegistrationUiEvent {
-	data class UsernameChanged(val username: String) : RegistrationUiEvent
-	data object ActionButtonNextClicked : RegistrationUiEvent
-	data object LoginLinkClicked : RegistrationUiEvent
-
-	data class PinDigitTapped(val digit: String) : RegistrationUiEvent
-	data object PinBackspaceTapped : RegistrationUiEvent
-	data class PinConfirmationDigitTapped(val digit: String) : RegistrationUiEvent
-	data object PinConfirmationBackspaceTapped : RegistrationUiEvent
-	data object ResetPinValues : RegistrationUiEvent
-
-    data object ButtonClicked : RegistrationUiEvent
-    data class ExpensesFormatSelected(val expensesFormat: ExpenseFormat) : RegistrationUiEvent
-    data class DecimalSeparatorSelected(val decimalSeparator: DecimalSeparator) : RegistrationUiEvent
-    data class ThousandSeparatorSelected(val thousandSeparator: ThousandSeparator) : RegistrationUiEvent
-    data class CurrencySelected(val currency: CurrencySymbol) : RegistrationUiEvent
-}
-
-

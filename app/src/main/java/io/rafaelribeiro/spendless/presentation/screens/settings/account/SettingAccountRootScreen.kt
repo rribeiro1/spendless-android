@@ -94,11 +94,8 @@ fun SettingsAccountScreen(
                 .background(MaterialTheme.colorScheme.surfaceContainer, RoundedCornerShape(16.dp))
 
         ) {
-            SettingItemList(stringResource(R.string.add_fake_transactions), Icons.Filled.AttachMoney) {
-                onEvent(SettingsUiEvent.AddFakeTransactionsClicked)
-            }
             SettingItemList(stringResource(R.string.delete_transactions), Icons.Filled.Delete) {
-                onEvent(SettingsUiEvent.DeleteFakeTransactionsClicked)
+                onEvent(SettingsUiEvent.DeleteTransactionsClicked)
             }
         }
         Column(

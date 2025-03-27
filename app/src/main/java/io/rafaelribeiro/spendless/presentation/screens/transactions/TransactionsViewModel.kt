@@ -93,11 +93,3 @@ class TransactionsViewModel @Inject constructor(
         viewModelScope.launch { _actionEvents.send(actionEvent) }
     }
 }
-
-
-
-sealed interface TransactionsUiEvent {
-    data class TransactionNoteClicked(val transactionId: Long) : TransactionsUiEvent
-    data object AddTransactionClicked : TransactionsUiEvent
-    data object DownloadTransactionsClicked : TransactionsUiEvent
-}

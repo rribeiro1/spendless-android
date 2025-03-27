@@ -186,12 +186,6 @@ fun RootAppNavigation(
                 ObserveAsEvents(flow = viewModel.actionEvents) { event ->
                     if (event is RegistrationActionEvent.UserPreferencesSaved) {
                         mainViewModel.startSession()
-                        navigationState.navigateTo(
-                            route = Screen.DashboardScreen.route,
-                            navOptions = navOptions {
-                                popUpTo(Screen.RegistrationFlow.route) { inclusive = true }
-                            }
-                        )
                     }
                 }
                 RegistrationPreferencesRootScreen(
@@ -330,11 +324,11 @@ fun RootAppNavigation(
                         navigationState.popBackStack()
                     }
                     is ExportTransactionActionEvent.TransactionExportSuccess -> {
-                        Toast.makeText(context, R.string.file_exported, Toast.LENGTH_LONG).show()
+                        Toast.makeText(context, R.string.file_exported, Toast.LENGTH_SHORT).show()
                         navigationState.popBackStack()
                     }
                     is ExportTransactionActionEvent.TransactionExportFailed -> {
-                        Toast.makeText(context, R.string.fail_to_save_file, Toast.LENGTH_LONG).show()
+                        Toast.makeText(context, R.string.fail_to_save_file, Toast.LENGTH_SHORT).show()
                         navigationState.popBackStack()
                     }
                 }
@@ -362,7 +356,6 @@ fun RootAppNavigation(
                         }
                         is SettingsActionEvent.OnLogoutClicked -> {
                             mainViewModel.terminateSession()
-                            navigationState.navigateAndClearBackStack(Screen.LoginScreen.route)
                         }
                         is SettingsActionEvent.OnAccountClicked -> {
                             navigationState.navigateTo(Screen.SettingsAccount.route)
