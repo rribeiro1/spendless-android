@@ -10,12 +10,15 @@ import io.rafaelribeiro.spendless.domain.transaction.TransactionRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
+import kotlin.math.abs
 
 class OfflineTransactionRepository @Inject constructor(
     private val transactionDao: TransactionDao
 ) : TransactionRepository {
     override fun getBalance(): Flow<Double?> {
-        return transactionDao.getBalance()
+        return getAllTransactions().map {
+            it.sumOf { transaction -> transaction.amount }
+        }
     }
 
     override fun getAllTransactions(): Flow<List<Transaction>> {
@@ -27,11 +30,19 @@ class OfflineTransactionRepository @Inject constructor(
     }
 
     override fun getTotalAmountLastWeek(): Flow<Double?> {
-        return transactionDao.getTotalAmountLastWeek()
+        return transactionDao.getTransactionsLastWeek().map {
+            it.toTransactions().sumOf { transaction ->
+                transaction.amount
+            }
+        }
     }
 
     override fun getBiggestTransaction(): Flow<Transaction?> {
-        return transactionDao.getLargestTransaction().map { it?.toTransaction() }
+        return transactionDao.getExpenses().map {
+            it.toTransactions().maxByOrNull { transaction ->
+                abs(transaction.amount)
+            }
+        }
     }
 
     override fun getMostPopularCategory(): Flow<TransactionCategory?> {

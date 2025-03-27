@@ -62,3 +62,6 @@ object Crypto {
         return cipher.doFinal(data)
     }
 }
+
+data class EncryptedString(val value: ByteArray)
+data class EncryptedDouble(val value: ByteArray)
