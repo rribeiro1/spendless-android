@@ -137,6 +137,7 @@ fun SettingItemList(
             .height(48.dp)
             .padding(horizontal = 4.dp, vertical = 4.dp)
             .background(color = MaterialTheme.colorScheme.surfaceContainer)
+            .clip(RoundedCornerShape(16.dp))
             .clickable(onClick = onClick)
     ) {
         Box(
