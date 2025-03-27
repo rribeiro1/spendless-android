@@ -93,17 +93,4 @@ class LoginViewModel @Inject constructor(
     private fun sendActionEvent(actionEvent: LoginActionEvent) {
         viewModelScope.launch { _actionEvents.send(actionEvent) }
     }
-
-}
-
-sealed interface LoginActionEvent {
-    data class LoginSucceed(val username: String) : LoginActionEvent
-}
-
-sealed interface LoginUiEvent {
-    data class UsernameChanged(val username: String) : LoginUiEvent
-    data class PinChanged(val pin: String) : LoginUiEvent
-    data object ActionButtonLoginClicked : LoginUiEvent
-    data class UsernameFocusChanged(val isFocused: Boolean) : LoginUiEvent
-    data class PinFocusChanged(val isFocused: Boolean) : LoginUiEvent
 }

@@ -11,4 +11,5 @@ interface AuthRepository {
 	suspend fun register(username: String, pin: String): Result<User, RegistrationError>
     suspend fun isPinCorrect(pin: String): Boolean
     suspend fun authenticateCredentials(pin: String, username: String): Boolean
+    suspend fun deleteAccount()
 }

@@ -38,4 +38,8 @@ class OfflineAuthRepository @Inject constructor(
     override suspend fun authenticateCredentials(pin: String, username: String): Boolean {
         return this.pin.first() == pin && this.userName.first() == username
     }
+
+    override suspend fun deleteAccount() {
+        dataStore.updateData { User("", "") }
+    }
 }

@@ -110,18 +110,3 @@ class DashboardViewModel @Inject constructor(
         viewModelScope.launch { _actionEvents.send(actionEvent) }
     }
 }
-
-sealed interface DashboardActionEvent {
-    data object ShowAllTransactions : DashboardActionEvent
-    data object AddTransaction : DashboardActionEvent
-    data object OnSettingsClicked : DashboardActionEvent
-    data object ExportTransactions : DashboardActionEvent
-}
-
-sealed interface DashboardUiEvent {
-    data object SettingsClicked : DashboardUiEvent
-    data object DownloadTransactionsClicked : DashboardUiEvent
-    data object AddTransactionClicked : DashboardUiEvent
-    data object ShowAllTransactionsClicked : DashboardUiEvent
-    data class TransactionNoteClicked(val transactionId: Long) : DashboardUiEvent
-}
