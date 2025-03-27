@@ -118,16 +118,3 @@ class SettingsSecurityViewModel @Inject constructor(
         }
     }
 }
-
-sealed interface SettingsSecurityActionEvent {
-    data object OnBackClicked : SettingsSecurityActionEvent
-    data object RestartSession : SettingsSecurityActionEvent
-}
-
-
-sealed interface SettingsSecurityUiEvent {
-    data object SaveClicked : SettingsSecurityUiEvent
-    data class SessionExpiryDurationSelected(val duration: SessionExpiryDuration) : SettingsSecurityUiEvent
-    data class LockedOutDurationSelected(val duration: LockoutDuration) : SettingsSecurityUiEvent
-    data class BiometricsSelected(val biometrics: Biometrics) : SettingsSecurityUiEvent
-}

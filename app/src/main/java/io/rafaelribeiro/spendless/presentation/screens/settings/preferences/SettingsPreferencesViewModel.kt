@@ -142,15 +142,3 @@ class SettingsPreferencesViewModel @Inject constructor(
         }
     }
 }
-
-sealed interface SettingsPreferencesActionEvent {
-    data object OnBackClicked : SettingsPreferencesActionEvent
-}
-
-sealed interface SettingsPreferencesUiEvent {
-    data object ButtonClicked : SettingsPreferencesUiEvent
-    data class ExpensesFormatSelected(val expensesFormat: ExpenseFormat) : SettingsPreferencesUiEvent
-    data class DecimalSeparatorSelected(val decimalSeparator: DecimalSeparator) : SettingsPreferencesUiEvent
-    data class ThousandSeparatorSelected(val thousandSeparator: ThousandSeparator) : SettingsPreferencesUiEvent
-    data class CurrencySelected(val currency: CurrencySymbol) : SettingsPreferencesUiEvent
-}
