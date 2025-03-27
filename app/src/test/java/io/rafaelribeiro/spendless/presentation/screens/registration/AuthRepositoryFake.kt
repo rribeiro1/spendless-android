@@ -31,6 +31,8 @@ class AuthRepositoryFake : AuthRepository {
         return pin == testPin && username == testUsername
     }
 
+    override suspend fun deleteAccount() {}
+
     override val userName: Flow<String> = flow { emit(testUsername) }
 
     override val pin: Flow<String> = flow { emit(testPin) }

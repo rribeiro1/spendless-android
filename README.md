@@ -1,4 +1,4 @@
-# SpendLess
+# <img src=".github/assets/logo.png" width="35" style="vertical-align: middle;" /> SpendLess
 
 SpendLess is a finance tracking app with a focus on security. The aim is to keep track of the 
 users income and expenses while also securing the data in terms of accessing the app and storing data.
@@ -45,7 +45,7 @@ users income and expenses while also securing the data in terms of accessing the
 
 ### Prerequisites
 
-- Android Studio Hedgehog (2023.1.1) or newer
+- Android Studio
 - JDK 17 or newer
 - Android SDK 34 or newer
 
@@ -70,7 +70,13 @@ The project uses Gradle for building. To build the project:
 ./gradlew build
 ```
 
-To create a release APK:
+To execute unit tests:
+
+```bash
+./gradlew app:testDebugUnitTest
+```
+
+To create the APK (build -> outputs -> apk -> release):
 
 ```bash
 ./gradlew assembleRelease
@@ -78,7 +84,7 @@ To create a release APK:
 
 ## License
 
-See [LICENSE](LICENSE) file for details.
+See [LICENSE](LICENSE.md) file for details.
 
 ### Acknowledgements
 
