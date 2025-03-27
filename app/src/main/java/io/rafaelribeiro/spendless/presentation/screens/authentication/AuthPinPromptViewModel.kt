@@ -95,13 +95,14 @@ class AuthPinPromptViewModel @Inject constructor(
             pinLockRemainingSeconds,
             authRepository.userName,
         ) { securityPreferences, pinLockRemainingSeconds, username ->
+            val isPinPadEnabled = pinLockRemainingSeconds == null || pinLockRemainingSeconds == 0
             AuthPinUiState(
                 isLoading = false,
                 username = username,
                 totalPinLockDuration = securityPreferences.lockedOutDuration,
-                biometricsEnabled = securityPreferences.isBiometricEnabled,
+                biometricsEnabled = securityPreferences.isBiometricEnabled && isPinPadEnabled,
                 pinLockRemainingSeconds = pinLockRemainingSeconds ?: 0,
-                pinPadEnabled = pinLockRemainingSeconds == null || pinLockRemainingSeconds == 0,
+                pinPadEnabled = isPinPadEnabled,
             )
         }
     }
@@ -164,7 +165,6 @@ class AuthPinPromptViewModel @Inject constructor(
         if (_authPinUiState.value.wrongPinCount < PIN_MAX_WRONG_COUNT) {
             updateUiState { it.copy(wrongPinCount = it.wrongPinCount + 1) }
         } else {
-            updateUiState { it.copy(pinPadEnabled = false) } // Disable PinPad
             viewModelScope.launch {
                 val totalPinLockDuration = _authPinUiState.value.totalPinLockDuration
                 dataStoreUserPreferencesRepository.savePinLockState(totalPinLockDuration)
