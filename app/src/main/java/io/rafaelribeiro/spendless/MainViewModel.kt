@@ -11,8 +11,11 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -61,11 +64,14 @@ class MainViewModel @Inject constructor(
                    UserSessionState.Inactive -> userSessionRepository.cancelWorker()
                    UserSessionState.Active -> userSessionRepository.startSession(sessionExpiryDuration.toLong())
                    UserSessionState.Idle -> startIdleTimer()
-                   else -> {
-                       stopIdleTimer()
-                   }
+                   else -> {}
                }
            }
+       }
+       viewModelScope.launch {
+           sessionState.filterNot { it == UserSessionState.Idle }.onEach {
+               stopIdleTimer()
+           }.collect()
        }
    }
 
