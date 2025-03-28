@@ -66,16 +66,15 @@ fun NavBackStackEntry.lifecycleIsResumed() = this.lifecycle.currentState == Life
 
 
 fun UserSessionState.getStartScreen(launchedFromWidget: Boolean): String? {
-    val startScreen = when {
-        this == UserSessionState.Idle -> null
-        this == UserSessionState.NotRegistered -> Screen.RegistrationFlow.route
-        this == UserSessionState.Inactive -> Screen.LoginScreen.route
-        this == UserSessionState.Expired -> Screen.PinPromptScreen.route
-        this == UserSessionState.Active -> Screen.DashboardScreen.route
-        launchedFromWidget -> Screen.DashboardScreen.route
-        else -> Screen.RegistrationFlow.route
+    val startScreen = when (this) {
+        UserSessionState.Idle -> null
+        UserSessionState.NotRegistered -> Screen.RegistrationFlow.route
+        UserSessionState.Inactive -> Screen.LoginScreen.route
+        UserSessionState.Expired -> Screen.PinPromptScreen.route
+        UserSessionState.Active -> Screen.DashboardScreen.route
     }
+    val finalStartScreen = if (launchedFromWidget && this == UserSessionState.Active) Screen.DashboardScreen.route else startScreen
     Log.i(WORKER_TAG, "Session State: $this")
-    Log.i(WORKER_TAG, "Start Screen: $startScreen")
-    return startScreen
+    Log.i(WORKER_TAG, "Start Screen: $finalStartScreen")
+    return finalStartScreen
 }

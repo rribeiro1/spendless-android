@@ -6,7 +6,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.rafaelribeiro.spendless.domain.UserSessionRepository
 import io.rafaelribeiro.spendless.domain.user.UserPreferencesRepository
 import io.rafaelribeiro.spendless.domain.user.UserSessionState
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -24,6 +26,8 @@ class MainViewModel @Inject constructor(
     companion object {
         const val WAIT_UNTIL_NO_CONSUMERS_IN_MILLIS = 5_000L
     }
+
+    private var idleTimerJob: Job? = null
 
     private val _actionEvents = Channel<MainActionEvent>()
     val actionEvents = _actionEvents.receiveAsFlow()
@@ -56,7 +60,10 @@ class MainViewModel @Inject constructor(
                when (session) {
                    UserSessionState.Inactive -> userSessionRepository.cancelWorker()
                    UserSessionState.Active -> userSessionRepository.startSession(sessionExpiryDuration.toLong())
-                   else -> {}
+                   UserSessionState.Idle -> startIdleTimer()
+                   else -> {
+                       stopIdleTimer()
+                   }
                }
            }
        }
@@ -72,6 +79,19 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch {
             userSessionRepository.updateSessionState(UserSessionState.Inactive)
         }
+    }
+
+    private fun startIdleTimer() {
+        idleTimerJob?.cancel()
+        idleTimerJob = viewModelScope.launch {
+            delay(1000L)
+            // The session is Idle for more than a second
+            userSessionRepository.updateSessionState(UserSessionState.NotRegistered)
+        }
+    }
+
+    private fun stopIdleTimer() {
+        idleTimerJob?.cancel()
     }
 }
 
