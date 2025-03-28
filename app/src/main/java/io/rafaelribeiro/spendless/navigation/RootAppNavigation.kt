@@ -39,7 +39,6 @@ import io.rafaelribeiro.spendless.MainActivity
 import io.rafaelribeiro.spendless.MainViewModel
 import io.rafaelribeiro.spendless.R
 import io.rafaelribeiro.spendless.core.data.BiometricPromptManager
-import io.rafaelribeiro.spendless.domain.user.UserSessionState
 import io.rafaelribeiro.spendless.presentation.screens.authentication.AuthPinActionEvent
 import io.rafaelribeiro.spendless.presentation.screens.authentication.AuthPinPromptScreen
 import io.rafaelribeiro.spendless.presentation.screens.authentication.AuthPinPromptViewModel
@@ -76,7 +75,6 @@ import io.rafaelribeiro.spendless.presentation.screens.transactions.create.Creat
 import io.rafaelribeiro.spendless.presentation.screens.transactions.export.ExportTransactionActionEvent
 import io.rafaelribeiro.spendless.presentation.screens.transactions.export.ExportTransactionRootScreen
 import io.rafaelribeiro.spendless.presentation.screens.transactions.export.ExportTransactionViewModel
-import io.rafaelribeiro.spendless.workers.UserSessionWorker.Companion.WORKER_TAG
 import kotlinx.coroutines.flow.Flow
 
 @Composable
@@ -89,17 +87,7 @@ fun RootAppNavigation(
     val activity = LocalActivity.current as MainActivity
     val mainViewModel = hiltViewModel<MainViewModel>()
     val sessionState by mainViewModel.sessionState.collectAsState()
-    Log.i(WORKER_TAG, "Session State: $sessionState")
-    val startScreen = when {
-        sessionState == UserSessionState.Idle -> return
-        sessionState == UserSessionState.NotRegistered -> Screen.RegistrationFlow.route
-        sessionState == UserSessionState.Inactive -> Screen.LoginScreen.route
-        sessionState == UserSessionState.Expired -> Screen.PinPromptScreen.route
-        sessionState == UserSessionState.Active -> Screen.DashboardScreen.route
-        launchedFromWidget -> Screen.DashboardScreen.route
-        else -> Screen.RegistrationFlow.route
-    }
-    Log.i(WORKER_TAG, "Start Screen: $startScreen")
+    val startScreen = sessionState.getStartScreen(launchedFromWidget) ?: return
     ObserveAsEvents(flow = mainViewModel.actionEvents) { event ->
         when (event) {
             MainActionEvent.SessionExpired -> navigationState.triggerPinPromptScreen()
