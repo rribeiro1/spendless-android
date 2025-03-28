@@ -1,10 +1,10 @@
 package io.rafaelribeiro.spendless.navigation
 
-import android.util.Log
 import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.provider.Settings
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -39,7 +39,6 @@ import io.rafaelribeiro.spendless.MainActivity
 import io.rafaelribeiro.spendless.MainViewModel
 import io.rafaelribeiro.spendless.R
 import io.rafaelribeiro.spendless.core.data.BiometricPromptManager
-import io.rafaelribeiro.spendless.domain.user.UserSessionState
 import io.rafaelribeiro.spendless.presentation.screens.authentication.AuthPinActionEvent
 import io.rafaelribeiro.spendless.presentation.screens.authentication.AuthPinPromptScreen
 import io.rafaelribeiro.spendless.presentation.screens.authentication.AuthPinPromptViewModel
@@ -76,7 +75,6 @@ import io.rafaelribeiro.spendless.presentation.screens.transactions.create.Creat
 import io.rafaelribeiro.spendless.presentation.screens.transactions.export.ExportTransactionActionEvent
 import io.rafaelribeiro.spendless.presentation.screens.transactions.export.ExportTransactionRootScreen
 import io.rafaelribeiro.spendless.presentation.screens.transactions.export.ExportTransactionViewModel
-import io.rafaelribeiro.spendless.workers.UserSessionWorker.Companion.WORKER_TAG
 import kotlinx.coroutines.flow.Flow
 
 @Composable
@@ -89,14 +87,7 @@ fun RootAppNavigation(
     val activity = LocalActivity.current as MainActivity
     val mainViewModel = hiltViewModel<MainViewModel>()
     val sessionState by mainViewModel.sessionState.collectAsState()
-    val startScreen = when (sessionState) {
-        UserSessionState.Idle -> Screen.RegistrationFlow.route
-        UserSessionState.Active -> Screen.DashboardScreen.route
-        UserSessionState.Inactive -> Screen.LoginScreen.route
-        UserSessionState.Expired -> Screen.PinPromptScreen.route
-    }
-    Log.i(WORKER_TAG, "Session State: $sessionState")
-    Log.i(WORKER_TAG, "Start Screen: $startScreen")
+    val startScreen = sessionState.getStartScreen(launchedFromWidget) ?: return
     ObserveAsEvents(flow = mainViewModel.actionEvents) { event ->
         when (event) {
             MainActionEvent.SessionExpired -> navigationState.triggerPinPromptScreen()
@@ -104,7 +95,7 @@ fun RootAppNavigation(
     }
     NavHost(
 		navController = navigationState.navHostController,
-		startDestination = if (launchedFromWidget) Screen.DashboardScreen.route else startScreen,
+		startDestination = startScreen,
 		enterTransition = enterTransition(),
 		exitTransition = exitTransition(),
 		popEnterTransition = popEnterTransition(),
