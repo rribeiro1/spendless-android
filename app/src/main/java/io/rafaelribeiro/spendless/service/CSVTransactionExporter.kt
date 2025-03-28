@@ -7,11 +7,14 @@ import android.os.Build
 import android.provider.MediaStore
 import androidx.annotation.RequiresApi
 import io.rafaelribeiro.spendless.domain.transaction.Transaction
+import java.text.SimpleDateFormat
+import java.util.Locale
 import javax.inject.Inject
 
 class CSVTransactionExporter @Inject constructor() : TransactionExporter {
     override val fileName = "transactions.csv"
     override val mimeType = "text/csv"
+    private val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
 
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun export(transactions: List<Transaction>, context: Context): Uri? {
@@ -53,7 +56,7 @@ class CSVTransactionExporter @Inject constructor() : TransactionExporter {
                 transaction.category.name,
                 transaction.type.name,
                 transaction.recurrence.name,
-                transaction.createdAt.toString()
+                dateFormat.format(transaction.createdAt)
             )
         }
         return buildString {
