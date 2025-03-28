@@ -1,5 +1,6 @@
 package io.rafaelribeiro.spendless.navigation
 
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.lifecycle.Lifecycle
@@ -8,6 +9,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
+import io.rafaelribeiro.spendless.domain.user.UserSessionState
+import io.rafaelribeiro.spendless.workers.UserSessionWorker.Companion.WORKER_TAG
 
 class NavigationState(
 	val navHostController: NavHostController,
@@ -60,3 +63,19 @@ private fun NavHostController.debounceClick(): NavHostController? {
  * This is used to de-duplicate navigation events.
  */
 fun NavBackStackEntry.lifecycleIsResumed() = this.lifecycle.currentState == Lifecycle.State.RESUMED
+
+
+fun UserSessionState.getStartScreen(launchedFromWidget: Boolean): String? {
+    Log.i(WORKER_TAG, "Session State: $this")
+    val startScreen = when (this) {
+        UserSessionState.Idle -> null
+        UserSessionState.NotRegistered -> Screen.RegistrationFlow.route
+        UserSessionState.Inactive -> Screen.LoginScreen.route
+        UserSessionState.Expired -> Screen.PinPromptScreen.route
+        UserSessionState.Active -> Screen.DashboardScreen.route
+    }
+    val finalStartScreen = if (launchedFromWidget && this == UserSessionState.Active) Screen.DashboardScreen.route else startScreen
+    Log.i(WORKER_TAG, "launchedFromWidget: $launchedFromWidget")
+    Log.i(WORKER_TAG, "Start Screen: $finalStartScreen")
+    return finalStartScreen
+}

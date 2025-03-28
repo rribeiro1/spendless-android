@@ -14,9 +14,11 @@ import io.rafaelribeiro.spendless.domain.preferences.SessionExpiryDuration
 import io.rafaelribeiro.spendless.domain.user.UserPreferencesRepository
 import io.rafaelribeiro.spendless.presentation.screens.registration.RegistrationPreferencesUiState
 import io.rafaelribeiro.spendless.presentation.screens.settings.preferences.SettingsPreferencesUiState
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -34,6 +36,7 @@ class DataStoreUserPreferencesRepository @Inject constructor(
         private val SESSION_EXPIRY_DURATION = intPreferencesKey("session_expiry_duration")
         private val LOCKED_OUT_DURATION = intPreferencesKey("locked_out_duration")
         private val BIOMETRIC_ENABLED = booleanPreferencesKey("biometric_enabled")
+        private val PIN_LOCK_REMAINING_SECONDS = intPreferencesKey("pin_lock_remaining_seconds")
     }
 
     override val userPreferences: Flow<UserPreferences> = dataStore.data
@@ -76,6 +79,10 @@ class DataStoreUserPreferencesRepository @Inject constructor(
             )
         }
 
+    override val pinLockStatePreferences: Flow<Int?> = dataStore.data.map { preferences ->
+        preferences[PIN_LOCK_REMAINING_SECONDS]
+    }
+
     override suspend fun clearAllPreferences() {
         dataStore.edit { preferences ->
             preferences.clear()
@@ -99,6 +106,21 @@ class DataStoreUserPreferencesRepository @Inject constructor(
         }
     }
 
+    override suspend fun savePinLockState(remainingSeconds: Int) {
+        withContext(Dispatchers.Default) {
+            dataStore.edit { preferences ->
+                preferences[PIN_LOCK_REMAINING_SECONDS] = remainingSeconds
+            }
+        }
+    }
+
+    override suspend fun clearPinLockState() {
+        withContext(Dispatchers.Default) {
+            dataStore.edit { preferences ->
+                preferences.remove(PIN_LOCK_REMAINING_SECONDS)
+            }
+        }
+    }
 }
 
 open class UserPreferences(
