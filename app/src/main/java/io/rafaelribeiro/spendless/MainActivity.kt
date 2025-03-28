@@ -1,9 +1,13 @@
 package io.rafaelribeiro.spendless
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.fragment.app.FragmentActivity
 import androidx.work.Constraints
@@ -20,10 +24,13 @@ import java.util.concurrent.TimeUnit
 
 @AndroidEntryPoint
 class MainActivity : FragmentActivity() {
+
+	private var launchedFromWidget by mutableStateOf(false)
+
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		scheduleRecurringTransactionWorker(this)
-		val launchedFromWidget = intent.getBooleanExtra(WIDGET_INTENT_KEY, false)
+		getIntent(intent)
 		installSplashScreen()
 		enableEdgeToEdge()
 		setContent {
@@ -34,6 +41,15 @@ class MainActivity : FragmentActivity() {
 				)
 			}
 		}
+	}
+
+	override fun onNewIntent(intent: Intent) {
+		super.onNewIntent(intent)
+		getIntent(intent)
+	}
+
+	private fun getIntent(intent: Intent) {
+		launchedFromWidget = intent.getBooleanExtra(WIDGET_INTENT_KEY, false)
 	}
 
 	/**

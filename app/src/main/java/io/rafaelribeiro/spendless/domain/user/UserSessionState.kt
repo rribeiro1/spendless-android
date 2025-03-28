@@ -11,6 +11,7 @@ package io.rafaelribeiro.spendless.domain.user
  */
 enum class UserSessionState {
     Idle,
+    NotRegistered,
     Active,
     Inactive,
     Expired,

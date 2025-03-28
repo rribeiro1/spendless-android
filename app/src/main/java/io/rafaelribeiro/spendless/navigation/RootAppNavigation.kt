@@ -1,10 +1,10 @@
 package io.rafaelribeiro.spendless.navigation
 
-import android.util.Log
 import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.provider.Settings
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -89,13 +89,16 @@ fun RootAppNavigation(
     val activity = LocalActivity.current as MainActivity
     val mainViewModel = hiltViewModel<MainViewModel>()
     val sessionState by mainViewModel.sessionState.collectAsState()
-    val startScreen = when (sessionState) {
-        UserSessionState.Idle -> Screen.RegistrationFlow.route
-        UserSessionState.Active -> Screen.DashboardScreen.route
-        UserSessionState.Inactive -> Screen.LoginScreen.route
-        UserSessionState.Expired -> Screen.PinPromptScreen.route
-    }
     Log.i(WORKER_TAG, "Session State: $sessionState")
+    val startScreen = when {
+        sessionState == UserSessionState.Idle -> return
+        sessionState == UserSessionState.NotRegistered -> Screen.RegistrationFlow.route
+        sessionState == UserSessionState.Inactive -> Screen.LoginScreen.route
+        sessionState == UserSessionState.Expired -> Screen.PinPromptScreen.route
+        sessionState == UserSessionState.Active -> Screen.DashboardScreen.route
+        launchedFromWidget -> Screen.DashboardScreen.route
+        else -> Screen.RegistrationFlow.route
+    }
     Log.i(WORKER_TAG, "Start Screen: $startScreen")
     ObserveAsEvents(flow = mainViewModel.actionEvents) { event ->
         when (event) {
@@ -104,7 +107,7 @@ fun RootAppNavigation(
     }
     NavHost(
 		navController = navigationState.navHostController,
-		startDestination = if (launchedFromWidget) Screen.DashboardScreen.route else startScreen,
+		startDestination = startScreen,
 		enterTransition = enterTransition(),
 		exitTransition = exitTransition(),
 		popEnterTransition = popEnterTransition(),

@@ -76,7 +76,7 @@ class SettingsViewModel @Inject constructor(
                 userPreferencesRepository.clearAllPreferences()
                 authRepository.deleteAccount()
             }
-            userSessionRepository.updateSessionState(UserSessionState.Idle)
+            userSessionRepository.updateSessionState(UserSessionState.NotRegistered)
         }
     }
 
