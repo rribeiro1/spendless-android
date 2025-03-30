@@ -13,13 +13,13 @@ class NavigationState(
 	val navHostController: NavHostController,
 ) {
 	fun navigateTo(route: String, navOptions: NavOptions? = null) {
-        navHostController.debounceClick()?.navigate(route, navOptions)
+        navHostController.debounceClick(route)?.navigate(route, navOptions)
     }
 
 	fun popBackStack() = navHostController.popBackStack()
 
     fun navigateAndClearBackStack(route: String) {
-        navHostController.debounceClick()?.navigate(route) {
+        navHostController.debounceClick(route)?.navigate(route) {
             launchSingleTop = true
             popUpTo(0) { inclusive = true }
         }
@@ -50,8 +50,10 @@ fun rememberNavigationState(
 }
 
 
-private fun NavHostController.debounceClick(): NavHostController? {
+private fun NavHostController.debounceClick(route: String): NavHostController? {
     if (this.currentBackStackEntry?.lifecycleIsResumed() == false)
+        return null
+    else if (this.currentBackStackEntry?.destination?.route?.hashCode() == route.hashCode())
         return null
     return this
 }
