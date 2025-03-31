@@ -46,6 +46,7 @@ import io.rafaelribeiro.spendless.presentation.screens.authentication.AuthPinPro
 import io.rafaelribeiro.spendless.presentation.screens.authentication.AuthPinUiEvent
 import io.rafaelribeiro.spendless.presentation.screens.dashboard.DashboardActionEvent
 import io.rafaelribeiro.spendless.presentation.screens.dashboard.DashboardScreen
+import io.rafaelribeiro.spendless.presentation.screens.dashboard.DashboardUiEvent
 import io.rafaelribeiro.spendless.presentation.screens.dashboard.DashboardViewModel
 import io.rafaelribeiro.spendless.presentation.screens.login.LoginActionEvent
 import io.rafaelribeiro.spendless.presentation.screens.login.LoginRootScreen
@@ -258,18 +259,19 @@ fun RootAppNavigation(
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
             ObserveAsEvents(flow = viewModel.actionEvents) { event ->
                 when (event) {
-                    is DashboardActionEvent.ShowAllTransactions -> {
-                        navigationState.navigateTo(Screen.TransactionsScreen.route)
-                    }
-                    is DashboardActionEvent.AddTransaction -> {
-                        navigationState.navigateTo(Screen.CreateTransactionScreen.route)
-                    }
-                    is DashboardActionEvent.OnSettingsClicked -> {
+                    is DashboardUiEvent.SettingsClicked -> {
                         navigationState.navigateTo(Screen.SettingsFlow.route)
                     }
-                    is DashboardActionEvent.ExportTransactions -> {
+                    is DashboardUiEvent.DownloadTransactionsClicked -> {
                         navigationState.navigateTo(Screen.ExportTransactionScreen.route)
                     }
+                    is DashboardUiEvent.AddTransactionClicked -> {
+                        navigationState.navigateTo(Screen.CreateTransactionScreen.route)
+                    }
+                    is DashboardUiEvent.ShowAllTransactionsClicked -> {
+                        navigationState.navigateTo(Screen.TransactionsScreen.route)
+                    }
+                    else -> {}
                 }
             }
             DashboardScreen(

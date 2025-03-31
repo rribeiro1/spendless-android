@@ -52,16 +52,15 @@ class DashboardViewModel @Inject constructor(
             initialValue = UserPreferences()
         )
 
-    private val _actionEvents = Channel<DashboardActionEvent>()
+    private val _actionEvents = Channel<DashboardUiEvent>()
     val actionEvents = _actionEvents.receiveAsFlow()
 
     fun onEvent(event: DashboardUiEvent) {
-        when (event) {
-            is DashboardUiEvent.AddTransactionClicked -> sendActionEvent(DashboardActionEvent.AddTransaction)
-            is DashboardUiEvent.DownloadTransactionsClicked -> sendActionEvent(DashboardActionEvent.ExportTransactions)
-            is DashboardUiEvent.SettingsClicked -> sendActionEvent(DashboardActionEvent.OnSettingsClicked)
-            is DashboardUiEvent.TransactionNoteClicked -> showTransactionNote(event.transactionId)
-            is DashboardUiEvent.ShowAllTransactionsClicked -> sendActionEvent(DashboardActionEvent.ShowAllTransactions)
+        viewModelScope.launch {
+            when {
+                event is DashboardUiEvent.TransactionNoteClicked -> showTransactionNote(event.transactionId)
+            }
+            _actionEvents.send(event)
         }
     }
 
@@ -107,6 +106,6 @@ class DashboardViewModel @Inject constructor(
     }
 
     private fun sendActionEvent(actionEvent: DashboardActionEvent) {
-        viewModelScope.launch { _actionEvents.send(actionEvent) }
+//        viewModelScope.launch { _actionEvents.send(actionEvent) }
     }
 }
