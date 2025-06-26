@@ -22,6 +22,8 @@ users income and expenses while also securing the data in terms of accessing the
   </tr>
 </table>
 
+https://github.com/user-attachments/assets/b836516b-4fdc-4f79-a1cd-477ba4a9f7a4
+
 ## Features
 
 - **Biometric Authentication**: Users can use their fingerprint or face to unlock the app.
